@@ -85,3 +85,15 @@ describe('format', () => {
     expect(formatLakh(9.1741)).toBe('₹9.2 lakh');
   });
 });
+
+describe('format edge cases', () => {
+  it('drops a trailing .0 and handles zero', () => {
+    expect(formatLakh(60)).toBe('₹60 lakh');
+    expect(formatLakh(5)).toBe('₹5 lakh');
+    expect(formatLakh(0)).toBe('₹0');
+    expect(formatLakh(1e-15)).toBe('₹0');
+    expect(formatLakh(-2.76)).toBe('−₹2.8 lakh');
+    expect(formatLakh(0.9)).toBe('₹90,000');
+    expect(formatLakh(23.58)).toBe('₹23.6 lakh');
+  });
+});

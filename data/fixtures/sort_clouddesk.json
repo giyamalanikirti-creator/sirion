@@ -1,0 +1,11 @@
+{
+  "redlineId": "RL-CLOUDDESK",
+  "results": [
+    { "no": 1, "group": "harmless", "line": null, "wordingGroup": null, "confidence": 0.98, "reason": "Only the notices address changes." },
+    { "no": 2, "group": "harmless", "line": null, "wordingGroup": null, "confidence": 0.97, "reason": "Capitalisation of a defined term; meaning unchanged." },
+    { "no": 3, "group": "legal", "line": null, "wordingGroup": null, "confidence": 0.95, "reason": "Halves the liability cap from 12 to 6 months of fees." },
+    { "no": 4, "group": "money", "line": "renewal", "wordingGroup": "notice_60_90", "confidence": 0.94, "reason": "Notice to stop auto-renewal grows from 30 to 90 days." },
+    { "no": 5, "group": "money", "line": "credits", "wordingGroup": "claim_le_10", "confidence": 0.96, "reason": "Automatic credits become a written claim within 10 days." },
+    { "no": 6, "group": "money", "line": "price", "wordingGroup": "open_yearly", "confidence": 0.95, "reason": "Fixed fees become open to a yearly revision with no cap." }
+  ]
+}

@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
+/* Sirion-style tokens (BUILD_SPEC §4.2). Light UI only, like the reference. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --teal-900: #0c5e69;
+  --teal-700: #0f6671;
+  --teal-title: #1e5a57;
+  --periwinkle: #828bfc;
+  --mint: #b1d0ca;
+  --indigo: #4364b2;
+  --lime: #e0e767;
+  --page-bg: #f6f6f6;
+  --card: #ffffff;
+  --border: #e6ebeb;
+  --text: #1f2a2e;
+  --text-muted: #7d9093;
+  --danger: #c2410c;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-teal-900: var(--teal-900);
+  --color-teal-700: var(--teal-700);
+  --color-teal-title: var(--teal-title);
+  --color-periwinkle: var(--periwinkle);
+  --color-mint: var(--mint);
+  --color-indigo: var(--indigo);
+  --color-lime: var(--lime);
+  --color-page-bg: var(--page-bg);
+  --color-card: var(--card);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow-card: 0 1px 2px rgba(16, 40, 44, 0.04), 0 2px 8px rgba(16, 40, 44, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background: var(--page-bg);
+  color: var(--text);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+:focus-visible {
+  outline: 2px solid var(--teal-700);
+  outline-offset: 2px;
+}
+
+/* Diff highlights in redline cards */
+.diff-del { background: #fde8e1; color: #9a3412; text-decoration: line-through; border-radius: 3px; padding: 0 2px; }
+.diff-ins { background: #dcefeb; color: #0c5e69; border-radius: 3px; padding: 0 2px; }
+
+/* Markdown on /story */
+.prose-story h1 { font-size: 1.5rem; color: var(--teal-title); margin: 0 0 1rem; font-weight: 400; }
+.prose-story h2 { font-size: 1.15rem; color: var(--teal-title); margin: 2.25rem 0 0.75rem; font-weight: 500; scroll-margin-top: 80px; }
+.prose-story h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; font-weight: 600; }
+.prose-story p, .prose-story li { line-height: 1.65; font-size: 0.925rem; }
+.prose-story p { margin: 0.6rem 0; }
+.prose-story ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose-story ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
+.prose-story table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; display: block; overflow-x: auto; }
+.prose-story th { text-align: left; color: var(--text-muted); font-weight: 500; border-bottom: 1px solid var(--border); padding: 0.5rem; }
+.prose-story td { border-bottom: 1px solid var(--border); padding: 0.5rem; vertical-align: top; }
+.prose-story a { color: var(--teal-900); text-decoration: underline; }
+.prose-story blockquote { border-left: 3px solid var(--mint); padding-left: 0.9rem; color: var(--text-muted); margin: 1rem 0; }
+.prose-story code { background: #eef3f2; padding: 0 4px; border-radius: 4px; font-size: 0.85em; }

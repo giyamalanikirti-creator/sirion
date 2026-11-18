@@ -49,7 +49,7 @@ export function atStakeByRedline(cloudDeskOpen = true) {
   const cd = redlinePriceTags('RL-CLOUDDESK').totalLakh;
   return redlines
     .filter((r) => r.interactive ? cloudDeskOpen : true)
-    .map((r) => ({ supplier: r.supplier, id: r.id, atStake: r.interactive ? cd : r.summary?.atStakeLakh ?? 0 }));
+    .map((r) => ({ supplier: r.supplier, short: r.supplier.split(' ')[0], id: r.id, atStake: r.interactive ? cd : r.summary?.atStakeLakh ?? 0 }));
 }
 
 /** North-star KPI: money lines enforceable at signing. */

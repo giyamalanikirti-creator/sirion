@@ -1,0 +1,36 @@
+[
+  {
+    "question": "Why is the credits line ₹3.2 lakh?",
+    "answer": "CloudDesk wants credits paid only if we claim in writing within 10 days. Our 14 software contracts with that wording recovered 22% of credits owed; automatic credits recover 94% (11 contracts). CloudDesk earned ₹4.5 lakh in credits over the last 12 months, so ₹4.5 lakh × (94% − 22%) = ₹3.2 lakh a year. Confidence is medium (14 contracts). Pooled data agrees: about 8 in 10 credits go unclaimed across 31 companies.",
+    "sources": [
+      { "label": "Price tag: service credits", "kind": "tool" },
+      { "label": "14 own contracts", "kind": "data" },
+      { "label": "Pooled: 31 companies", "kind": "pooled" }
+    ],
+    "links": [{ "label": "Open the credits price tag", "href": "/redlines/RL-CLOUDDESK?tab=tags" }],
+    "toolCalls": ["get_price_tag"]
+  },
+  {
+    "question": "What if we accept a 15-day claim window?",
+    "answer": "A 15-day claim would cost about ₹2.4 lakh a year, down from ₹3.2 lakh for 10 days. We have 0 own contracts with an 11–30 day window, so this uses pooled data: about 6 in 10 credits go unclaimed across 27 companies (40% recovered vs 94% automatic). Confidence is low. Package C's auto-filed 30-day claim is cheaper.",
+    "sources": [
+      { "label": "What-if: claim within 11–30 days", "kind": "tool" },
+      { "label": "Pooled: 27 companies", "kind": "pooled" },
+      { "label": "0 own contracts", "kind": "data" }
+    ],
+    "links": [
+      { "label": "Compare packages", "href": "/redlines/RL-CLOUDDESK?tab=packages" }
+    ],
+    "toolCalls": ["run_what_if"]
+  },
+  {
+    "question": "Show packages without the 3-year term",
+    "answer": "Without the 3-year term, two packages remain. B “Pay faster” protects ₹10.5 lakh a year for paying in 30 days (about ₹22,000 a year), net ₹10.3 lakh, lead approval only. C “Meet halfway” protects ₹6.9 lakh with no cash give, lead approval only. Figures rest on 12 renewal, 14 credits and 9 price contracts.",
+    "sources": [
+      { "label": "Packages without term_3y", "kind": "tool" },
+      { "label": "35 own contracts", "kind": "data" }
+    ],
+    "links": [{ "label": "Open packages", "href": "/redlines/RL-CLOUDDESK?tab=packages" }],
+    "toolCalls": ["build_packages"]
+  }
+]

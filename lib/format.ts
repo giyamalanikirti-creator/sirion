@@ -6,12 +6,13 @@
  * Engines work in lakh; format only at the UI edge.
  */
 export function formatLakh(lakh: number): string {
-  const sign = lakh < 0 ? '−' : '';
+  const sign = lakh < -0.000005 ? '−' : '';
   const v = Math.abs(lakh);
-  if (v >= 100) return `${sign}₹${(v / 100).toFixed(1)} crore`;
-  if (v >= 1 || v === 0) return `${sign}₹${v.toFixed(1)} lakh`;
+  const oneDp = (x: number) => x.toFixed(1).replace(/\.0$/, '');
+  if (v >= 99.95) return `${sign}₹${oneDp(v / 100)} crore`;
+  if (v >= 0.995) return `${sign}₹${oneDp(v)} lakh`;
   const rupees = Math.round((v * 1e5) / 1000) * 1000;
-  if (rupees >= 1e5) return `${sign}₹1.0 lakh`;
+  if (rupees === 0) return '₹0';
   return `${sign}₹${rupees.toLocaleString('en-IN')}`;
 }
 

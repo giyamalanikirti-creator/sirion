@@ -236,7 +236,7 @@ export function priceTag(c: Contract, line: Line, group: WordingGroup): PriceTag
       n: r.n,
       source: r.source,
       proof,
-      pooledBackup: r.source === 'own' ? pooledBackup : undefined,
+      pooledBackup: r.source === 'assumption' ? undefined : pooledBackup,
     };
   }
 

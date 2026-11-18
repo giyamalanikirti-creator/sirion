@@ -145,8 +145,8 @@ export interface PricedPackage {
 export interface ChangeClass {
   no: number;
   group: ChangeGroup;
-  line?: Line;
-  wordingGroup?: WordingGroup;
+  line?: Line | null;
+  wordingGroup?: WordingGroup | null;
   confidence: number;
   reason: string;
 }
