@@ -1,0 +1,5 @@
+[
+  { "id": "A", "name": "Certainty", "gives": ["term_3y"], "wordings": { "renewal": "opt_in", "credits": "automatic", "price": "cap_5" } },
+  { "id": "B", "name": "Pay faster", "gives": ["payment_30"], "wordings": { "renewal": "notice_le_30", "credits": "automatic", "price": "cap_5" } },
+  { "id": "C", "name": "Meet halfway", "gives": ["notice_60", "claim_30_autofiled"], "wordings": { "renewal": "notice_60_90", "credits": "claim_30_autofiled", "price": "cap_5" } }
+]

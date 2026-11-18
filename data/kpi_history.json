@@ -1,0 +1,19 @@
+{
+  "northStar": {
+    "label": "Money lines enforceable at signing",
+    "enforceableBefore": 18,
+    "totalBefore": 29,
+    "byQuarter": [
+      { "quarter": "Q1 FY26", "enforceable": 3, "total": 7 },
+      { "quarter": "Q2 FY26", "enforceable": 4, "total": 7 },
+      { "quarter": "Q3 FY26", "enforceable": 5, "total": 7 },
+      { "quarter": "Q4 FY26", "enforceable": 6, "total": 8 }
+    ]
+  },
+  "roundsToSign": [
+    { "quarter": "Q1 FY26", "rounds": 4.2 },
+    { "quarter": "Q2 FY26", "rounds": 3.8 },
+    { "quarter": "Q3 FY26", "rounds": 3.1 },
+    { "quarter": "Q4 FY26", "rounds": 2.6 }
+  ]
+}

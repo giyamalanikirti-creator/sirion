@@ -1,0 +1,2402 @@
+[
+  {
+    "contractId": "C-001",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.48,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 5800
+  },
+  {
+    "contractId": "C-001",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.07,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 1800
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.52,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 5000
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.58,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.89,
+    "creditOwedInr": 18000,
+    "creditReceivedInr": 5000
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.65,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.2,
+    "creditOwedInr": 17000,
+    "creditReceivedInr": 2000
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.93,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.58,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.39,
+    "creditOwedInr": 21000,
+    "creditReceivedInr": 3900
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.65,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-001",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.74,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-002",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.06,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 12900
+  },
+  {
+    "contractId": "C-002",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.59,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.57,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 97.98,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 10200
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.29,
+    "creditOwedInr": 7000,
+    "creditReceivedInr": 6800
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.48,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 15600
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 97.9,
+    "creditOwedInr": 15000,
+    "creditReceivedInr": 13700
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.45,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 7800
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.68,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 12200
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.91,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 98.02,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 12500
+  },
+  {
+    "contractId": "C-002",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.88,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.81,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.98,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 2100
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.91,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 3300
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.56,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.74,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.75,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.84,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.69,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.21,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 8100
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.68,
+    "creditOwedInr": 29000,
+    "creditReceivedInr": 11500
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.29,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 2400
+  },
+  {
+    "contractId": "C-003",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.9,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.95,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.63,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.01,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 8700
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.48,
+    "creditOwedInr": 22000,
+    "creditReceivedInr": 9100
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.66,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.18,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 4000
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.61,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.52,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.56,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.76,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.74,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-004",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.67,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.3,
+    "creditOwedInr": 17000,
+    "creditReceivedInr": 16800
+  },
+  {
+    "contractId": "C-005",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.74,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.97,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.52,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.15,
+    "creditOwedInr": 12000,
+    "creditReceivedInr": 11800
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 97.99,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 10400
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.55,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.77,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.09,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 12800
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.6,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 11700
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.89,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-005",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.28,
+    "creditOwedInr": 10000,
+    "creditReceivedInr": 9200
+  },
+  {
+    "contractId": "C-006",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.41,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 2100
+  },
+  {
+    "contractId": "C-006",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.59,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.67,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.66,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 1600
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.64,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.84,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 3000
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.52,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.81,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.52,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 1600
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.84,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.54,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-006",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.86,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-007",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-007",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.86,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.16,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 22600
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.27,
+    "creditOwedInr": 41000,
+    "creditReceivedInr": 37000
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.6,
+    "creditOwedInr": 38000,
+    "creditReceivedInr": 34200
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.21,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 18500
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.49,
+    "creditOwedInr": 31000,
+    "creditReceivedInr": 27900
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.67,
+    "creditOwedInr": 26000,
+    "creditReceivedInr": 24600
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.05,
+    "creditOwedInr": 39000,
+    "creditReceivedInr": 35500
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.34,
+    "creditOwedInr": 46000,
+    "creditReceivedInr": 45300
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.34,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 23000
+  },
+  {
+    "contractId": "C-007",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.66,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.73,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.95,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 1400
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.4,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 9200
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.04,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 4600
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.73,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.86,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.65,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.47,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 2800
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.02,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 1600
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 98.21,
+    "creditOwedInr": 15000,
+    "creditReceivedInr": 3200
+  },
+  {
+    "contractId": "C-008",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.64,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 97.93,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 11900
+  },
+  {
+    "contractId": "C-009",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.97,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 12600
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.55,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.95,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 97.89,
+    "creditOwedInr": 21000,
+    "creditReceivedInr": 19600
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.95,
+    "creditOwedInr": 30000,
+    "creditReceivedInr": 28900
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.54,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.64,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.01,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 20900
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.78,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.91,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-009",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.47,
+    "creditOwedInr": 30000,
+    "creditReceivedInr": 29500
+  },
+  {
+    "contractId": "C-010",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.78,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-010",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.83,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 1800
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.69,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.93,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.15,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 2800
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 97.82,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 3100
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.94,
+    "creditOwedInr": 7000,
+    "creditReceivedInr": 700
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.14,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 900
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.98,
+    "creditOwedInr": 12000,
+    "creditReceivedInr": 400
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.88,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-010",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.35,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 1100
+  },
+  {
+    "contractId": "C-011",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.29,
+    "creditOwedInr": 25000,
+    "creditReceivedInr": 24300
+  },
+  {
+    "contractId": "C-011",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 97.95,
+    "creditOwedInr": 23000,
+    "creditReceivedInr": 22300
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.9,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.1,
+    "creditOwedInr": 22000,
+    "creditReceivedInr": 21600
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.73,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.48,
+    "creditOwedInr": 26000,
+    "creditReceivedInr": 25400
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.62,
+    "creditOwedInr": 38000,
+    "creditReceivedInr": 35300
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 98.1,
+    "creditOwedInr": 25000,
+    "creditReceivedInr": 23000
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.95,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-011",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.76,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.14,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 3200
+  },
+  {
+    "contractId": "C-012",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 97.91,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 3900
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.23,
+    "creditOwedInr": 5000,
+    "creditReceivedInr": 1600
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.22,
+    "creditOwedInr": 5000,
+    "creditReceivedInr": 1100
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.7,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.84,
+    "creditOwedInr": 10000,
+    "creditReceivedInr": 1600
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.86,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.71,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.75,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.71,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.69,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-012",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.71,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.84,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.51,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.6,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.94,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 97.91,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 3000
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 97.9,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 2000
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.75,
+    "creditOwedInr": 13000,
+    "creditReceivedInr": 1800
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.7,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 98.61,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 2400
+  },
+  {
+    "contractId": "C-013",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.25,
+    "creditOwedInr": 4000,
+    "creditReceivedInr": 3700
+  },
+  {
+    "contractId": "C-014",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.83,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.93,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.53,
+    "creditOwedInr": 10000,
+    "creditReceivedInr": 8900
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.6,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.26,
+    "creditOwedInr": 5000,
+    "creditReceivedInr": 4700
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.95,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.68,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.74,
+    "creditOwedInr": 4000,
+    "creditReceivedInr": 3700
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.33,
+    "creditOwedInr": 10000,
+    "creditReceivedInr": 9200
+  },
+  {
+    "contractId": "C-014",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.87,
+    "creditOwedInr": 10000,
+    "creditReceivedInr": 9200
+  },
+  {
+    "contractId": "C-015",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.06,
+    "creditOwedInr": 18000,
+    "creditReceivedInr": 4800
+  },
+  {
+    "contractId": "C-015",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.61,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.33,
+    "creditOwedInr": 25000,
+    "creditReceivedInr": 9800
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.14,
+    "creditOwedInr": 17000,
+    "creditReceivedInr": 5100
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 97.87,
+    "creditOwedInr": 34000,
+    "creditReceivedInr": 4300
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.69,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.87,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.6,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.81,
+    "creditOwedInr": 39000,
+    "creditReceivedInr": 6800
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 98.47,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 2800
+  },
+  {
+    "contractId": "C-015",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.96,
+    "creditOwedInr": 29000,
+    "creditReceivedInr": 900
+  },
+  {
+    "contractId": "C-016",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.8,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 2400
+  },
+  {
+    "contractId": "C-016",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.96,
+    "creditOwedInr": 21000,
+    "creditReceivedInr": 6200
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.15,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 1100
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.12,
+    "creditOwedInr": 17000,
+    "creditReceivedInr": 6400
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.25,
+    "creditOwedInr": 9000,
+    "creditReceivedInr": 3400
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.88,
+    "creditOwedInr": 8000,
+    "creditReceivedInr": 700
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.56,
+    "creditOwedInr": 21000,
+    "creditReceivedInr": 1800
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.71,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.67,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.62,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-016",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.9,
+    "creditOwedInr": 12000,
+    "creditReceivedInr": 2500
+  },
+  {
+    "contractId": "C-017",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.84,
+    "creditOwedInr": 60000,
+    "creditReceivedInr": 53800
+  },
+  {
+    "contractId": "C-017",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.97,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.77,
+    "creditOwedInr": 45000,
+    "creditReceivedInr": 42700
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.75,
+    "creditOwedInr": 90000,
+    "creditReceivedInr": 83040
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.83,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.65,
+    "creditOwedInr": 30000,
+    "creditReceivedInr": 27800
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.67,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.13,
+    "creditOwedInr": 75000,
+    "creditReceivedInr": 72200
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.76,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.25,
+    "creditOwedInr": 60000,
+    "creditReceivedInr": 57400
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.79,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-017",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.49,
+    "creditOwedInr": 90000,
+    "creditReceivedInr": 86400
+  },
+  {
+    "contractId": "C-018",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.97,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.5,
+    "creditOwedInr": 3000,
+    "creditReceivedInr": 2900
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.61,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.89,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.62,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.67,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.98,
+    "creditOwedInr": 7000,
+    "creditReceivedInr": 6700
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.15,
+    "creditOwedInr": 7000,
+    "creditReceivedInr": 6300
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 97.98,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 5700
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.27,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 5600
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.54,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-018",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.07,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 5900
+  },
+  {
+    "contractId": "C-019",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.59,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-019",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.11,
+    "creditOwedInr": 15000,
+    "creditReceivedInr": 2700
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.74,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.28,
+    "creditOwedInr": 26000,
+    "creditReceivedInr": 7900
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.45,
+    "creditOwedInr": 18000,
+    "creditReceivedInr": 7200
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.58,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.88,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 97.81,
+    "creditOwedInr": 35000,
+    "creditReceivedInr": 1400
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 97.92,
+    "creditOwedInr": 42000,
+    "creditReceivedInr": 5600
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 98.33,
+    "creditOwedInr": 36000,
+    "creditReceivedInr": 14000
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.91,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-019",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.96,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.09,
+    "creditOwedInr": 20000,
+    "creditReceivedInr": 2800
+  },
+  {
+    "contractId": "C-020",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.71,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.15,
+    "creditOwedInr": 25000,
+    "creditReceivedInr": 2900
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.1,
+    "creditOwedInr": 34000,
+    "creditReceivedInr": 2900
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.1,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 7900
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.94,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.51,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.49,
+    "creditOwedInr": 33000,
+    "creditReceivedInr": 5400
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 97.84,
+    "creditOwedInr": 33000,
+    "creditReceivedInr": 4000
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.63,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.65,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-020",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.75,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.93,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.66,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.93,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 98.09,
+    "creditOwedInr": 24000,
+    "creditReceivedInr": 22700
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 98.95,
+    "creditOwedInr": 34000,
+    "creditReceivedInr": 33300
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.7,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.6,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.79,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.26,
+    "creditOwedInr": 46000,
+    "creditReceivedInr": 42100
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.05,
+    "creditOwedInr": 25000,
+    "creditReceivedInr": 22300
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.83,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-021",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.9,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.79,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.55,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.37,
+    "creditOwedInr": 6000,
+    "creditReceivedInr": 2000
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.61,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.94,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.21,
+    "creditOwedInr": 4000,
+    "creditReceivedInr": 1200
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.26,
+    "creditOwedInr": 4000,
+    "creditReceivedInr": 600
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.65,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.32,
+    "creditOwedInr": 3000,
+    "creditReceivedInr": 700
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 98.43,
+    "creditOwedInr": 5000,
+    "creditReceivedInr": 1200
+  },
+  {
+    "contractId": "C-023",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.51,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.05,
+    "creditOwedInr": 11000,
+    "creditReceivedInr": 1100
+  },
+  {
+    "contractId": "C-024",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 98.56,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 3300
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.81,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.54,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.75,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.51,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.44,
+    "creditOwedInr": 27000,
+    "creditReceivedInr": 10200
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.43,
+    "creditOwedInr": 22000,
+    "creditReceivedInr": 7500
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.5,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.59,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.51,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-024",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 98.68,
+    "creditOwedInr": 22000,
+    "creditReceivedInr": 5900
+  },
+  {
+    "contractId": "C-025",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 98.48,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 14400
+  },
+  {
+    "contractId": "C-025",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.07,
+    "creditOwedInr": 21000,
+    "creditReceivedInr": 19800
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 99.72,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.62,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.36,
+    "creditOwedInr": 20000,
+    "creditReceivedInr": 18900
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 99.62,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 99.33,
+    "creditOwedInr": 12000,
+    "creditReceivedInr": 10800
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 99.86,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 99.35,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 14400
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.95,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.85,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-025",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.69,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2025-11",
+    "target": 99.5,
+    "actual": 99.57,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2025-12",
+    "target": 99.5,
+    "actual": 99.55,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-01",
+    "target": 99.5,
+    "actual": 98.81,
+    "creditOwedInr": 15000,
+    "creditReceivedInr": 13500
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-02",
+    "target": 99.5,
+    "actual": 99.87,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-03",
+    "target": 99.5,
+    "actual": 99.8,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-04",
+    "target": 99.5,
+    "actual": 98.1,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 18700
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-05",
+    "target": 99.5,
+    "actual": 98.61,
+    "creditOwedInr": 16000,
+    "creditReceivedInr": 15000
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-06",
+    "target": 99.5,
+    "actual": 98.5,
+    "creditOwedInr": 14000,
+    "creditReceivedInr": 12700
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-07",
+    "target": 99.5,
+    "actual": 97.87,
+    "creditOwedInr": 19000,
+    "creditReceivedInr": 18700
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-08",
+    "target": 99.5,
+    "actual": 99.64,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-09",
+    "target": 99.5,
+    "actual": 99.77,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  },
+  {
+    "contractId": "C-026",
+    "month": "2026-10",
+    "target": 99.5,
+    "actual": 99.76,
+    "creditOwedInr": 0,
+    "creditReceivedInr": 0
+  }
+]

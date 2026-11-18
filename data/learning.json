@@ -1,0 +1,8 @@
+[
+  { "line": "Renewal, 90 days", "supplier": "Nimbus HR Cloud", "predicted": 2.1, "actual": 2.4 },
+  { "line": "Credits, 10-day claim", "supplier": "SwiftShip Logistics", "predicted": 1.6, "actual": 1.4 },
+  { "line": "Price, yearly revision", "supplier": "BrightStaff Services", "predicted": 0.9, "actual": 1.1 },
+  { "line": "Renewal, 60 days", "supplier": "HelpHub", "predicted": 1.2, "actual": 0.8 },
+  { "line": "Credits, 7-day claim", "supplier": "DataVault", "predicted": 2.0, "actual": 2.3 },
+  { "line": "Price, yearly revision", "supplier": "CloudOps Suite", "predicted": 1.5, "actual": 1.6 }
+]
