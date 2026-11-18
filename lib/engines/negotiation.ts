@@ -1,6 +1,6 @@
 import { getContract, getRedline, packageTemplates, wordingLibrary } from '../data';
 import { LEAD_RANGE_LAKH_PER_LINE } from '../settings';
-import type { Counter, FinalDeal, FinalDealLine, Line, PackageId, WordingGroup, Wordings } from '../types';
+import type { Counter, FinalDeal, FinalDealLine, Line, PackageId, PackageTemplate, WordingGroup, Wordings } from '../types';
 import { cost } from './costEngine';
 import { holdFirmTemplate, pricePackage } from './givegetEngine';
 import { changedLines, priced, supplierAsk } from './redline';
@@ -36,7 +36,9 @@ export function priceCounter(line: Line, currentGroup: WordingGroup, proposedGro
   return { extraLakh, insideRange: extraLakh <= LEAD_RANGE_LAKH_PER_LINE, rangeLakh: LEAD_RANGE_LAKH_PER_LINE };
 }
 
-export function templateFor(pkgId: PackageId, redlineId = 'RL-CLOUDDESK') {
+export function templateFor(pkgId: PackageId, redlineId = 'RL-CLOUDDESK', extra: PackageTemplate[] = []) {
+  const own = extra.find((t) => t.id === pkgId);
+  if (own) return own;
   if (pkgId === 'D') {
     const r = getRedline(redlineId);
     return holdFirmTemplate(getContract(r.contractId), supplierAsk(r));
@@ -46,12 +48,12 @@ export function templateFor(pkgId: PackageId, redlineId = 'RL-CLOUDDESK') {
   return t;
 }
 
-export function finalDeal(pkgId: PackageId, counters: Counter[] = [], redlineId = 'RL-CLOUDDESK'): FinalDeal {
+export function finalDeal(pkgId: PackageId, counters: Counter[] = [], redlineId = 'RL-CLOUDDESK', extra: PackageTemplate[] = []): FinalDeal {
   const r = getRedline(redlineId);
   const c = getContract(r.contractId);
   const ask = supplierAsk(r, c);
   const lines = changedLines(r);
-  const base = pricePackage(c, ask, templateFor(pkgId, redlineId), lines);
+  const base = pricePackage(c, ask, templateFor(pkgId, redlineId, extra), lines);
   const wordings = { ...base.wordings } as Record<Line, WordingGroup>;
   for (const k of counters) wordings[k.line] = k.group;
 

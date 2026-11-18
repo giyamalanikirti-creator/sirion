@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useSwitchRole } from '@/components/shell/RoleSwitcher';
 import { Button, EmptyState, PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { getContract, redlines } from '@/lib/data';
-import { buildPackages } from '@/lib/engines/givegetEngine';
+import { offersFor } from '@/lib/offers';
 import { formatLakh } from '@/lib/format';
 import { atLeast, financePackages, legalChanges, needsFinanceStep, type Negotiation, useDemo } from '@/lib/store';
 import type { Redline } from '@/lib/types';
 
 function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
   const approveOwner = useDemo((s) => s.approveOwner);
-  const packages = buildPackages({ redlineId: r.id }).filter((p) => n.selectedPackages.includes(p.id));
+  const packages = offersFor(r.id, n).filter((p) => n.selectedPackages.includes(p.id));
   const maxProtect = Math.max(...packages.map((p) => p.protectedLakh));
   const gives = [...new Set(packages.flatMap((p) => p.gives.map((g) => g.id)))];
   const giveText =
@@ -37,7 +37,7 @@ function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
       </div>
       <div className="px-5 py-4">
         <h2 className="text-[16px] font-semibold text-[#242424]">
-          {r.supplier} renewal: approve {packages.length} package{packages.length === 1 ? '' : 's'}?
+          {r.supplier} renewal: approve {packages.length} offer{packages.length === 1 ? '' : 's'} to send back?
         </h2>
         <ul className="mt-3 space-y-2 text-sm text-[#242424]">
           <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 text-teal-900" /> Get back up to {formatLakh(maxProtect)} a year</li>
@@ -54,7 +54,17 @@ function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
       </div>
       <div className="flex flex-wrap gap-2 border-t border-[#edebe9] px-5 py-3">
         {done ? (
-          <span className="flex items-center gap-1.5 text-sm text-teal-900"><CheckCircle2 className="h-4 w-4" /> You approved this</span>
+          <span className="flex flex-wrap items-center gap-1.5 text-sm text-teal-900">
+            <CheckCircle2 className="h-4 w-4" /> You approved this.
+            <span className="text-muted">
+              Next:{' '}
+              {n.status === 'awaiting_approval'
+                ? 'Finance decides on the three-year commitment.'
+                : n.status === 'approved'
+                  ? `Riya sends the offers to ${r.supplier}.`
+                  : `${r.supplier} has the offers.`}
+            </span>
+          </span>
         ) : (
           <>
             <Button onClick={() => approveOwner(r.id)} disabled={!waiting}>Approve</Button>
@@ -72,7 +82,7 @@ function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
 function FinanceTable({ items }: { items: { r: Redline; n: Negotiation }[] }) {
   const decideFinance = useDemo((s) => s.decideFinance);
   const rows = items.flatMap(({ r, n }) =>
-    buildPackages({ redlineId: r.id }).flatMap((p) =>
+    offersFor(r.id, n).flatMap((p) =>
       p.gives
         .filter((g) => g.needsFinance || g.cashCostLakh > 0)
         .map((g) => ({ r, n, p, g, offered: n.selectedPackages.includes(p.id), needs: g.needsFinance && n.selectedPackages.includes(p.id) })),

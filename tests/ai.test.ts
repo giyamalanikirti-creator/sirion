@@ -144,3 +144,13 @@ describe('cached answers for the other suppliers come from the engines', () => {
     expect(a.answer).toMatch(/nothing to price/);
   });
 });
+
+describe('assistant respects the peer benchmarks setting', () => {
+  it('15-day what-if says insufficient data when peer benchmarks are off', async () => {
+    const a = await answerQuestion({ messages: [{ role: 'user', content: 'What if we accept a 15-day claim window?' }], redlineId: 'RL-CLOUDDESK', role: 'lead', peerBenchmarks: false });
+    expect(a.answer).toMatch(/Insufficient data to estimate/);
+    expect(a.answer).not.toMatch(/27 companies/);
+    const on = await answerQuestion({ messages: [{ role: 'user', content: 'What if we accept a 15-day claim window?' }], redlineId: 'RL-CLOUDDESK', role: 'lead', peerBenchmarks: true });
+    expect(on.answer).toMatch(/27 companies/);
+  });
+});

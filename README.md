@@ -25,20 +25,21 @@ Without a key (or with `DEMO_MODE=cached`) every AI feature uses saved fixtures,
 
 ## Demo script (about 3 minutes)
 
-One story end to end: CloudDesk asks for a 10-day claim window → the buyer sees why ₹3.2 lakh is exposed → tests 15 days → trades faster payment for automatic credits → sees Sirion check the first invoice.
+The question the user carries through: **“CloudDesk wants to change our renewal terms. Which changes should I accept, and what should I ask for in return?”**
 
-Use the **Demo guide** button (bottom left). Each step has a "Go" link that also switches role. **Reset demo** clears everything.
+Each screen has one next-action button in a sticky panel at the top. It says whose turn it is, what they are deciding and what happens next. You can finish the story with that button alone; the demo guide is optional, behind **Walk me through the demo**.
 
-1. Dashboard → **Review supplier changes** (CloudDesk returned the ₹60 lakh renewal with six edits; nothing is priced yet)
-2. **Sort changes**: routine edits fold away, the 10-day claim change rises to the top, 1 change goes to legal
-3. Price tags: credits first. Current wording / CloudDesk asks / benchmark used; ₹11.6 lakh a year exposure vs procurement benchmarks (₹13.3 lakh vs the current contract)
-4. On the credits card, **Try a different claim window** → 15 days: ₹2.4 lakh vs ₹3.2 lakh (0 own contracts, pooled 11–30 day cohort, 27 companies, low confidence) → **Use as draft counteroffer**
-5. Packages: "A nets an estimated ₹1.3 lakh a year more than B and requires a three-year commitment". Tick **Must retain annual exit** to see B recommended → **Send for approval**
-6. Business owner approves; finance decides on package A
-7. Lead: **Send to CloudDesk** → supplier portal: pick B, suggest a 7% cap (no ₹ shown)
-8. Lead: accept the counter (₹1.1 lakh, inside the ₹1.5 lakh range)
-9. Signing → **Send for signature** (3 of 3 terms with an automated check; north star 62% → 66%)
-10. **Run the first invoice check**: credit expected ₹25,000, found ₹0, dispute owned by the procurement lead
+1. **Continue as Riya Kapoor** (stand-in for company single sign-on). The welcome panel says who you are and what you are deciding; beside it, **How this workspace uses data** shows the read-only sources and the admin's two peer-data switches (use: on; contribute: off).
+2. **Review CloudDesk’s changes** → **Analyse six changes**: “Three changes could affect what you pay. One needs legal review. Two are routine.” The service-credit change leads, in plain English; the clause text is one click away.
+3. **See the financial impact**: accepting all three could cost about ₹13.3 lakh more a year than the current contract (₹11.6 lakh vs procurement benchmarks). The credits card separates the evidence used from the peer comparison.
+4. On the credits card, **Try 15 days**: ₹2.4 lakh vs ₹3.2 lakh, from 27 participating companies, confidence low. **Save as my draft counter** → **Review my draft** → **Add it as offer E**.
+5. **Compare offers**: commit for three years, pay 15 days sooner, offer more time to claim credits, or your counter. **Send offers for approval**.
+6. The panel says it is the business owner's turn, then Finance's. Use **View as business owner** / **View as Finance** to play them.
+7. **Preview what CloudDesk will see** → **Send to CloudDesk** → **View as CloudDesk**: pick “Pay faster” and suggest a 7% cap.
+8. **Accept** the counter (₹1.1 lakh, inside your ₹1.5 lakh range) → **Send for signature**.
+9. **Run the first invoice check**: the signed agreement requires an automatic ₹25,000 credit, the invoice shows ₹0, and Riya is assigned to follow up.
+
+To see the evidence change, switch **Use aggregate peer benchmarks** off: the 15-day estimate becomes “Insufficient data to estimate” (you can still draft it), and SwiftShip's estimates disappear.
 
 ### The other five redlines
 

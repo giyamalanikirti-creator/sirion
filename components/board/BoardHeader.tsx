@@ -9,16 +9,16 @@ import type { Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const STEPS: { label: string; doneAt: Status }[] = [
-  { label: 'Sorted', doneAt: 'sorted' },
-  { label: 'Priced', doneAt: 'priced' },
-  { label: 'Packages', doneAt: 'awaiting_approval' },
+  { label: 'Analysed', doneAt: 'sorted' },
+  { label: 'Impact', doneAt: 'priced' },
+  { label: 'Offers', doneAt: 'awaiting_approval' },
   { label: 'Approval', doneAt: 'approved' },
   { label: 'Supplier', doneAt: 'agreed' },
   { label: 'Signed', doneAt: 'signed' },
 ];
 
 const LEGAL_ONLY_STEPS: { label: string; doneAt: Status }[] = [
-  { label: 'Sorted', doneAt: 'sorted' },
+  { label: 'Analysed', doneAt: 'sorted' },
   { label: 'Signed', doneAt: 'signed' },
 ];
 
@@ -47,15 +47,17 @@ export function BoardHeader({
           <div className="ml-auto max-w-[280px] text-right text-sm text-muted">No money lines: every change is with legal. Nothing to price.</div>
         ) : atLeast(status, 'sorted') ? (
           <div className="ml-auto text-right">
-            <div className="text-[26px] font-light leading-tight text-teal-900">{formatLakh(totalLakh)} a year</div>
-            <div className="text-sm text-ink">Estimated annual exposure vs procurement benchmarks</div>
+            <div className="text-[26px] font-light leading-tight text-teal-900">
+              {vsCurrentLakh > 0.005 ? `${formatLakh(vsCurrentLakh)} more a year` : 'No extra cost'}
+            </div>
+            <div className="text-sm text-ink">than your current contract, if you accept every change (estimate)</div>
             <div className="text-xs text-muted">
-              {formatPct(pctOfFee)} of fee · {vsCurrentLakh > 0.005 ? `${formatLakh(vsCurrentLakh)} a year more than the current contract` : 'no extra cost vs the current contract'}
+              {formatLakh(totalLakh)} a year vs procurement benchmarks · {formatPct(pctOfFee)} of fee
               {unpriced > 0 && ` · ${unpriced} line not priced (not enough history)`}
             </div>
           </div>
         ) : (
-          <div className="max-w-[260px] text-right text-sm text-muted">Sort the changes to see which ones cost money.</div>
+          <div className="max-w-[260px] text-right text-sm text-muted">Analyse the changes to see which ones affect what you pay.</div>
         )}
       </div>
 

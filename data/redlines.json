@@ -15,7 +15,8 @@
         "newText": "All notices shall be sent to CloudDesk at Tower B, 7th Floor, Outer Ring Road, Bengaluru 560103.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "CloudDesk's office address for legal notices has changed."
       },
       {
         "no": 2,
@@ -25,7 +26,8 @@
         "newText": "\"Effective Date\" means the date on which this Agreement is signed by both parties.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A defined term is now capitalised. The meaning doesn't change."
       },
       {
         "no": 3,
@@ -35,7 +37,8 @@
         "newText": "Each party's total liability shall not exceed the fees paid in the six (6) months before the claim.",
         "expected": {
           "group": "legal"
-        }
+        },
+        "plain": "Today, either side's liability is capped at 12 months of fees. CloudDesk wants to halve that to 6 months."
       },
       {
         "no": 4,
@@ -47,7 +50,8 @@
           "group": "money",
           "line": "renewal",
           "wordingGroup": "notice_60_90"
-        }
+        },
+        "plain": "Today, you can stop the auto-renewal with 30 days' notice. CloudDesk wants 90 days, so you'd have to decide three months before the end."
       },
       {
         "no": 5,
@@ -59,7 +63,8 @@
           "group": "money",
           "line": "credits",
           "wordingGroup": "claim_le_10"
-        }
+        },
+        "plain": "Today, credits come off your invoice automatically. CloudDesk wants you to claim them in writing within 10 days."
       },
       {
         "no": 6,
@@ -71,7 +76,8 @@
           "group": "money",
           "line": "price",
           "wordingGroup": "open_yearly"
-        }
+        },
+        "plain": "Today, the fees are fixed for the term. CloudDesk wants to be able to raise them once a year, with no cap."
       }
     ],
     "slug": "clouddesk"
@@ -92,7 +98,8 @@
         "newText": "Notices to SwiftShip shall be sent to contracts@swiftship.example.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "SwiftShip's email address for legal notices has changed."
       },
       {
         "no": 2,
@@ -104,7 +111,8 @@
           "group": "money",
           "line": "renewal",
           "wordingGroup": "notice_60_90"
-        }
+        },
+        "plain": "Today, the contract renews only if you say yes. SwiftShip wants it to renew automatically unless you give 90 days' notice."
       },
       {
         "no": 3,
@@ -116,7 +124,8 @@
           "group": "money",
           "line": "credits",
           "wordingGroup": "claim_le_10"
-        }
+        },
+        "plain": "Today, you have 15 days to claim service credits. SwiftShip wants to cut that to 7 days."
       }
     ],
     "slug": "swiftship"
@@ -137,7 +146,8 @@
         "newText": "\"Business Day\" means a day other than a Saturday, Sunday or public holiday in Bengaluru.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A defined term is now capitalised. The meaning doesn't change."
       },
       {
         "no": 2,
@@ -147,7 +157,8 @@
         "newText": "Notices to Nimbus shall be sent to 9th Floor, Embassy Tech Village, Bengaluru.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "Nimbus's office address for legal notices has changed."
       },
       {
         "no": 3,
@@ -157,7 +168,8 @@
         "newText": "Schedule 2: Service Levels",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A typo in a schedule heading is fixed."
       },
       {
         "no": 4,
@@ -167,7 +179,8 @@
         "newText": "Supplier shall indemnify Customer against third-party claims that the Service infringes intellectual property rights, up to the fees paid in the twelve (12) months before the claim.",
         "expected": {
           "group": "legal"
-        }
+        },
+        "plain": "Today, Nimbus's intellectual-property indemnity has no cap. Nimbus wants to cap it at 12 months of fees."
       },
       {
         "no": 5,
@@ -179,7 +192,8 @@
           "group": "money",
           "line": "price",
           "wordingGroup": "open_yearly"
-        }
+        },
+        "plain": "Today, Nimbus can raise fees once a year with no cap. Nimbus wants a second rise in any year its hosting costs go up."
       }
     ],
     "slug": "nimbus"
@@ -200,7 +214,8 @@
         "newText": "The Customer wishes to engage the Supplier to provide contract personnel.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A spelling mistake in the recitals is fixed."
       },
       {
         "no": 2,
@@ -210,7 +225,8 @@
         "newText": "\"Contractor Personnel\" means individuals supplied by Supplier under this Agreement.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A defined term is now capitalised. The meaning doesn't change."
       },
       {
         "no": 3,
@@ -220,7 +236,8 @@
         "newText": "Customer shall not directly hire Contractor Personnel during the Term and for twenty-four (24) months after it.",
         "expected": {
           "group": "legal"
-        }
+        },
+        "plain": "Today, you can't hire BrightStaff's people for 6 months after the contract ends. BrightStaff wants 24 months."
       },
       {
         "no": 4,
@@ -232,7 +249,8 @@
           "group": "money",
           "line": "renewal",
           "wordingGroup": "notice_60_90"
-        }
+        },
+        "plain": "Today, the contract renews only if you say yes. BrightStaff wants it to renew automatically unless you give 60 days' notice."
       },
       {
         "no": 5,
@@ -244,7 +262,8 @@
           "group": "money",
           "line": "price",
           "wordingGroup": "open_yearly"
-        }
+        },
+        "plain": "Today, the rates are fixed for the term. BrightStaff wants to be able to raise them once a year, with no cap."
       }
     ],
     "slug": "brightstaff"
@@ -265,7 +284,8 @@
         "newText": "Site 2: Plot 14A, Whitefield Main Road, Bengaluru.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A site's plot number is corrected."
       },
       {
         "no": 2,
@@ -275,7 +295,8 @@
         "newText": "Supplier's account manager is Lata Menon.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "CleanCo's account manager has changed."
       },
       {
         "no": 3,
@@ -285,7 +306,8 @@
         "newText": "The Supplier shall provide housekeeping services at each Site.",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A spelling mistake in the services clause is fixed."
       },
       {
         "no": 4,
@@ -295,7 +317,8 @@
         "newText": "10.4 Insurance",
         "expected": {
           "group": "harmless"
-        }
+        },
+        "plain": "A clause is renumbered."
       },
       {
         "no": 5,
@@ -307,7 +330,8 @@
           "group": "money",
           "line": "renewal",
           "wordingGroup": "notice_60_90"
-        }
+        },
+        "plain": "Today, you can stop the auto-renewal with 30 days' notice. CleanCo wants 90 days."
       }
     ],
     "slug": "cleanco"
@@ -328,7 +352,8 @@
         "newText": "Supplier shall notify Customer of any personal data breach within seventy-two (72) hours of becoming aware of it.",
         "expected": {
           "group": "legal"
-        }
+        },
+        "plain": "Today, DataVault must tell you about a personal-data breach within 24 hours. DataVault wants 72 hours."
       },
       {
         "no": 2,
@@ -338,7 +363,8 @@
         "newText": "This Agreement is governed by the laws of Singapore, and disputes shall be finally resolved by arbitration under the SIAC Rules.",
         "expected": {
           "group": "legal"
-        }
+        },
+        "plain": "Today, Indian law applies and disputes go to Bengaluru courts. DataVault wants Singapore law and arbitration."
       }
     ],
     "slug": "datavault"

@@ -1,7 +1,7 @@
 import 'server-only';
 import type Anthropic from '@anthropic-ai/sdk';
 import { getContract, getRedline, wordingLibrary } from '../data';
-import { BENCHMARK, cost, groupOf, GROUPS, priceTag } from '../engines/costEngine';
+import { BENCHMARK, cost, groupOf, GROUPS, priceTag, setPeerBenchmarks } from '../engines/costEngine';
 import { buildPackages, supplierAskFromRedline } from '../engines/givegetEngine';
 import { changedLines } from '../engines/redline';
 import { GIVE_LABEL } from '../engines/gives';
@@ -239,6 +239,12 @@ export function engineAnswer(question: string, redlineId: string): AskResponse |
     if (!lines.includes('credits')) return fromRuns(`${r.supplier} did not change the service-credit clause, so there is no claim window to trade here.`, []);
     const run = runTool('run_what_if', { line: 'credits', wordingGroup: 'claim_11_30' }, redlineId);
     const o = run.output as ReturnType<typeof tagView> & { comparedWithSupplierAsk: { costPerYear: string } };
+    if (o.costLakh === null) {
+      return fromRuns(
+        `Insufficient data to estimate a 15-day window: we have ${o.ownContracts} own contracts with an 11–30 day window, and peer benchmarks are turned off for this workspace. You can still draft it as a counter.`,
+        [run],
+      );
+    }
     return fromRuns(
       `A 15-day claim would cost about ${o.costPerYear} a year, vs ${o.comparedWithSupplierAsk.costPerYear} for what ${r.supplier} asked. We have no own contracts with an 11–30 day window, so this uses ${basis(o)}. Confidence is ${o.confidence}.`,
       [run],
@@ -270,14 +276,14 @@ export function engineAnswer(question: string, redlineId: string): AskResponse |
   return undefined;
 }
 
-function cachedAnswer(question: string, redlineId: string): AskResponse {
-  if (redlineId === 'RL-CLOUDDESK') {
+function cachedAnswer(question: string, redlineId: string, peer = true): AskResponse {
+  // CloudDesk's hand-written answers cite peer data, so they only apply while peer benchmarks are on.
+  if (redlineId === 'RL-CLOUDDESK' && peer) {
     const ex = matchExample(question);
     if (ex) return { answer: ex.answer, sources: ex.sources as Chip[], links: ex.links, toolCalls: ex.toolCalls, source: 'cached' };
-  } else {
-    const a = engineAnswer(question, redlineId);
-    if (a) return a;
   }
+  const a = engineAnswer(question, redlineId);
+  if (a) return a;
   return { answer: CACHED_OFF_MESSAGE, sources: [], links: [], toolCalls: [], source: 'cached' };
 }
 
@@ -305,7 +311,9 @@ Rules:
 - Never reveal or suggest sharing ₹ figures or pooled data with the supplier.`;
 }
 
-export async function answerQuestion(input: { messages: AskMessage[]; redlineId: string; role: string }): Promise<AskResponse> {
+export async function answerQuestion(input: { messages: AskMessage[]; redlineId: string; role: string; peerBenchmarks?: boolean }): Promise<AskResponse> {
+  const peer = input.peerBenchmarks ?? true;
+  setPeerBenchmarks(peer);
   if (input.role === 'supplier') {
     return { answer: SUPPLIER_REFUSAL, sources: [], links: [], toolCalls: [], source: 'cached' };
   }
@@ -318,17 +326,17 @@ export async function answerQuestion(input: { messages: AskMessage[]; redlineId:
     throw new Error(`Keep questions under ${ASK_LIMITS.maxUserChars} characters`);
   }
 
-  if (!isLive()) return cachedAnswer(last.content, input.redlineId);
+  if (!isLive()) return cachedAnswer(last.content, input.redlineId, peer);
 
   try {
-    return await withTimeout(liveLoop(history, input.redlineId, input.role), AI_TIMEOUT_MS * 2);
+    return await withTimeout(liveLoop(history, input.redlineId, input.role, peer), AI_TIMEOUT_MS * 2);
   } catch (err) {
     logAiFailure('ask', err);
-    return cachedAnswer(last.content, input.redlineId);
+    return cachedAnswer(last.content, input.redlineId, peer);
   }
 }
 
-async function liveLoop(history: AskMessage[], redlineId: string, role: string): Promise<AskResponse> {
+async function liveLoop(history: AskMessage[], redlineId: string, role: string, peer = true): Promise<AskResponse> {
   const client = getClient();
   const messages: Anthropic.MessageParam[] = history.map((m) => ({ role: m.role, content: m.content }));
   const runs: ToolRun[] = [];
@@ -356,6 +364,8 @@ async function liveLoop(history: AskMessage[], redlineId: string, role: string):
     const results: Anthropic.ToolResultBlockParam[] = uses.map((u) => {
       toolCalls.push(u.name);
       try {
+        // Re-apply the workspace setting: other requests may have run between awaits.
+        setPeerBenchmarks(peer);
         const run = runTool(u.name, u.input, redlineId);
         runs.push(run);
         return { type: 'tool_result', tool_use_id: u.id, content: JSON.stringify(run.output) };

@@ -23,9 +23,9 @@ export const atLeast = (s: Status, min: Status) => STATUS_ORDER.indexOf(s) >= ST
 
 export const STATUS_LABEL: Record<Status, string> = {
   received: 'New',
-  sorted: 'Sorted',
-  priced: 'Priced',
-  packages_ready: 'Packages ready',
+  sorted: 'Analysed',
+  priced: 'Impact reviewed',
+  packages_ready: 'Offers ready',
   awaiting_approval: 'Awaiting approval',
   approved: 'Approved',
   with_supplier: 'With supplier',
@@ -72,7 +72,17 @@ export interface Negotiation {
   keepAnnualExit: boolean;
   /** Credits what-if the lead saved as a draft counteroffer (from the price tag card). */
   creditDraft?: CreditsGroup;
+  /** The lead added her saved what-if as an offer of her own (package E). */
+  draftInOffers?: boolean;
   invoiceChecked: boolean;
+}
+
+/** Workspace data settings an admin controls. */
+export interface DataSettings {
+  /** Estimates may use aggregate peer benchmarks (20+ companies). */
+  usePeerBenchmarks: boolean;
+  /** This workspace contributes aggregate outcomes to peer benchmarks. Off by default. */
+  contributeOutcomes: boolean;
 }
 
 type Result = { ok: boolean; message?: string };
@@ -110,6 +120,15 @@ interface DemoState {
   role: Role;
   negotiations: Record<string, Negotiation>;
   completedSteps: number[];
+  /** Demo stand-in for company single sign-on. */
+  signedIn: boolean;
+  welcomeDismissed: boolean;
+  data: DataSettings;
+
+  signIn: () => void;
+  dismissWelcome: () => void;
+  setData: (p: Partial<DataSettings>) => void;
+  addDraftOffer: (id: string) => Result;
 
   setRole: (r: Role) => void;
   completeStep: (n: number) => void;
@@ -165,6 +184,26 @@ export const useDemo = create<DemoState>()(
         role: 'lead',
         negotiations: initialNegotiations(),
         completedSteps: [],
+        signedIn: false,
+        welcomeDismissed: false,
+        data: { usePeerBenchmarks: true, contributeOutcomes: false },
+
+        signIn: () => set({ signedIn: true, role: 'lead' }),
+        dismissWelcome: () => set({ welcomeDismissed: true }),
+        setData: (p) => {
+          set({ data: { ...get().data, ...p } });
+          if (p.usePeerBenchmarks !== undefined) {
+            toast(p.usePeerBenchmarks ? 'Estimates may now use peer benchmarks' : 'Peer benchmarks off: estimates use your own data only');
+          }
+        },
+        addDraftOffer: (id) => {
+          const n = neg(id);
+          if (!n.creditDraft) return fail('Save a draft on the Financial impact tab first');
+          if (atLeast(n.status, 'awaiting_approval')) return fail('Offers are locked once they are sent for approval');
+          patch(id, { draftInOffers: true, selectedPackages: [...new Set([...n.selectedPackages, 'E' as PackageId])].sort() as PackageId[] });
+          toast.success('Your counter is now offer E');
+          return { ok: true };
+        },
 
         setRole: (role) => set({ role }),
         completeStep: (n) => step(STORY_REDLINE, n),
@@ -292,7 +331,13 @@ export const useDemo = create<DemoState>()(
           if (keepAnnualExit && without.length < n.selectedPackages.length) toast(`Package ${multiYear.join(', ')} removed from the offer: no annual exit for 3 years`);
         },
         saveCreditDraft: (id, creditDraft) => {
-          patch(id, { creditDraft });
+          const n = neg(id);
+          if (atLeast(n.status, 'awaiting_approval')) {
+            toast('Offers are locked once they are sent for approval');
+            return;
+          }
+          // A new draft replaces the old one; an offer built from the old draft is withdrawn until re-added.
+          patch(id, { creditDraft, draftInOffers: false, selectedPackages: n.selectedPackages.filter((p) => p !== 'E') });
           if (creditDraft) {
             step(id, 4);
             toast.success('Saved as a draft counteroffer. Compare it with the packages.');
@@ -305,19 +350,22 @@ export const useDemo = create<DemoState>()(
           return { ok: true };
         },
         reset: () => {
-          set({ role: 'lead', negotiations: initialNegotiations(), completedSteps: [] });
+          set({ role: 'lead', negotiations: initialNegotiations(), completedSteps: [], signedIn: false, welcomeDismissed: false, data: { usePeerBenchmarks: true, contributeOutcomes: false } });
           toast('Demo reset');
         },
       };
     },
     {
       name: 'cost-of-yes-demo',
-      version: 3,
-      // Older saved demos had a single negotiation: start them fresh.
+      version: 4,
+      // Older saved demos predate per-redline state and sign-in: start them fresh.
       migrate: () => ({}) as never,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
-      partialize: (s) => ({ role: s.role, negotiations: s.negotiations, completedSteps: s.completedSteps }),
+      partialize: (s) => ({
+        role: s.role, negotiations: s.negotiations, completedSteps: s.completedSteps,
+        signedIn: s.signedIn, welcomeDismissed: s.welcomeDismissed, data: s.data,
+      }),
       // Redlines added after a demo was saved still get a starting state.
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<DemoState>;

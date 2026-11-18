@@ -57,7 +57,7 @@ export function pricePackage(c: Contract, ask: SupplierAsk, t: PackageTemplate, 
   const approvals: PricedPackage['approvals'] = ['lead'];
   if (gives.some((g) => g.needsFinance)) approvals.push('finance');
   return {
-    id: t.id, name: t.name, gives, wordings: wordings as Wordings, lines,
+    id: t.id, name: t.name, gives, wordings: wordings as Wordings, lines, concession: t.concession,
     protectedLakh, protectedByLine, giveCostLakh, commitmentLakh,
     netLakh: protectedLakh - giveCostLakh, approvals,
   };
@@ -67,6 +67,8 @@ export interface BuildOptions {
   redlineId?: string;
   excludeGives?: GiveId[];
   templates?: PackageTemplate[];
+  /** Offers the lead built herself (e.g. from a saved what-if). Always shown if they protect anything. */
+  extra?: PackageTemplate[];
 }
 
 /** Price every template, drop those that trade nothing, rank by net. */
@@ -86,8 +88,33 @@ export function buildPackages(opts: BuildOptions = {}): PricedPackage[] {
     const keep = pricePackage(c, ask, holdFirmTemplate(c, ask), lines);
     if (keep.protectedLakh > 0.005) priced = [...priced, keep];
   }
+  for (const t of opts.extra ?? []) {
+    const p = pricePackage(c, ask, t, lines);
+    if (p.protectedLakh > 0.005) priced = [...priced, p];
+  }
   const ranked = [...priced].sort(byNetThenCommitment);
   return priced.map((p) => ({ ...p, rank: ranked.findIndex((x) => x.id === p.id) + 1 }));
+}
+
+const CLAIM_DAYS: Partial<Record<WordingGroup, string>> = {
+  claim_11_30: '15 days',
+  claim_30_autofiled: '30 days, filed automatically',
+  claim_le_10: '10 days',
+};
+
+/**
+ * The lead's own counter from a saved credits what-if: hold firm on the other
+ * changed lines, and concede the claim window she tested on credits.
+ */
+export function draftOfferTemplate(c: Contract, ask: SupplierAsk, credits: WordingGroup): PackageTemplate {
+  const base = holdFirmTemplate(c, ask);
+  return {
+    id: 'E',
+    name: 'Your counter',
+    gives: [],
+    wordings: { ...base.wordings, credits } as Wordings,
+    concession: credits === 'automatic' ? undefined : `${CLAIM_DAYS[credits] ?? 'a claim window'} to claim credits, instead of automatic credits`,
+  };
 }
 
 export interface Preferences {

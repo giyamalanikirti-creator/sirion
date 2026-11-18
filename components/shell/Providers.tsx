@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, Fragment, useContext, useEffect, useState } from 'react';
+import { setPeerBenchmarks } from '@/lib/engines/costEngine';
 import { Toaster } from 'sonner';
 import { useDemo } from '@/lib/store';
 
@@ -15,7 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <HydratedCtx.Provider value={hydrated}>
       {children}
-      <Toaster position="top-center" toastOptions={{ style: { fontFamily: 'var(--font-sans)' } }} />
+      <Toaster position="bottom-right" toastOptions={{ style: { fontFamily: 'var(--font-sans)' } }} />
     </HydratedCtx.Provider>
   );
 }
@@ -31,5 +32,15 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  return <>{children}</>;
+  return <EngineSettings>{children}</EngineSettings>;
+}
+
+/**
+ * Applies the workspace's data settings to the engines before anything below renders.
+ * Changing a setting remounts the subtree so every figure is recomputed.
+ */
+function EngineSettings({ children }: { children: React.ReactNode }) {
+  const peer = useDemo((s) => s.data.usePeerBenchmarks);
+  setPeerBenchmarks(peer);
+  return <Fragment key={peer ? 'peer' : 'own-only'}>{children}</Fragment>;
 }

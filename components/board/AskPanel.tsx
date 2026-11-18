@@ -50,7 +50,7 @@ export function AskPanel({
       const res = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ messages: [...history, { role: 'user', content: question }].slice(-ASK_LIMITS.maxMessages), redlineId, role }),
+        body: JSON.stringify({ messages: [...history, { role: 'user', content: question }].slice(-ASK_LIMITS.maxMessages), redlineId, role, peerBenchmarks: useDemo.getState().data.usePeerBenchmarks }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'The assistant could not answer');

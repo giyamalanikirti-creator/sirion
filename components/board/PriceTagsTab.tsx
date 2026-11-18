@@ -99,89 +99,133 @@ function Comparison({ c, supplier }: { c: LineComparison; supplier: string }) {
 }
 
 const CLAIM_OPTIONS: { group: CreditsGroup; label: string }[] = [
-  { group: 'claim_le_10', label: '≤10 days' },
   { group: 'claim_11_30', label: '15 days' },
-  { group: 'claim_30_autofiled', label: '30 days, auto-filed' },
-  { group: 'automatic', label: 'Automatic' },
+  { group: 'claim_30_autofiled', label: '30 days, filed automatically' },
+  { group: 'automatic', label: 'Automatic credits' },
 ];
 
-function ClaimWindowWhatIf({ contract, askTag }: { contract: Contract; askTag: PriceTag }) {
+/** "Try a different claim window": starts on the supplier's proposal; the comparison appears only after a choice. */
+function ClaimWindowWhatIf({ contract, askTag, onReviewDraft }: { contract: Contract; askTag: PriceTag; onReviewDraft: () => void }) {
   const { n, saveCreditDraft: saveDraft } = useBoard();
   const draft = n.creditDraft;
-  const [group, setGroup] = useState<CreditsGroup>(draft ?? 'claim_11_30');
-  const alt = priceTag(contract, 'credits', group);
-  const diff = askTag.costLakh - alt.costLakh;
-  const isAsk = group === askTag.group;
+  const peerOn = useDemo((s) => s.data.usePeerBenchmarks);
+  const [group, setGroup] = useState<CreditsGroup | undefined>(draft);
+  const alt = group ? priceTag(contract, 'credits', group) : undefined;
+  const priced = alt && Number.isFinite(alt.costLakh);
+  const label = CLAIM_OPTIONS.find((o) => o.group === group)?.label;
 
   return (
     <div className="rounded-xl border border-teal-900/25 bg-teal-900/[0.03] p-4">
       <div className="mb-2 flex items-center gap-2 text-sm font-medium text-teal-title">
         <FlaskConical className="h-4 w-4" /> Try a different claim window
       </div>
-      <div role="radiogroup" aria-label="Claim window" className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setGroup(undefined)}
+          aria-pressed={!group}
+          className={cn('rounded-full border px-2.5 py-1 text-xs', !group ? 'border-teal-900 bg-teal-900 text-white' : 'border-line bg-white text-ink hover:border-teal-900/40')}
+        >
+          {contract.supplier}’s proposal · {askTag.group === 'claim_le_10' ? '10 days or less' : GROUP_LABEL[askTag.group].toLowerCase()}
+        </button>
         {CLAIM_OPTIONS.map((o) => (
           <button
             key={o.group}
             type="button"
-            role="radio"
-            aria-checked={group === o.group}
+            aria-pressed={group === o.group}
             onClick={() => setGroup(o.group)}
             className={cn(
               'rounded-full border px-2.5 py-1 text-xs',
               group === o.group ? 'border-teal-900 bg-teal-900 text-white' : 'border-line bg-white text-ink hover:border-teal-900/40',
             )}
           >
-            {o.label}
+            Try {o.label.toLowerCase()}
           </button>
         ))}
       </div>
 
-      {!isAsk && (
+      {!group && <p className="mt-3 text-xs text-muted">Pick an alternative to see how the estimate and its evidence change.</p>}
+
+      {group && alt && (
         <>
           <div className="mt-3 grid grid-cols-2 gap-2 text-center">
             <div className="rounded-lg bg-white p-2.5">
-              <div className="text-[11px] text-muted">{contract.supplier}’s ask</div>
+              <div className="text-[11px] text-muted">{contract.supplier}’s proposal</div>
               <div className="text-[20px] font-light text-teal-900">{formatLakh(askTag.costLakh)}</div>
-              <div className="text-[11px] text-muted">{askTag.n} own contracts</div>
+              <div className="text-[11px] text-muted">{askTag.source === 'own' ? `${askTag.n} of your contracts` : 'peer data'}</div>
             </div>
             <div className="rounded-lg bg-white p-2.5 ring-1 ring-teal-900/30">
-              <div className="text-[11px] text-muted">{CLAIM_OPTIONS.find((o) => o.group === group)!.label}</div>
-              <div className="text-[20px] font-light text-teal-900">{formatLakh(alt.costLakh)}</div>
+              <div className="text-[11px] text-muted">{label}</div>
+              <div className={cn('font-light', priced ? 'text-[20px] text-teal-900' : 'py-1 text-[13px] text-danger')}>
+                {priced ? formatLakh(alt.costLakh) : 'Insufficient data to estimate'}
+              </div>
               <div className="text-[11px] text-muted">
-                {alt.source === 'pooled' && alt.pooledBackup ? `${alt.n} own · pooled, ${alt.pooledBackup.companies} companies` : alt.source === 'assumption' ? 'assumption' : `${alt.n} own contracts`}
+                {!priced ? 'no comparable contracts' : alt.source === 'pooled' && alt.pooledBackup ? `${alt.pooledBackup.companies} participating companies` : alt.source === 'assumption' ? 'assumption' : `${alt.n} of your contracts`}
               </div>
             </div>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-ink">
-            {group === 'claim_11_30' && (
-              <>
-                We have {alt.n === 0 ? 'no' : `only ${alt.n}`} own {contract.supplierType} contract{alt.n === 1 ? '' : 's'} with an 11–30 day window, so a 15-day window is priced with the broader <strong className="font-medium">11–30 day</strong> cohort from
-                pooled data ({alt.pooledBackup?.label.toLowerCase()}, {alt.pooledBackup?.companies} companies).{' '}
-              </>
-            )}
-            {group === 'claim_30_autofiled' && <>Assumes claims filed by the contract system recover about 90% of credits. </>}
-            {group === 'automatic' && <>The benchmark: credits arrive on the invoice without anyone claiming them. </>}
-            Exposure falls by {formatLakh(diff)} a year. <ConfidenceInline tag={alt} />
+            {group === 'claim_11_30' &&
+              (priced ? (
+                <>
+                  Your company has {alt.n === 0 ? 'no' : `only ${alt.n}`} comparable contract{alt.n === 1 ? '' : 's'} for this window. This estimate uses outcomes from{' '}
+                  {alt.pooledBackup?.companies} participating companies (claim windows of 11–30 days). Confidence is low.
+                </>
+              ) : (
+                <>
+                  Your company has no comparable contracts for this window{peerOn ? '' : ', and peer benchmarks are turned off for this workspace'}. You can still draft it as a counter.
+                </>
+              ))}
+            {group === 'claim_30_autofiled' && <>Assumes claims filed by the contract system recover about 90% of credits. Confidence is low.</>}
+            {group === 'automatic' && <>Today’s wording and the benchmark: credits arrive on the invoice without anyone claiming them.</>}
+            {priced && group !== 'automatic' && <> Exposure falls by {formatLakh(askTag.costLakh - alt.costLakh)} a year.</>}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {draft === group ? (
-              <span className="flex items-center gap-1.5 text-xs text-teal-900"><Check className="h-3.5 w-3.5" /> Saved as draft counteroffer</span>
+              <>
+                <span className="flex items-center gap-1.5 text-xs text-teal-900"><Check className="h-3.5 w-3.5" /> Saved as your draft counter</span>
+                <Button size="sm" onClick={onReviewDraft}>Review my draft <ArrowRight className="h-3.5 w-3.5" /></Button>
+              </>
             ) : (
-              <Button size="sm" variant="outline" onClick={() => saveDraft(group)}>
-                Use as draft counteroffer
-              </Button>
+              <Button size="sm" variant="outline" onClick={() => saveDraft(group)}>Save as my draft counter</Button>
             )}
             {draft && draft !== group && <span className="text-[11px] text-muted">Current draft: {CLAIM_CHOICE_LABEL[draft]}</span>}
           </div>
         </>
       )}
-      {isAsk && <p className="mt-3 text-xs text-muted">This is what {contract.supplier} asked for. Pick another window to compare.</p>}
     </div>
   );
 }
 
-function ConfidenceInline({ tag }: { tag: PriceTag }) {
-  return <span className="text-muted">Confidence: {tag.confidence === 'none' ? 'not enough history' : tag.confidence}.</span>;
+/** Evidence actually used for the number, kept apart from peer data shown only for comparison. */
+function Evidence({ t }: { t: PriceTag }) {
+  const peerUsed = t.source === 'pooled';
+  return (
+    <div className="mt-4 space-y-3">
+      <div>
+        <div className="mb-1.5 text-[11px] uppercase tracking-wide text-muted">Used to calculate this estimate</div>
+        <ul className="space-y-2 text-sm">
+          {t.proof.map((p, i) => (
+            <li key={i} className={cn('flex gap-2', i === t.proof.length - 1 && 'font-medium text-ink')}>
+              {i === t.proof.length - 1 ? <Calculator className="mt-0.5 h-4 w-4 shrink-0 text-teal-900" /> : <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted" />}
+              <span>{p}</span>
+            </li>
+          ))}
+        </ul>
+        {peerUsed && t.pooledBackup && (
+          <div className="mt-2">
+            <Chip icon={<Users className="h-3 w-3" />} tone="teal">Peer data used: {t.pooledBackup.label.toLowerCase()} · {t.pooledBackup.companies} companies</Chip>
+          </div>
+        )}
+      </div>
+      {!peerUsed && t.pooledBackup && (
+        <div>
+          <div className="mb-1.5 text-[11px] uppercase tracking-wide text-muted">Peer comparison · not used in this number</div>
+          <Chip icon={<Users className="h-3 w-3" />} tone="muted">{t.pooledBackup.label} across {t.pooledBackup.companies} companies</Chip>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function PriceTagsTab({
@@ -194,6 +238,7 @@ export function PriceTagsTab({
   contract: Contract;
   onGoPackages: () => void;
   onAsk: (question: string) => void;
+  onGoTab?: (t: 'changes' | 'tags' | 'packages' | 'signing') => void;
 }) {
   const { id, n, markPriced } = useBoard();
   const sortResult = n.sortResult;
@@ -209,63 +254,55 @@ export function PriceTagsTab({
   }, [sortResult, id]);
 
   if (!sortResult) {
-    return <EmptyState title="Sort the changes first">Price tags appear once the money lines are found. Go to the Changes tab and press Sort.</EmptyState>;
+    return <EmptyState title="Analyse the changes first">The financial impact appears once the commercial changes are found. Use Analyse above.</EmptyState>;
+  }
+  if (!tags.length) {
+    return <EmptyState title="No financial impact">None of {contract.supplier}’s changes touch renewal, service credits or price.</EmptyState>;
   }
 
   const ordered = CARD_ORDER.map((l) => tags.find((t) => t.line === l)).filter((t): t is PriceTag => !!t);
+  const unpriced = tags.filter((t) => !Number.isFinite(t.costLakh)).length;
+  const k = ordered.length;
+  const changesWord = k === 1 ? 'this commercial change' : k === 2 ? 'both commercial changes' : `all ${k === 3 ? 'three' : k} commercial changes`;
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-line bg-white px-6 py-4 text-sm shadow-card">
-        Each figure is the <strong className="font-medium">estimated yearly loss vs a procurement benchmark</strong> (opt-in renewal, automatic credits,
-        5% price cap), from our own contract history, or pooled data where ours is thin.{' '}
-        {vsCurrentLakh > 0.005 ? (
-          <>
-            Against the current contract, accepting {ordered.length === 1 ? 'this edit' : ordered.length === 2 ? 'both edits' : `all ${ordered.length} edits`} would cost about{' '}
-            <strong className="font-medium text-teal-900">{formatLakh(vsCurrentLakh)} a year</strong>.
-          </>
-        ) : (
-          <>Against the current contract it costs nothing extra: today’s wording already has the same weakness, and this renewal is the chance to fix it.</>
-        )}
+      <div className="rounded-2xl border border-line bg-white px-6 py-5 shadow-card">
+        <p className="text-[18px] leading-snug text-teal-title">
+          {vsCurrentLakh > 0.005 ? (
+            <>Accepting {changesWord} could cost an estimated <strong className="font-medium text-teal-900">{formatLakh(vsCurrentLakh)} more per year</strong> than your current contract.</>
+          ) : (
+            <>Accepting {changesWord} costs nothing extra compared with your current contract: today’s wording already has the same weakness.</>
+          )}
+        </p>
+        <p className="mt-1 text-sm text-muted">
+          Against procurement benchmarks (opt-in renewal, automatic credits, a 5% price cap) the exposure is {formatLakh(totalLakh)} a year.
+          {unpriced > 0 && ` ${unpriced} term could not be estimated: insufficient data.`}
+        </p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         {ordered.map((t) => {
           const cmp = comparisons.find((c) => c.line === t.line)!;
+          const vsCurrent = cmp.vsCurrentLakh;
           return (
             <SirionCard key={t.line} title={LINE_LABEL[t.line]} className="flex flex-col" bodyClassName="flex flex-1 flex-col">
               <div className="text-[34px] font-light leading-none text-teal-900">
-                {Number.isFinite(t.costLakh) ? formatLakh(t.costLakh) : 'Not enough history'}
+                {!Number.isFinite(t.costLakh) ? <span className="text-[22px] text-danger">Insufficient data to estimate</span> : vsCurrent > 0.005 ? formatLakh(vsCurrent) : '₹0'}
               </div>
-              <div className="mt-1 text-sm text-muted">a year · estimated exposure vs benchmark</div>
-              <div className="mt-1 text-xs text-ink">
-                {!Number.isFinite(cmp.vsCurrentLakh)
-                  ? 'Cannot be compared with the current wording'
-                  : cmp.vsCurrentLakh > 0.005
-                    ? `${formatLakh(cmp.vsCurrentLakh)} a year more than the current wording`
-                    : 'Same wording group as today: no extra cost vs the current contract'}
+              <div className="mt-1 text-sm text-muted">
+                {Number.isFinite(t.costLakh) && (vsCurrent > 0.005 ? 'a year more than your current contract' : 'extra a year: same wording group as today')}
               </div>
+              {Number.isFinite(t.costLakh) && <div className="mt-1 text-xs text-ink">{formatLakh(t.costLakh)} a year vs the procurement benchmark</div>}
               <div className="mt-3 flex flex-wrap gap-2">
                 <ConfidencePill confidence={t.confidence} n={t.n} source={t.source} />
-                {t.pooledBackup && (
-                  <Chip icon={<Users className="h-3 w-3" />} tone="muted" title="Pooled figure from other companies (counts only, 20+ companies)">
-                    Pooled: {t.pooledBackup.label.toLowerCase()} · {t.pooledBackup.companies} companies
-                  </Chip>
-                )}
               </div>
               <div className="mt-4">
                 <Comparison c={cmp} supplier={contract.supplier} />
               </div>
-              <ul className="mt-4 space-y-2 text-sm">
-                {t.proof.map((p, i) => (
-                  <li key={i} className={cn('flex gap-2', i === t.proof.length - 1 && 'font-medium text-ink')}>
-                    {i === t.proof.length - 1 ? <Calculator className="mt-0.5 h-4 w-4 shrink-0 text-teal-900" /> : <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted" />}
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
+              <Evidence t={t} />
               {t.line === 'credits' && (
                 <div className="mt-4">
-                  <ClaimWindowWhatIf contract={contract} askTag={t} />
+                  <ClaimWindowWhatIf contract={contract} askTag={t} onReviewDraft={onGoPackages} />
                 </div>
               )}
               <div className="mt-auto flex flex-wrap gap-1 pt-4">
@@ -279,14 +316,6 @@ export function PriceTagsTab({
             </SirionCard>
           );
         })}
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
-        <div className="text-sm">
-          Estimated annual exposure vs procurement benchmarks: <strong className="font-medium text-teal-900">{formatLakh(totalLakh)} a year</strong>.
-        </div>
-        <Button onClick={onGoPackages}>
-          Build packages <ArrowRight className="h-4 w-4" />
-        </Button>
       </div>
       {drawer && <ContractsDrawer tag={drawer} type={contract.supplierType} open={!!drawer} onOpenChange={(o) => !o && setDrawer(null)} />}
     </div>

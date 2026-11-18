@@ -2,67 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, FileDiff } from 'lucide-react';
 import { Donut, SimpleBars, StackedBars } from '@/components/charts';
 import { KpiTile, PageHeader, SirionCard } from '@/components/ui';
-import { getRedline } from '@/lib/data';
 import { atStakeByRedline, creditsByGroup, creditWordingSplit, northStar, noticeDeadlinesNext6Months } from '@/lib/engines/dashboard';
-import { redlinePriceTags } from '@/lib/engines/redline';
-import { formatDate, formatLakh } from '@/lib/format';
-import { atLeast, STORY_REDLINE, useDemo, useNegotiation } from '@/lib/store';
-import { finalDeal } from '@/lib/engines/negotiation';
+import { formatLakh } from '@/lib/format';
+import { atLeast, STORY_REDLINE, useDemo } from '@/lib/store';
+import { dealFor } from '@/lib/offers';
 import { redlines } from '@/lib/data';
 
-const BOARD = '/redlines/RL-CLOUDDESK';
-
-function FrontDoor() {
-  const status = useNegotiation(STORY_REDLINE).status;
-  const sorted = atLeast(status, 'sorted');
-  const signed = status === 'signed';
-  const r = getRedline('RL-CLOUDDESK');
-  const { contract: c, totalLakh } = redlinePriceTags(r.id);
-
-  let title: string, body: string, cta: string, href: string;
-  if (signed) {
-    title = 'CloudDesk is signed. All three commercial terms have an automated check.';
-    body = 'The first invoice after signature is where the service-credit clause earns its keep.';
-    cta = 'See the first invoice check';
-    href = `${BOARD}?tab=signing`;
-  } else if (sorted) {
-    title = `CloudDesk’s three money edits carry an estimated ${formatLakh(totalLakh)} a year of exposure`;
-    body = 'Measured against procurement benchmarks. Two routine edits are logged and one liability change is with legal.';
-    cta = 'Continue the negotiation';
-    href = `${BOARD}?tab=${atLeast(status, 'awaiting_approval') ? 'packages' : 'tags'}`;
-  } else {
-    title = `CloudDesk returned your ${formatLakh(c.annualFeeInr / 1e5)} renewal with ${r.changes.length} edits`;
-    body = `Helpdesk software · ${c.seats} seats · received ${formatDate(r.receivedAt)}. Some edits are routine; some change what you pay. Sort them before anyone says yes.`;
-    cta = 'Review supplier changes';
-    href = `${BOARD}?tab=changes`;
-  }
-
-  return (
-    <section className="mb-6 overflow-hidden rounded-2xl bg-teal-900 text-white shadow-card">
-      <div className="flex flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between md:px-8">
-        <div className="flex items-start gap-4">
-          <span className="mt-1 hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 sm:flex">
-            <FileDiff className="h-6 w-6" />
-          </span>
-          <div>
-            <div className="text-xs uppercase tracking-wide text-white/60">Waiting on you</div>
-            <h2 className="mt-1 max-w-2xl text-[22px] font-normal leading-snug">{title}</h2>
-            <p className="mt-2 max-w-2xl text-sm text-white/75">{body}</p>
-          </div>
-        </div>
-        <Link
-          href={href}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-medium text-teal-900 hover:bg-white/90"
-        >
-          {cta} <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
-    </section>
-  );
-}
+import { FrontDoor } from '@/components/dashboard/FrontDoor';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -80,7 +28,7 @@ export default function DashboardPage() {
     .filter((r) => negotiations[r.id]?.status === 'signed' && negotiations[r.id].supplierPick)
     .map((r) => {
       const n = negotiations[r.id];
-      const d = finalDeal(n.supplierPick!, n.counter ? [n.counter] : [], r.id);
+      const d = dealFor(r.id, { ...n, supplierPick: n.supplierPick! });
       return { enforceable: d.enforceableCount, total: d.totalLines };
     });
   const ns = northStar(signedDeals);

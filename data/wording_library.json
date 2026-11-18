@@ -1,12 +1,101 @@
 [
-  { "id": "R1", "line": "renewal", "wordingGroup": "opt_in", "text": "This Agreement renews only if Customer confirms in writing before the end of the Term.", "plainReason": "Renewal becomes a clear yes from both sides.", "enforceable": true, "sirionCheck": "Renewal decision task on a fixed date" },
-  { "id": "R2", "line": "renewal", "wordingGroup": "notice_le_30", "text": "This Agreement renews automatically unless either party gives thirty (30) days' written notice.", "plainReason": "A 30-day window gives both sides time to plan without a long lock-in.", "enforceable": true, "sirionCheck": "Renewal alert 45 days before the notice deadline" },
-  { "id": "R3", "line": "renewal", "wordingGroup": "notice_60_90", "text": "This Agreement renews automatically unless either party gives sixty (60) days' written notice.", "plainReason": "A middle ground on notice.", "enforceable": true, "sirionCheck": "Renewal alert 75 days before the notice deadline" },
-  { "id": "S1", "line": "credits", "wordingGroup": "automatic", "text": "Service credits are applied automatically to the next invoice.", "plainReason": "Saves both sides the work of tracking and claiming credits.", "enforceable": true, "sirionCheck": "Credit check on every invoice" },
-  { "id": "S2", "line": "credits", "wordingGroup": "claim_30_autofiled", "text": "Service credits are claimed within thirty (30) days; Supplier accepts claims filed through Customer's contract system.", "plainReason": "Claims arrive on time and in one format.", "enforceable": true, "sirionCheck": "Claim filed automatically on day 2" },
-  { "id": "S3", "line": "credits", "wordingGroup": "claim_le_10", "text": "Service credits are payable only if Customer submits a written claim within ten (10) days of the end of the month in which the failure occurred.", "plainReason": "(not offered)", "enforceable": false, "sirionCheck": "None. Relies on people remembering" },
-  { "id": "P1", "line": "price", "wordingGroup": "fixed", "text": "The Fees are fixed for the Term.", "plainReason": "Predictable budgets on both sides.", "enforceable": true, "sirionCheck": "Invoice price check" },
-  { "id": "P2", "line": "price", "wordingGroup": "cap_5", "text": "Fees may increase once per contract year by no more than five percent (5%), with sixty (60) days' written notice.", "plainReason": "Lets prices move with costs, within a known limit.", "enforceable": true, "sirionCheck": "Invoice price check against the cap" },
-  { "id": "P3", "line": "price", "wordingGroup": "cap_7", "text": "Fees may increase once per contract year by no more than seven percent (7%), with sixty (60) days' written notice.", "plainReason": "A slightly higher limit, still predictable.", "enforceable": true, "sirionCheck": "Invoice price check against the cap" },
-  { "id": "P4", "line": "price", "wordingGroup": "open_yearly", "text": "Supplier may revise the Fees once in each contract year by written notice.", "plainReason": "(not offered)", "enforceable": false, "sirionCheck": "None. No price to check against" }
+  {
+    "id": "R1",
+    "line": "renewal",
+    "wordingGroup": "opt_in",
+    "text": "This Agreement renews only if Customer confirms in writing before the end of the Term.",
+    "plainReason": "Renewal becomes a clear yes from both sides.",
+    "enforceable": true,
+    "sirionCheck": "Renewal decision task on a fixed date"
+  },
+  {
+    "id": "R2",
+    "line": "renewal",
+    "wordingGroup": "notice_le_30",
+    "text": "This Agreement renews automatically unless either party gives thirty (30) days' written notice.",
+    "plainReason": "A 30-day window gives both sides time to plan without a long lock-in.",
+    "enforceable": true,
+    "sirionCheck": "Renewal alert 45 days before the notice deadline"
+  },
+  {
+    "id": "R3",
+    "line": "renewal",
+    "wordingGroup": "notice_60_90",
+    "text": "This Agreement renews automatically unless either party gives sixty (60) days' written notice.",
+    "plainReason": "A middle ground on notice.",
+    "enforceable": true,
+    "sirionCheck": "Renewal alert 75 days before the notice deadline"
+  },
+  {
+    "id": "S1",
+    "line": "credits",
+    "wordingGroup": "automatic",
+    "text": "Service credits are applied automatically to the next invoice.",
+    "plainReason": "Saves both sides the work of tracking and claiming credits.",
+    "enforceable": true,
+    "sirionCheck": "Credit check on every invoice"
+  },
+  {
+    "id": "S2",
+    "line": "credits",
+    "wordingGroup": "claim_30_autofiled",
+    "text": "Service credits are claimed within thirty (30) days; Supplier accepts claims filed through Customer's contract system.",
+    "plainReason": "Claims arrive on time and in one format.",
+    "enforceable": true,
+    "sirionCheck": "Claim filed automatically on day 2"
+  },
+  {
+    "id": "S3",
+    "line": "credits",
+    "wordingGroup": "claim_le_10",
+    "text": "Service credits are payable only if Customer submits a written claim within ten (10) days of the end of the month in which the failure occurred.",
+    "plainReason": "(not offered)",
+    "enforceable": false,
+    "sirionCheck": "None. Relies on people remembering"
+  },
+  {
+    "id": "S4",
+    "line": "credits",
+    "wordingGroup": "claim_11_30",
+    "text": "Service credits are payable if Customer submits a written claim within fifteen (15) days of the end of the month in which the failure occurred.",
+    "plainReason": "Gives both teams more time to review a month's service before claiming.",
+    "enforceable": false,
+    "sirionCheck": "Claim reminder only. Relies on someone filing in time"
+  },
+  {
+    "id": "P1",
+    "line": "price",
+    "wordingGroup": "fixed",
+    "text": "The Fees are fixed for the Term.",
+    "plainReason": "Predictable budgets on both sides.",
+    "enforceable": true,
+    "sirionCheck": "Invoice price check"
+  },
+  {
+    "id": "P2",
+    "line": "price",
+    "wordingGroup": "cap_5",
+    "text": "Fees may increase once per contract year by no more than five percent (5%), with sixty (60) days' written notice.",
+    "plainReason": "Lets prices move with costs, within a known limit.",
+    "enforceable": true,
+    "sirionCheck": "Invoice price check against the cap"
+  },
+  {
+    "id": "P3",
+    "line": "price",
+    "wordingGroup": "cap_7",
+    "text": "Fees may increase once per contract year by no more than seven percent (7%), with sixty (60) days' written notice.",
+    "plainReason": "A slightly higher limit, still predictable.",
+    "enforceable": true,
+    "sirionCheck": "Invoice price check against the cap"
+  },
+  {
+    "id": "P4",
+    "line": "price",
+    "wordingGroup": "open_yearly",
+    "text": "Supplier may revise the Fees once in each contract year by written notice.",
+    "plainReason": "(not offered)",
+    "enforceable": false,
+    "sirionCheck": "None. No price to check against"
+  }
 ]

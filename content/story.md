@@ -2,6 +2,8 @@
 
 **Every supplier redline has a price. Cost of Yes shows it before anyone says yes.**
 
+> **Who you are.** Riya, a procurement lead at a company that pays CloudDesk ₹60 lakh a year for helpdesk software. CloudDesk has proposed six changes to renew the contract. **The question:** which changes should she accept, and what should she ask for in return?
+>
 > **The demo in one line.** CloudDesk asks for a 10-day claim window → the buyer sees why that exposes ₹3.2 lakh a year → tests 15 days (₹2.4 lakh, on thin pooled data) → trades faster payment for automatic credits → watches Sirion check the first invoice and catch a missing ₹25,000 credit.
 
 Cost of Yes is a concept for the **negotiation** stage of the contract lifecycle. When a supplier sends back a renewal with changes, it sorts the changes, puts a ₹ price tag on every money line with proof, builds give-get packages, routes approvals, lets the supplier choose in a portal, and makes sure every money line that gets signed can be checked by a system afterwards.
@@ -84,6 +86,9 @@ The same flow works for every redline in the inbox, not just CloudDesk. Where ou
 The assistant ("Ask Cost of Yes") can only calculate and draft. Every number it says must come from a tool that runs the same engines as the screen, and it always says how many contracts a number rests on.
 
 ## Data and privacy
+
+- **Access.** Customers sign in with company single sign-on. An admin authorises read-only analysis of contracts, invoices, service-level records and past renewals; nothing in Sirion is changed.
+- **Two independent switches.** *Use aggregate peer benchmarks* (on by default) lets estimates fall back on outcomes from 20+ companies when own history is thin. *Contribute aggregate outcomes* (off by default) shares rates and counts back. Using benchmarks does not require contributing. With benchmarks off, any estimate that would need them says “Insufficient data to estimate” instead of guessing.
 
 - **Own data:** contracts, invoices, service-level events and past renewals already in the contract system. In this prototype they are generated with a fixed seed so every number is reproducible.
 - **Pooled data:** counts from other companies, used only when own history is thin. A pooled figure shows only with 20+ companies, a little noise is added, data is at least 6 months old, and companies opt in. A row with 14 companies is hidden ("Not enough companies yet").

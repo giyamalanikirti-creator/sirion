@@ -22,7 +22,7 @@ describe('seed: shape', () => {
     expect(renewals).toHaveLength(22);
   });
   it('has the hand-written files', () => {
-    expect(wordingLibrary).toHaveLength(10);
+    expect(wordingLibrary).toHaveLength(11);
     expect(redlines).toHaveLength(6);
     expect(packageTemplates).toHaveLength(3);
     expect(pooledRates.length).toBeGreaterThanOrEqual(12);

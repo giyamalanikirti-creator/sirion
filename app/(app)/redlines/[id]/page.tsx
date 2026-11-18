@@ -10,10 +10,9 @@ import { ChangesTab } from '@/components/board/ChangesTab';
 import { PackagesTab } from '@/components/board/PackagesTab';
 import { PriceTagsTab } from '@/components/board/PriceTagsTab';
 import { SigningTab } from '@/components/board/SigningTab';
-import { StatusBanner } from '@/components/board/StatusBanner';
+import { NextStepPanel } from '@/components/board/NextStepPanel';
 import { EmptyState } from '@/components/ui';
 import { redlines } from '@/lib/data';
-import { buildPackages } from '@/lib/engines/givegetEngine';
 import { redlinePriceTags } from '@/lib/engines/redline';
 import { atLeast, hasMoneyLines, STORY_REDLINE, useDemo, useNegotiation } from '@/lib/store';
 import { RedlineProvider } from '@/components/board/context';
@@ -23,8 +22,8 @@ import { cn } from '@/lib/utils';
 type Tab = 'changes' | 'tags' | 'packages' | 'signing';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'changes', label: 'Changes' },
-  { id: 'tags', label: 'Price tags' },
-  { id: 'packages', label: 'Packages' },
+  { id: 'tags', label: 'Financial impact' },
+  { id: 'packages', label: 'Compare offers' },
   { id: 'signing', label: 'Signing' },
 ];
 
@@ -53,13 +52,16 @@ function Board() {
 
   const setTab = (t: Tab) => router.replace(`${pathname}?tab=${t}`, { scroll: false });
 
+  const dismissWelcome = useDemo((s) => s.dismissWelcome);
   useEffect(() => {
     if (redline?.id === STORY_REDLINE) completeStep(1);
-  }, [redline, completeStep]);
+    // Opening any redline makes this a returning user: the dashboard then shows the work queue.
+    if (redline) dismissWelcome();
+  }, [redline, completeStep, dismissWelcome]);
 
   const data = useMemo(() => {
     if (!redline) return null;
-    return { ...redlinePriceTags(redline.id), packages: buildPackages({ redlineId: redline.id }) };
+    return redlinePriceTags(redline.id);
   }, [redline]);
 
   if (!redline) return <EmptyState title="Redline not found"><Link className="text-teal-900 underline" href="/redlines">Back to the inbox</Link></EmptyState>;
@@ -80,7 +82,7 @@ function Board() {
           moneyLines={data.lines.length}
           unpriced={data.unpriced.length}
         />
-        <StatusBanner onGoSigning={() => setTab('signing')} />
+        <NextStepPanel onGoTab={setTab} />
 
         <div className="flex items-center justify-between gap-3 border-b border-line">
           <div role="tablist" aria-label="Negotiation board" className="flex gap-1 overflow-x-auto">
@@ -119,7 +121,7 @@ function Board() {
         </div>
 
         <div role="tabpanel">
-          {tab === 'changes' && <ChangesTab redline={redline} tags={data.tags} onGoTags={() => setTab('tags')} />}
+          {tab === 'changes' && <ChangesTab redline={redline} tags={data.tags} onGoTags={() => setTab('tags')} onGoTab={setTab} />}
           {tab === 'tags' && (
             <PriceTagsTab
               tags={data.tags}
@@ -128,10 +130,11 @@ function Board() {
               vsCurrentLakh={data.vsCurrentLakh}
               contract={data.contract}
               onGoPackages={() => setTab('packages')}
+              onGoTab={setTab}
               onAsk={askAbout}
             />
           )}
-          {tab === 'packages' && <PackagesTab packages={data.packages} />}
+          {tab === 'packages' && <PackagesTab onGoTab={setTab} />}
           {tab === 'signing' && <SigningTab />}
         </div>
 

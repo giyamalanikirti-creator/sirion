@@ -1,9 +1,9 @@
 'use client';
 
 import { AlertTriangle, Check, FileSignature, ReceiptText, UserRound, X } from 'lucide-react';
-import { Button, EmptyState, KpiTile, SirionCard, StatusPill } from '@/components/ui';
+import { EmptyState, KpiTile, SirionCard, StatusPill } from '@/components/ui';
 import { firstInvoiceCheck } from '@/lib/engines/invoiceCheck';
-import { finalDeal } from '@/lib/engines/negotiation';
+import { dealFor } from '@/lib/offers';
 import { getRedline } from '@/lib/data';
 import { COUNTER_PHRASE } from '@/lib/format';
 import { hasMoneyLines, legalChanges } from '@/lib/store';
@@ -12,7 +12,7 @@ import { formatDate, formatLakh, LINE_LABEL } from '@/lib/format';
 import { atLeast } from '@/lib/store';
 
 export function SigningTab() {
-  const { id, n, sign, runInvoiceCheck } = useBoard();
+  const { id, n } = useBoard();
   const { status, supplierPick: pick, counter, signedAt, invoiceChecked } = n;
   const redline = getRedline(id);
 
@@ -20,7 +20,7 @@ export function SigningTab() {
   if (!atLeast(status, 'agreed') || !pick) {
     return <EmptyState title="Signing opens once the deal is agreed">{redline.supplier} needs to pick a package, and you need to accept any counter-offer.</EmptyState>;
   }
-  const deal = finalDeal(pick, counter ? [counter] : [], id);
+  const deal = dealFor(id, { ...n, supplierPick: pick });
   const check = firstInvoiceCheck(redline.contractId);
   const signed = status === 'signed';
 
@@ -79,66 +79,89 @@ export function SigningTab() {
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
         <div className="text-sm text-muted">
           {signed
-            ? `Sent for signature${signedAt ? ` on ${formatDate(signedAt)}` : ''}. All three trackers are live; the dashboard north star now counts these lines.`
-            : 'Every money line has wording a system can check. Send it for signature to switch the trackers on.'}
+            ? `Sent for signature${signedAt ? ` on ${formatDate(signedAt)}` : ''}. ${deal.enforceableCount} of ${deal.totalLines} trackers are live; the dashboard north star now counts these terms.`
+            : deal.enforceableCount === deal.totalLines
+              ? 'Every commercial term has wording Sirion can check. Use Send for signature at the top to switch the trackers on.'
+              : `${deal.totalLines - deal.enforceableCount} term${deal.totalLines - deal.enforceableCount === 1 ? '' : 's'} would have no automated check. You can still sign; Sirion will only remind someone to file claims.`}
         </div>
-        <Button onClick={sign} disabled={signed}>
-          <FileSignature className="h-4 w-4" /> {signed ? 'Sent for signature' : 'Send for signature'}
-        </Button>
+        {signed && <span className="flex items-center gap-1.5 text-sm text-teal-900"><FileSignature className="h-4 w-4" /> Sent for signature</span>}
       </div>
 
-      {signed && check && <InvoiceCheck c={check} checked={invoiceChecked} onRun={runInvoiceCheck} estimatedLakh={deal.protectedLakh} />}
+      {signed && check && <InvoiceCheck c={check} checked={invoiceChecked} estimatedLakh={deal.protectedLakh} />}
     </div>
   );
 }
 
-function InvoiceCheck({ c, checked, onRun, estimatedLakh }: { c: NonNullable<ReturnType<typeof firstInvoiceCheck>>; checked: boolean; onRun: () => void; estimatedLakh: number }) {
-  const rupees = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+function InvoiceCheck({ c, checked, estimatedLakh }: { c: NonNullable<ReturnType<typeof firstInvoiceCheck>>; checked: boolean; estimatedLakh: number }) {
+  const rupees = (v: number) => `₹${v.toLocaleString('en-IN')}`;
   return (
     <SirionCard
-      title={<span className="flex items-center gap-2"><ReceiptText className="h-4 w-4" /> Monday morning: the first invoice check</span>}
+      title={<span className="flex items-center gap-2"><ReceiptText className="h-4 w-4" /> The first invoice after signing</span>}
       action={<StatusPill tone="grey">Simulated</StatusPill>}
     >
       {!checked ? (
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="max-w-2xl text-sm text-muted">
-            Invoice {c.invoiceId} from {c.supplier} arrived on {formatDate(c.invoiceDate)}. Sirion compares it with the signed credit clause and last
-            month’s service levels.
-          </p>
-          <Button onClick={onRun}>Run the check</Button>
-        </div>
+        <p className="text-sm text-muted">
+          Invoice {c.invoiceId} from {c.supplier} arrived on {formatDate(c.invoiceDate)}. Use <strong className="font-medium text-ink">Run the first invoice check</strong> at the top: Sirion compares it with the signed credit clause and last month’s service levels.
+        </p>
       ) : (
         <div className="space-y-5">
-          <ol className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <Fact n={1} label="Signed clause" value={`“${c.clause.text}”`} />
-            <Fact n={2} label={`Service failure · ${c.serviceMonth}`} value={`Uptime ${c.uptimeActual}% vs ${c.uptimeTarget}% target (${c.shortfall}% short)`} />
-            <Fact n={3} label="Credit expected" value={rupees(c.expectedInr)} sub={c.creditRule} strong />
-            <Fact n={4} label={`Credit found on ${c.invoiceId}`} value={rupees(c.foundInr)} danger={c.foundInr < c.expectedInr} />
-          </ol>
           {c.status === 'discrepancy' && (
-            <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-danger/30 bg-danger/[0.04] px-4 py-3 text-sm">
+            <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-danger/30 bg-danger/[0.04] px-4 py-3">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
-                <div>
-                  <div className="font-medium text-ink">{rupees(c.gapInr)} credit missing from the invoice</div>
-                  <div className="text-muted">{c.action} · due in {c.dueInDays} days</div>
-                </div>
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
+                <p className="text-[15px] leading-snug text-ink">
+                  The signed agreement requires an automatic {rupees(c.expectedInr)} credit. The first invoice shows {rupees(c.foundInr)}.{' '}
+                  {c.owner.split(',')[0].split(' ')[0]} has been assigned to follow up.
+                </p>
               </div>
-              <div className="flex items-center gap-2 text-ink">
-                <UserRound className="h-4 w-4 text-muted" /> Owner: {c.owner}
+              <div className="flex items-center gap-2 text-sm text-ink">
+                <UserRound className="h-4 w-4 text-muted" /> {c.owner} · due in {c.dueInDays} days
               </div>
             </div>
           )}
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-line p-4">
+              <div className="text-[11px] uppercase tracking-wide text-muted">Signed clause · service credits</div>
+              <p className="mt-2 text-[15px] text-ink">“{c.clause.text}”</p>
+              <dl className="mt-4 space-y-1.5 border-t border-line pt-3 text-sm">
+                <div className="flex justify-between gap-3"><dt className="text-muted">Service in {c.serviceMonth}</dt><dd>Uptime {c.uptimeActual}% vs {c.uptimeTarget}% target</dd></div>
+                <div className="flex justify-between gap-3"><dt className="text-muted">Credit rule</dt><dd className="text-right">{c.creditRule}</dd></div>
+                <div className="flex justify-between gap-3 font-medium"><dt>Credit the clause requires</dt><dd className="text-teal-900">{rupees(c.expectedInr)}</dd></div>
+              </dl>
+            </div>
+            <div className="rounded-xl border border-line p-4">
+              <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-muted">
+                <span>Invoice {c.invoiceId}</span>
+                <span>{formatDate(c.invoiceDate)}</span>
+              </div>
+              <table className="mt-2 w-full text-sm">
+                <tbody>
+                  <tr className="border-b border-line"><td className="py-2">Subscription, {c.serviceMonth}</td><td className="py-2 text-right tabular-nums">{rupees(c.monthlyFeeInr)}</td></tr>
+                  <tr className="border-b border-line">
+                    <td className="py-2">Service credit</td>
+                    <td className="py-2 text-right tabular-nums text-danger">{c.foundInr ? `−${rupees(c.foundInr)}` : `${rupees(0)} (expected −${rupees(c.expectedInr)})`}</td>
+                  </tr>
+                  <tr className="font-medium"><td className="py-2">Amount due</td><td className="py-2 text-right tabular-nums">{rupees(c.monthlyFeeInr - c.foundInr)}</td></tr>
+                </tbody>
+              </table>
+              {c.gapInr > 0 && (
+                <div className="mt-3 flex items-center justify-between rounded-lg bg-danger/[0.06] px-3 py-2 text-sm">
+                  <span className="text-ink">Credit flagged for follow-up</span>
+                  <span className="font-medium tabular-nums text-danger">{rupees(c.gapInr)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="grid gap-3 border-t border-line pt-4 text-sm md:grid-cols-2">
             <div>
               <div className="text-[11px] uppercase tracking-wide text-muted">Estimated value protected</div>
-              <div>{formatLakh(estimatedLakh)} a year. Forecast from contract history; it stays an estimate.</div>
+              <div>{formatLakh(estimatedLakh)} a year. A forecast from contract history; it stays an estimate.</div>
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wide text-muted">Actual credits recovered</div>
-              <div>
-                {rupees(c.foundInr)} of {rupees(c.expectedInr)} expected so far. Counted only when a credit appears on an invoice.
-              </div>
+              <div>{rupees(c.foundInr)} so far. {rupees(c.gapInr)} is flagged for follow-up and counts only once it appears on an invoice.</div>
             </div>
           </div>
         </div>
@@ -147,27 +170,15 @@ function InvoiceCheck({ c, checked, onRun, estimatedLakh }: { c: NonNullable<Ret
   );
 }
 
-function Fact({ n, label, value, sub, strong, danger }: { n: number; label: string; value: string; sub?: string; strong?: boolean; danger?: boolean }) {
-  return (
-    <li className="rounded-xl border border-line p-3">
-      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
-        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-page-bg text-[10px]">{n}</span>
-        {label}
-      </div>
-      <div className={'mt-1.5 text-sm ' + (danger ? 'text-[20px] font-light text-danger' : strong ? 'text-[20px] font-light text-teal-900' : 'text-ink')}>{value}</div>
-      {sub && <div className="mt-1 text-xs text-muted">{sub}</div>}
-    </li>
-  );
-}
 
 /** Redlines with legal changes only: sign once legal has decided every change. */
 function LegalOnlySigning() {
-  const { id, n, sign } = useBoard();
+  const { id, n } = useBoard();
   const redline = getRedline(id);
   const items = legalChanges(id);
   const pending = items.filter((c) => !n.legalDecisions[c.no]);
   const signed = n.status === 'signed';
-  if (!n.sortResult) return <EmptyState title="Sort the changes first">Signing opens once the changes are sorted.</EmptyState>;
+  if (!n.sortResult) return <EmptyState title="Analyse the changes first">Signing opens once the changes are analysed.</EmptyState>;
   return (
     <div className="space-y-4">
       <SirionCard title={`Legal decisions · ${redline.supplier}`} bodyClassName="p-0">
@@ -193,12 +204,9 @@ function LegalOnlySigning() {
           {signed
             ? `Sent for signature${n.signedAt ? ` on ${formatDate(n.signedAt)}` : ''}. No money lines changed, so the north star is unaffected.`
             : pending.length
-              ? `Waiting for legal on ${pending.length} change${pending.length === 1 ? '' : 's'}. Switch to the Legal role to decide.`
-              : 'Legal has decided every change. No money lines changed, so nothing needs pricing.'}
+              ? `Waiting for Legal on ${pending.length} change${pending.length === 1 ? '' : 's'}.`
+              : 'Legal has decided every change. Use Send for signature at the top.'}
         </div>
-        <Button onClick={sign} disabled={signed || pending.length > 0}>
-          <FileSignature className="h-4 w-4" /> {signed ? 'Sent for signature' : 'Send for signature'}
-        </Button>
       </div>
     </div>
   );

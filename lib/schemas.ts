@@ -66,6 +66,8 @@ export const AskRequestSchema = z.object({
   messages: z.array(AskMessageSchema).min(1).max(20),
   redlineId: z.string().min(1).max(40),
   role: z.enum(['lead', 'owner', 'finance', 'legal', 'supplier']),
+  /** Workspace setting: may estimates use aggregate peer benchmarks? */
+  peerBenchmarks: z.boolean().default(true),
 });
 export const ChipSchema = z.object({ label: z.string(), kind: z.enum(['data', 'pooled', 'assumption', 'tool']).optional() });
 export const AskResponseSchema = z.object({

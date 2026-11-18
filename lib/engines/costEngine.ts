@@ -46,7 +46,19 @@ export function contractsInGroup(line: Line, group: WordingGroup, type: Supplier
 export function pooledFor(type: SupplierType, line: Line, group: WordingGroup): PooledRate | undefined {
   return pooledRates.find((p) => p.supplierType === type && p.line === line && p.wordingGroup === group);
 }
-export const pooledUsable = (p?: PooledRate): p is PooledRate => !!p && p.companies >= MIN_POOLED_COMPANIES;
+/**
+ * Workspace setting: may estimates use aggregate peer benchmarks? Set by the admin
+ * ("Use aggregate peer benchmarks"). When off, any input that would need pooled
+ * data has no source, and the estimate says "Insufficient data to estimate".
+ * Engines are synchronous, so callers set this right before computing.
+ */
+let peerBenchmarks = true;
+export function setPeerBenchmarks(on: boolean) {
+  peerBenchmarks = on;
+}
+export const peerBenchmarksEnabled = () => peerBenchmarks;
+
+export const pooledUsable = (p?: PooledRate): p is PooledRate => peerBenchmarks && !!p && p.companies >= MIN_POOLED_COMPANIES;
 
 function confidenceFor(n: number): Confidence {
   if (n >= 20) return 'high';

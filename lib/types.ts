@@ -78,6 +78,8 @@ export interface RedlineChange {
   title: string;
   oldText: string;
   newText: string;
+  /** One plain-English sentence: what today's contract says and what the supplier wants instead. */
+  plain: string;
   expected: { group: ChangeGroup; line?: Line; wordingGroup?: WordingGroup };
 }
 
@@ -95,7 +97,7 @@ export interface Redline {
 }
 
 export type GiveId = 'term_3y' | 'payment_30' | 'notice_60' | 'claim_30_autofiled';
-export type PackageId = 'A' | 'B' | 'C' | 'D';
+export type PackageId = 'A' | 'B' | 'C' | 'D' | 'E';
 
 export type Wordings = { renewal: RenewalGroup; credits: CreditsGroup; price: PriceGroup };
 
@@ -104,6 +106,8 @@ export interface PackageTemplate {
   name: string;
   gives: GiveId[];
   wordings: Wordings;
+  /** A concession that is a wording, not a give (e.g. the lead's own counter). */
+  concession?: string;
 }
 
 // ---- Engine outputs ----
@@ -139,6 +143,7 @@ export interface PricedPackage {
   wordings: Wordings;
   /** Money lines the supplier changed (the only lines the package negotiates). */
   lines: Line[];
+  concession?: string;
   protectedLakh: number;
   protectedByLine: Record<Line, number>;
   giveCostLakh: number;
