@@ -9,12 +9,14 @@ import { getRedline } from '@/lib/data';
 import { atStakeByRedline, creditsByGroup, creditWordingSplit, northStar, noticeDeadlinesNext6Months } from '@/lib/engines/dashboard';
 import { redlinePriceTags } from '@/lib/engines/redline';
 import { formatDate, formatLakh } from '@/lib/format';
-import { atLeast, useDemo } from '@/lib/store';
+import { atLeast, STORY_REDLINE, useDemo, useNegotiation } from '@/lib/store';
+import { finalDeal } from '@/lib/engines/negotiation';
+import { redlines } from '@/lib/data';
 
 const BOARD = '/redlines/RL-CLOUDDESK';
 
 function FrontDoor() {
-  const status = useDemo((s) => s.status);
+  const status = useNegotiation(STORY_REDLINE).status;
   const sorted = atLeast(status, 'sorted');
   const signed = status === 'signed';
   const r = getRedline('RL-CLOUDDESK');
@@ -64,18 +66,29 @@ function FrontDoor() {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const status = useDemo((s) => s.status);
-  const signed = status === 'signed';
-  const priced = atLeast(status, 'sorted');
+  const negotiations = useDemo((s) => s.negotiations);
+  const cd = negotiations[STORY_REDLINE];
+  const signed = cd?.status === 'signed';
+  const priced = !!cd && atLeast(cd.status, 'sorted');
 
-  // CloudDesk only gets a ₹ figure once its changes are sorted and priced.
-  const stake = atStakeByRedline(!signed).filter((r) => r.id !== 'RL-CLOUDDESK' || priced);
+  // A redline only gets a ₹ figure once its changes are sorted; signed redlines leave the open list.
+  const openPriced = redlines.filter((r) => negotiations[r.id]?.sortResult && negotiations[r.id].status !== 'signed').map((r) => r.id);
+  const unsortedCount = redlines.filter((r) => !negotiations[r.id]?.sortResult).length;
+  const stake = atStakeByRedline(openPriced);
   const totalStake = stake.reduce((a, r) => a + r.atStake, 0);
-  const ns = northStar(signed);
+  const signedDeals = redlines
+    .filter((r) => negotiations[r.id]?.status === 'signed' && negotiations[r.id].supplierPick)
+    .map((r) => {
+      const n = negotiations[r.id];
+      const d = finalDeal(n.supplierPick!, n.counter ? [n.counter] : [], r.id);
+      return { enforceable: d.enforceableCount, total: d.totalLines };
+    });
+  const ns = northStar(signedDeals);
   const credits = creditsByGroup();
   const deadlines = noticeDeadlinesNext6Months();
   const split = creditWordingSplit();
-  const cloudDeskCaption = signed ? 'CloudDesk signed' : priced ? `CloudDesk ${formatLakh(stake[0].atStake)}` : 'CloudDesk not priced yet';
+  const cdStake = stake.find((r) => r.id === STORY_REDLINE);
+  const cloudDeskCaption = signed ? 'CloudDesk signed' : priced && cdStake ? `CloudDesk ${formatLakh(cdStake.atStake)}` : `${unsortedCount} not sorted yet`;
 
   return (
     <>
@@ -98,7 +111,7 @@ export default function DashboardPage() {
             caption={
               <>
                 {ns.enforceable} of {ns.total} signed renewal, credit and price terms have a Sirion check
-                {signed ? <span className="text-teal-900"> · up from 62% after CloudDesk</span> : ''}
+                {signedDeals.length ? <span className="text-teal-900"> · up from 62% with {signedDeals.length} signed here</span> : ''}
               </>
             }
           />
@@ -110,10 +123,10 @@ export default function DashboardPage() {
             x="short"
             y="atStake"
             format={(v) => formatLakh(v)}
-            onBarClick={(d) => router.push(d.id === 'RL-CLOUDDESK' ? BOARD : '/redlines')}
+            onBarClick={(d) => router.push(`/redlines/${d.id}`)}
           />
           <p className="mt-2 text-xs text-muted">
-            Versus procurement benchmarks, not current terms. {priced ? '' : 'CloudDesk appears once its changes are sorted. '}Only CloudDesk is interactive in this demo.
+            Versus procurement benchmarks, not current terms. {priced ? '' : 'CloudDesk appears once its changes are sorted. '}Click a bar to open the redline.
           </p>
         </SirionCard>
 

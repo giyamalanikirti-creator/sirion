@@ -79,6 +79,8 @@ The people involved each see only part of this:
 7. **Sign.** All three money lines are enforceable and linked to a Sirion tracker: a renewal alert, a credit check on every invoice, and an invoice price check against the cap. An estimated **₹9.4 lakh a year is protected, ₹9.2 lakh net** of the payment give.
 8. **Check the first invoice (simulated).** In January 2027 uptime is 98.9% against a 99.5% target. The signed clause says credits apply automatically, so Sirion expects a ₹25,000 credit (5% of the ₹5 lakh monthly fee) on the February invoice, finds ₹0, and opens a dispute owned by the procurement lead. This is what the buyer actually gets on Monday morning.
 
+The same flow works for every redline in the inbox, not just CloudDesk. Where our own history is thin (logistics, staffing and facilities have fewer than 8 contracts each), the price tags use pooled data from 20+ companies and say so. Packages adapt to the redline: gives that make no sense are dropped (no "pay in 30 days" for a supplier already paid in 30), lines the supplier did not touch keep today's wording, and when fewer than two trades fit, a no-give "Hold firm" option is offered. A redline with only legal changes (DataVault) skips pricing and signs once legal has decided.
+
 The assistant ("Ask Cost of Yes") can only calculate and draft. Every number it says must come from a tool that runs the same engines as the screen, and it always says how many contracts a number rests on.
 
 ## Data and privacy

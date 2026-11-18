@@ -87,20 +87,23 @@ export interface Redline {
   supplier: string;
   supplierType: SupplierType;
   receivedAt: string;
+  slug: string; // supplier portal path, e.g. 'clouddesk'
   interactive: boolean;
-  changes: RedlineChange[]; // only for interactive redlines
+  changes: RedlineChange[];
   summary?: { harmless: number; legal: number; money: number; atStakeLakh: number };
   status?: string; // display status for non-interactive rows
 }
 
 export type GiveId = 'term_3y' | 'payment_30' | 'notice_60' | 'claim_30_autofiled';
-export type PackageId = 'A' | 'B' | 'C';
+export type PackageId = 'A' | 'B' | 'C' | 'D';
+
+export type Wordings = { renewal: RenewalGroup; credits: CreditsGroup; price: PriceGroup };
 
 export interface PackageTemplate {
   id: PackageId;
   name: string;
   gives: GiveId[];
-  wordings: { renewal: RenewalGroup; credits: CreditsGroup; price: PriceGroup };
+  wordings: Wordings;
 }
 
 // ---- Engine outputs ----
@@ -132,7 +135,10 @@ export interface PricedPackage {
   id: PackageId;
   name: string;
   gives: GiveCost[];
-  wordings: PackageTemplate['wordings'];
+  /** Final wording on every line; lines the supplier did not change keep today's wording. */
+  wordings: Wordings;
+  /** Money lines the supplier changed (the only lines the package negotiates). */
+  lines: Line[];
   protectedLakh: number;
   protectedByLine: Record<Line, number>;
   giveCostLakh: number;
@@ -157,8 +163,8 @@ export interface SortResult {
 }
 
 export interface Counter {
-  line: 'price';
-  group: 'cap_7';
+  line: Line;
+  group: WordingGroup;
 }
 
 export interface FinalDealLine {

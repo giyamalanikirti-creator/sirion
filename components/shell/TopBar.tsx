@@ -15,8 +15,8 @@ const PERSON: Record<Role, { name: string; initials: string }> = {
 
 export function TopBar() {
   const role = useDemo((s) => s.role);
-  const status = useDemo((s) => s.status);
-  const pending = (role === 'owner' || role === 'finance') && status === 'awaiting_approval';
+  const anyAwaiting = useDemo((s) => Object.values(s.negotiations).some((n) => n.status === 'awaiting_approval'));
+  const pending = (role === 'owner' || role === 'finance') && anyAwaiting;
   const p = PERSON[role];
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 bg-white px-4 md:px-8">

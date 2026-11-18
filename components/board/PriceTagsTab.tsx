@@ -7,7 +7,8 @@ import { Button, Chip, ConfidencePill, EmptyState, SirionCard } from '@/componen
 import { groupContractRows, priceTag } from '@/lib/engines/costEngine';
 import type { LineComparison } from '@/lib/engines/redline';
 import { CLAIM_CHOICE_LABEL, formatLakh, GROUP_LABEL, LINE_LABEL } from '@/lib/format';
-import { useDemo } from '@/lib/store';
+import { STORY_REDLINE, useDemo } from '@/lib/store';
+import { useBoard } from './context';
 import type { Contract, CreditsGroup, Line, PriceTag } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -16,8 +17,8 @@ const CARD_ORDER: Line[] = ['credits', 'renewal', 'price'];
 
 export const askQuestionFor = (t: PriceTag) => `Why is the ${t.line === 'credits' ? 'credits' : t.line} line ${formatLakh(t.costLakh)}?`;
 
-function ContractsDrawer({ tag, open, onOpenChange }: { tag: PriceTag; open: boolean; onOpenChange: (o: boolean) => void }) {
-  const rows = groupContractRows(tag.line, tag.group);
+function ContractsDrawer({ tag, type, open, onOpenChange }: { tag: PriceTag; type: Contract['supplierType']; open: boolean; onOpenChange: (o: boolean) => void }) {
+  const rows = groupContractRows(tag.line, tag.group, type);
   const bad = rows.filter((r) => r.bad).length;
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -30,7 +31,7 @@ function ContractsDrawer({ tag, open, onOpenChange }: { tag: PriceTag; open: boo
                 {LINE_LABEL[tag.line]}: {GROUP_LABEL[tag.group]}
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-sm text-muted">
-                {rows.length} of our software contracts use this wording{rows.length ? ` · ${bad} with a poor outcome` : ''}.
+                {rows.length} of our {type} contracts use this wording{rows.length ? ` · ${bad} with a poor outcome` : ''}.
               </Dialog.Description>
             </div>
             <Dialog.Close className="rounded p-1 text-muted hover:bg-page-bg" aria-label="Close">
@@ -76,10 +77,10 @@ function ContractsDrawer({ tag, open, onOpenChange }: { tag: PriceTag; open: boo
 }
 
 /** Current wording / supplier asks / benchmark used, each with its estimated yearly exposure. */
-function Comparison({ c }: { c: LineComparison }) {
+function Comparison({ c, supplier }: { c: LineComparison; supplier: string }) {
   const rows = [
     { k: 'Current wording', group: c.current.group, cost: c.current.costLakh, strong: false },
-    { k: 'CloudDesk asks', group: c.ask.group, cost: c.ask.costLakh, strong: true },
+    { k: `${supplier} asks`, group: c.ask.group, cost: c.ask.costLakh, strong: true },
     { k: 'Benchmark used', group: c.benchmark.group, cost: c.benchmark.costLakh, strong: false },
   ];
   return (
@@ -98,15 +99,15 @@ function Comparison({ c }: { c: LineComparison }) {
 }
 
 const CLAIM_OPTIONS: { group: CreditsGroup; label: string }[] = [
-  { group: 'claim_le_10', label: '10 days' },
+  { group: 'claim_le_10', label: '≤10 days' },
   { group: 'claim_11_30', label: '15 days' },
   { group: 'claim_30_autofiled', label: '30 days, auto-filed' },
   { group: 'automatic', label: 'Automatic' },
 ];
 
 function ClaimWindowWhatIf({ contract, askTag }: { contract: Contract; askTag: PriceTag }) {
-  const draft = useDemo((s) => s.creditDraft);
-  const saveDraft = useDemo((s) => s.saveCreditDraft);
+  const { n, saveCreditDraft: saveDraft } = useBoard();
+  const draft = n.creditDraft;
   const [group, setGroup] = useState<CreditsGroup>(draft ?? 'claim_11_30');
   const alt = priceTag(contract, 'credits', group);
   const diff = askTag.costLakh - alt.costLakh;
@@ -139,7 +140,7 @@ function ClaimWindowWhatIf({ contract, askTag }: { contract: Contract; askTag: P
         <>
           <div className="mt-3 grid grid-cols-2 gap-2 text-center">
             <div className="rounded-lg bg-white p-2.5">
-              <div className="text-[11px] text-muted">CloudDesk: 10 days</div>
+              <div className="text-[11px] text-muted">{contract.supplier}’s ask</div>
               <div className="text-[20px] font-light text-teal-900">{formatLakh(askTag.costLakh)}</div>
               <div className="text-[11px] text-muted">{askTag.n} own contracts</div>
             </div>
@@ -154,7 +155,7 @@ function ClaimWindowWhatIf({ contract, askTag }: { contract: Contract; askTag: P
           <p className="mt-2 text-xs leading-relaxed text-ink">
             {group === 'claim_11_30' && (
               <>
-                We have no contracts with a 15-day window, so this uses the broader <strong className="font-medium">11–30 day</strong> cohort from
+                We have {alt.n === 0 ? 'no' : `only ${alt.n}`} own {contract.supplierType} contract{alt.n === 1 ? '' : 's'} with an 11–30 day window, so a 15-day window is priced with the broader <strong className="font-medium">11–30 day</strong> cohort from
                 pooled data ({alt.pooledBackup?.label.toLowerCase()}, {alt.pooledBackup?.companies} companies).{' '}
               </>
             )}
@@ -174,7 +175,7 @@ function ClaimWindowWhatIf({ contract, askTag }: { contract: Contract; askTag: P
           </div>
         </>
       )}
-      {isAsk && <p className="mt-3 text-xs text-muted">This is what CloudDesk asked for. Pick another window to compare.</p>}
+      {isAsk && <p className="mt-3 text-xs text-muted">This is what {contract.supplier} asked for. Pick another window to compare.</p>}
     </div>
   );
 }
@@ -194,40 +195,54 @@ export function PriceTagsTab({
   onGoPackages: () => void;
   onAsk: (question: string) => void;
 }) {
-  const sortResult = useDemo((s) => s.sortResult);
-  const markPriced = useDemo((s) => s.markPriced);
+  const { id, n, markPriced } = useBoard();
+  const sortResult = n.sortResult;
   const completeStep = useDemo((s) => s.completeStep);
   const [drawer, setDrawer] = useState<PriceTag | null>(null);
 
   useEffect(() => {
     if (sortResult) {
       markPriced();
-      completeStep(3);
+      if (id === STORY_REDLINE) completeStep(3);
     }
-  }, [sortResult, markPriced, completeStep]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortResult, id]);
 
   if (!sortResult) {
     return <EmptyState title="Sort the changes first">Price tags appear once the money lines are found. Go to the Changes tab and press Sort.</EmptyState>;
   }
 
-  const ordered = CARD_ORDER.map((l) => tags.find((t) => t.line === l)!);
+  const ordered = CARD_ORDER.map((l) => tags.find((t) => t.line === l)).filter((t): t is PriceTag => !!t);
 
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-line bg-white px-6 py-4 text-sm shadow-card">
         Each figure is the <strong className="font-medium">estimated yearly loss vs a procurement benchmark</strong> (opt-in renewal, automatic credits,
-        5% price cap), from our own contract history. Against the current contract, accepting all three edits would cost about{' '}
-        <strong className="font-medium text-teal-900">{formatLakh(vsCurrentLakh)} a year</strong>.
+        5% price cap), from our own contract history, or pooled data where ours is thin.{' '}
+        {vsCurrentLakh > 0.005 ? (
+          <>
+            Against the current contract, accepting {ordered.length === 1 ? 'this edit' : ordered.length === 2 ? 'both edits' : `all ${ordered.length} edits`} would cost about{' '}
+            <strong className="font-medium text-teal-900">{formatLakh(vsCurrentLakh)} a year</strong>.
+          </>
+        ) : (
+          <>Against the current contract it costs nothing extra: today’s wording already has the same weakness, and this renewal is the chance to fix it.</>
+        )}
       </div>
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         {ordered.map((t) => {
           const cmp = comparisons.find((c) => c.line === t.line)!;
           return (
             <SirionCard key={t.line} title={LINE_LABEL[t.line]} className="flex flex-col" bodyClassName="flex flex-1 flex-col">
-              <div className="text-[34px] font-light leading-none text-teal-900">{formatLakh(t.costLakh)}</div>
+              <div className="text-[34px] font-light leading-none text-teal-900">
+                {Number.isFinite(t.costLakh) ? formatLakh(t.costLakh) : 'Not enough history'}
+              </div>
               <div className="mt-1 text-sm text-muted">a year · estimated exposure vs benchmark</div>
               <div className="mt-1 text-xs text-ink">
-                {formatLakh(cmp.vsCurrentLakh)} a year more than the current wording
+                {!Number.isFinite(cmp.vsCurrentLakh)
+                  ? 'Cannot be compared with the current wording'
+                  : cmp.vsCurrentLakh > 0.005
+                    ? `${formatLakh(cmp.vsCurrentLakh)} a year more than the current wording`
+                    : 'Same wording group as today: no extra cost vs the current contract'}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 <ConfidencePill confidence={t.confidence} n={t.n} source={t.source} />
@@ -238,7 +253,7 @@ export function PriceTagsTab({
                 )}
               </div>
               <div className="mt-4">
-                <Comparison c={cmp} />
+                <Comparison c={cmp} supplier={contract.supplier} />
               </div>
               <ul className="mt-4 space-y-2 text-sm">
                 {t.proof.map((p, i) => (
@@ -273,7 +288,7 @@ export function PriceTagsTab({
           Build packages <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
-      {drawer && <ContractsDrawer tag={drawer} open={!!drawer} onOpenChange={(o) => !o && setDrawer(null)} />}
+      {drawer && <ContractsDrawer tag={drawer} type={contract.supplierType} open={!!drawer} onOpenChange={(o) => !o && setDrawer(null)} />}
     </div>
   );
 }

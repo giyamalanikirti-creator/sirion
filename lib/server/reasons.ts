@@ -5,11 +5,11 @@ import { isSupplierSafe, ReasonsModelOutputSchema } from '../schemas';
 import fixture from '@/data/fixtures/reasons_clouddesk.json';
 import { getClient, isLive, logAiFailure, MODEL_SMART, withTimeout } from './anthropic';
 
-const SYSTEM = `You write one short, friendly sentence per contract wording, explaining to the supplier (CloudDesk, a helpdesk software company) why the wording is good for both sides.
+const SYSTEM = `You write one short, friendly sentence per contract wording, explaining to the supplier named in the request why the wording is good for both sides.
 Rules:
 - At most 25 words per sentence.
 - Never mention money amounts, currencies, internal costs, savings, benchmarks, other customers, other suppliers or other companies.
-- Start from the given plain reason and lightly tailor it to a helpdesk software relationship. Keep the meaning.
+- Start from the given plain reason and lightly tailor it to this supplier's kind of service. Keep the meaning.
 Return one entry per id, using the ids given.`;
 
 const FIXTURE = fixture as Record<string, string>;
@@ -18,7 +18,7 @@ export function cachedReason(id: string): string {
   return FIXTURE[id] ?? wordingLibrary.find((w) => w.id === id)?.plainReason ?? '';
 }
 
-export async function writeReasons(ids: string[]): Promise<{ reasons: Record<string, string>; source: 'live' | 'cached' }> {
+export async function writeReasons(ids: string[], supplier = 'CloudDesk (helpdesk software)'): Promise<{ reasons: Record<string, string>; source: 'live' | 'cached' }> {
   const options = ids.map((id) => wordingLibrary.find((w) => w.id === id)).filter((w) => !!w && w.enforceable);
   const cached = Object.fromEntries(options.map((w) => [w!.id, cachedReason(w!.id)]));
   if (!isLive() || options.length === 0) return { reasons: cached, source: 'cached' };
@@ -33,7 +33,7 @@ export async function writeReasons(ids: string[]): Promise<{ reasons: Record<str
         messages: [
           {
             role: 'user',
-            content: JSON.stringify(options.map((w) => ({ id: w!.id, wording: w!.text, plainReason: w!.plainReason }))),
+            content: `Supplier: ${supplier}\n` + JSON.stringify(options.map((w) => ({ id: w!.id, wording: w!.text, plainReason: w!.plainReason }))),
           },
         ],
       }),

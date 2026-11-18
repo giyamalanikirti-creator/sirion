@@ -5,7 +5,9 @@ import { getContract, wordingLibrary } from '../data';
  * Simulated first invoice check after signature (credits line).
  * Credit rule: creditPctPerStep of the monthly fee for each full step of uptime below target.
  */
-export function firstInvoiceCheck() {
+export function firstInvoiceCheck(contractId = check.contractId) {
+  // Only the story contract has a simulated first invoice.
+  if (contractId !== check.contractId) return undefined;
   const c = getContract(check.contractId);
   const clause = wordingLibrary.find((w) => w.id === check.signedWordingId)!;
   const monthlyFeeInr = c.annualFeeInr / 12;

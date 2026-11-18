@@ -50,7 +50,8 @@ describe('package recommendation', () => {
 
 describe('first invoice check (simulated)', () => {
   it('expects ₹25,000, finds ₹0, flags the gap', () => {
-    const c = firstInvoiceCheck();
+    const c = firstInvoiceCheck()!;
+    expect(firstInvoiceCheck('C-022')).toBeUndefined();
     expect(c.monthlyFeeInr).toBe(500_000);
     expect(c.steps).toBe(1);
     expect(c.expectedInr).toBe(25_000);

@@ -37,7 +37,10 @@ export const SortModelOutputSchema = z.object({
 });
 
 // ---- /api/reasons ----
-export const ReasonsRequestSchema = z.object({ wordingOptionIds: z.array(z.string().max(8)).min(1).max(12) });
+export const ReasonsRequestSchema = z.object({
+  wordingOptionIds: z.array(z.string().max(8)).min(1).max(12),
+  redlineId: z.string().max(40).optional(),
+});
 export const ReasonsModelOutputSchema = z.object({
   reasons: z.array(z.object({ id: z.string(), text: z.string() })),
 });

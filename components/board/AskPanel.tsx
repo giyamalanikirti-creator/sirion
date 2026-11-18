@@ -7,12 +7,8 @@ import { AiBadge, Chip } from '@/components/ui';
 import { Logo } from '@/components/shell/Logo';
 import { type AskResponse, AskResponseSchema, ASK_LIMITS } from '@/lib/schemas';
 import { useDemo } from '@/lib/store';
+import { suggestedQuestions } from '@/lib/askSuggestions';
 
-export const SUGGESTED = [
-  'Why is the credits line ₹3.2 lakh?',
-  'What if we accept a 15-day claim window?',
-  'Show packages without the 3-year term',
-];
 
 type Turn = { question: string; response?: AskResponse; error?: string };
 
@@ -23,6 +19,7 @@ export function AskPanel({
   redlineId, onClose, request,
 }: { redlineId: string; onClose?: () => void; request?: { text: string; id: number } }) {
   const role = useDemo((s) => s.role);
+  const SUGGESTED = suggestedQuestions(redlineId);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);

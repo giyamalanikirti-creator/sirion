@@ -3,21 +3,43 @@
 import { ArrowRight, Clock, Handshake, Send } from 'lucide-react';
 import { useSwitchRole } from '@/components/shell/RoleSwitcher';
 import { Button } from '@/components/ui';
-import { priceCounter } from '@/lib/engines/negotiation';
-import { formatLakh } from '@/lib/format';
-import { needsFinanceStep, useDemo } from '@/lib/store';
+import { getRedline } from '@/lib/data';
+import { priceCounter, templateFor } from '@/lib/engines/negotiation';
+import { pricePackage } from '@/lib/engines/givegetEngine';
+import { changedLines, supplierAsk } from '@/lib/engines/redline';
+import { getContract } from '@/lib/data';
+import { COUNTER_PHRASE, formatLakh } from '@/lib/format';
+import { financePackages, hasMoneyLines, legalChanges, needsFinanceStep } from '@/lib/store';
+import { useBoard } from './context';
 
 export function StatusBanner({ onGoSigning }: { onGoSigning: () => void }) {
-  const s = useDemo();
+  const { id, n, sendToSupplier, acceptCounter, declineCounter } = useBoard();
   const switchRole = useSwitchRole();
+  const redline = getRedline(id);
+  const name = redline.supplier;
 
-  if (s.status === 'awaiting_approval') {
-    const next = !s.ownerApproved ? 'owner' : needsFinanceStep(s.selectedPackages) && !s.financeDecision ? 'finance' : null;
+  if (!hasMoneyLines(id) && n.sortResult && n.status !== 'signed') {
+    const pending = legalChanges(id).filter((c) => !n.legalDecisions[c.no]).length;
     return (
       <Banner icon={<Clock className="h-4 w-4" />}>
-        <span>
-          Waiting for {next === 'finance' ? 'finance approval of package A' : 'the business owner to approve'}.
-        </span>
+        <span>{pending ? `Legal changes only: waiting for legal on ${pending} change${pending === 1 ? '' : 's'}.` : 'Legal has decided every change. Ready to sign.'}</span>
+        {pending ? (
+          <Button size="sm" variant="outline" onClick={() => switchRole('legal', '/legal')}>
+            View as legal <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <Button size="sm" onClick={onGoSigning}>Go to signing <ArrowRight className="h-3.5 w-3.5" /></Button>
+        )}
+      </Banner>
+    );
+  }
+
+  if (n.status === 'awaiting_approval') {
+    const fin = financePackages(id, n.selectedPackages);
+    const next = !n.ownerApproved ? 'owner' : needsFinanceStep(id, n.selectedPackages) && !n.financeDecision ? 'finance' : null;
+    return (
+      <Banner icon={<Clock className="h-4 w-4" />}>
+        <span>Waiting for {next === 'finance' ? `finance approval of package ${fin.join(', ')}` : 'the business owner to approve'}.</span>
         {next && (
           <Button size="sm" variant="outline" onClick={() => switchRole(next, '/approvals')}>
             View as {next === 'owner' ? 'business owner' : 'finance'} <ArrowRight className="h-3.5 w-3.5" />
@@ -26,47 +48,60 @@ export function StatusBanner({ onGoSigning }: { onGoSigning: () => void }) {
       </Banner>
     );
   }
-  if (s.status === 'approved') {
+  if (n.status === 'approved') {
     return (
       <Banner icon={<Handshake className="h-4 w-4" />} tone="teal">
         <span>
-          Approved: packages {s.selectedPackages.join(', ')} can go to CloudDesk.
-          {s.financeDecision?.A === 'rejected' && ' Finance rejected A, so it is not offered.'}
+          Approved: package{n.selectedPackages.length === 1 ? '' : 's'} {n.selectedPackages.join(', ')} can go to {name}.
+          {n.financeDecision === 'rejected' && ' Finance rejected the multi-year commitment, so it is not offered.'}
         </span>
-        <Button size="sm" onClick={s.sendToSupplier}>
-          <Send className="h-3.5 w-3.5" /> Send to CloudDesk
+        <Button size="sm" onClick={sendToSupplier}>
+          <Send className="h-3.5 w-3.5" /> Send to {name}
         </Button>
       </Banner>
     );
   }
-  if (s.status === 'with_supplier') {
+  if (n.status === 'with_supplier') {
     return (
       <Banner icon={<Clock className="h-4 w-4" />}>
-        <span>With CloudDesk. They see the packages and plain reasons, never our ₹ figures.</span>
-        <Button size="sm" variant="outline" onClick={() => switchRole('supplier')}>
+        <span>With {name}. They see the packages and plain reasons, never our ₹ figures.</span>
+        <Button size="sm" variant="outline" onClick={() => switchRole('supplier', `/portal/${redline.slug}`)}>
           Open supplier portal <ArrowRight className="h-3.5 w-3.5" />
         </Button>
       </Banner>
     );
   }
-  if (s.status === 'countered' && s.counter && s.supplierPick) {
-    const c = priceCounter('price', 'cap_5', s.counter.group);
+  if (n.status === 'countered' && n.counter && n.supplierPick) {
+    // Price the counter against the wording the picked package offered on that line.
+    const c = getContract(redline.contractId);
+    const pkg = pricePackage(c, supplierAsk(redline, c), templateFor(n.supplierPick, id), changedLines(redline));
+    const from = pkg.wordings[n.counter.line];
+    const pc = priceCounter(n.counter.line, from, n.counter.group, id);
     return (
       <Banner icon={<Handshake className="h-4 w-4" />} tone="teal">
         <span>
-          CloudDesk picked <strong>{s.supplierPick}</strong> and asked for a 7% price cap: <strong>{formatLakh(c.extraLakh)} a year more</strong>,{' '}
-          {c.insideRange ? `inside your ${formatLakh(c.rangeLakh)} range` : `outside your ${formatLakh(c.rangeLakh)} range`}.
+          {name} picked <strong>{n.supplierPick}</strong> and asked for {COUNTER_PHRASE[n.counter.group]}:{' '}
+          <strong>{formatLakh(pc.extraLakh)} a year more</strong>,{' '}
+          {pc.insideRange ? `inside your ${formatLakh(pc.rangeLakh)} range` : `outside your ${formatLakh(pc.rangeLakh)} range`}.
         </span>
-        <Button size="sm" onClick={() => s.acceptCounter().ok && onGoSigning()}>
-          Accept
-        </Button>
+        <span className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => declineCounter().ok && onGoSigning()}>
+            Decline
+          </Button>
+          <Button size="sm" onClick={() => acceptCounter().ok && onGoSigning()}>
+            Accept
+          </Button>
+        </span>
       </Banner>
     );
   }
-  if (s.status === 'agreed') {
+  if (n.status === 'agreed') {
     return (
       <Banner icon={<Handshake className="h-4 w-4" />} tone="teal">
-        <span>Agreed with CloudDesk on package {s.supplierPick}{s.counter ? ' with a 7% cap' : ''}. Ready to sign.</span>
+        <span>
+          Agreed with {name} on package {n.supplierPick}
+          {n.counter ? ` with ${COUNTER_PHRASE[n.counter.group]}` : ''}. Ready to sign.
+        </span>
         <Button size="sm" onClick={onGoSigning}>
           Go to signing <ArrowRight className="h-3.5 w-3.5" />
         </Button>

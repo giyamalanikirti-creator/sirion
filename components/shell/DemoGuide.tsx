@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Check, Compass, RotateCcw, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { type Role, useDemo } from '@/lib/store';
+import { type Role, STORY_REDLINE, useDemo } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui';
 
@@ -26,14 +26,14 @@ export function DemoGuide() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const done = useDemo((s) => s.completedSteps);
-  const status = useDemo((s) => s.status);
+  const status = useDemo((s) => s.negotiations[STORY_REDLINE]?.status ?? 'received');
     const setRole = useDemo((s) => s.setRole);
   const reset = useDemo((s) => s.reset);
 
   // Step 5 needs finance after the owner: route to the right role.
   const go = (step: (typeof DEMO_STEPS)[number]) => {
     let r = step.role;
-    if (step.n === 6) r = useDemo.getState().ownerApproved ? 'finance' : 'owner';
+    if (step.n === 6) r = useDemo.getState().negotiations[STORY_REDLINE]?.ownerApproved ? 'finance' : 'owner';
     setRole(r);
     router.push(step.href);
     setOpen(false);
@@ -48,7 +48,7 @@ export function DemoGuide() {
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
             <div>
               <div className="text-[15px] text-teal-title">Demo guide</div>
-              <div className="text-xs text-muted">About 3 minutes · status: {status.replace('_', ' ')}</div>
+              <div className="text-xs text-muted">CloudDesk story · about 3 minutes · {status.replace('_', ' ')}</div>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Close demo guide" className="rounded p-1 text-muted hover:bg-page-bg">
               <X className="h-4 w-4" />

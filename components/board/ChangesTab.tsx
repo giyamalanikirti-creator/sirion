@@ -7,10 +7,11 @@ import { AiBadge, Button, EmptyState, GROUP_TONE, StatusPill } from '@/component
 import { wordDiff } from '@/lib/diff';
 import { formatLakh, GROUP_LABEL } from '@/lib/format';
 import { SortResponseSchema } from '@/lib/schemas';
-import { useDemo } from '@/lib/store';
+import Link from 'next/link';
+import { useBoard } from './context';
 import type { PriceTag, Redline, SortResult } from '@/lib/types';
 
-function Diff({ oldText, newText }: { oldText: string; newText: string }) {
+function Diff({ oldText, newText, supplier }: { oldText: string; newText: string; supplier: string }) {
   const parts = wordDiff(oldText, newText);
   return (
     <div className="grid gap-3 text-sm leading-relaxed md:grid-cols-2">
@@ -19,7 +20,7 @@ function Diff({ oldText, newText }: { oldText: string; newText: string }) {
         <p>{parts.filter((p) => p.type !== 'ins').map((p, i) => <span key={i} className={p.type === 'del' ? 'diff-del' : undefined}>{p.text}</span>)}</p>
       </div>
       <div>
-        <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">CloudDesk proposes</div>
+        <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">{supplier} proposes</div>
         <p>{parts.filter((p) => p.type !== 'del').map((p, i) => <span key={i} className={p.type === 'ins' ? 'diff-ins' : undefined}>{p.text}</span>)}</p>
       </div>
     </div>
@@ -27,9 +28,9 @@ function Diff({ oldText, newText }: { oldText: string; newText: string }) {
 }
 
 export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags: PriceTag[]; onGoTags: () => void }) {
-  const sortResult = useDemo((s) => s.sortResult);
-  const sort = useDemo((s) => s.sort);
-  const legalDecision = useDemo((s) => s.legalDecision);
+  const { n, sort } = useBoard();
+  const sortResult = n.sortResult;
+  const legalDecisions = n.legalDecisions;
   const [loading, setLoading] = useState(false);
 
   const runSort = async () => {
@@ -77,7 +78,7 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
                 <StatusPill tone="grey">Not sorted</StatusPill>
               )}
             </header>
-            <Diff oldText={ch.oldText} newText={ch.newText} />
+            <Diff oldText={ch.oldText} newText={ch.newText} supplier={redline.supplier} />
             {cls && (
               <footer className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 text-sm">
                 <span className="text-muted">{cls.reason}</span>
@@ -88,7 +89,7 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
                 ) : cls.group === 'legal' ? (
                   <span className="flex items-center gap-1.5 text-indigo">
                     <Scale className="h-4 w-4" />
-                    {legalDecision ? `Legal: ${legalDecision}` : 'Sent to legal'}
+                    {legalDecisions[ch.no] ? `Legal: ${legalDecisions[ch.no]}` : <Link href="/legal" className="hover:underline">Sent to legal</Link>}
                   </span>
                 ) : (
                   <button type="button" onClick={onGoTags} className="flex items-center gap-1.5 font-medium text-teal-900 hover:underline">
@@ -133,13 +134,17 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
             <CheckCircle2 className="h-4 w-4 text-teal-900" />
             <span>
               {redline.changes.length} changes sorted: {counts!.harmless} harmless approved and logged · {counts!.legal} sent to legal ·{' '}
-              <strong className="font-medium text-teal-900">{counts!.money} money lines</strong> priced
+              {counts!.money ? (
+                <><strong className="font-medium text-teal-900">{counts!.money} money line{counts!.money === 1 ? '' : 's'}</strong> priced</>
+              ) : (
+                <strong className="font-medium text-teal-900">no money lines</strong>
+              )}
             </span>
             <AiBadge source={sortResult.source} />
           </div>
         ) : (
           <div className="text-sm text-muted">
-            {redline.changes.length} changes from CloudDesk. Sort them into harmless, legal and money before anyone reads every line.
+            {redline.changes.length} changes from {redline.supplier}. Sort them into harmless, legal and money before anyone reads every line.
           </div>
         )}
         {!sortResult ? (
@@ -148,7 +153,7 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
             {loading ? 'Sorting…' : 'Sort changes'}
           </Button>
         ) : (
-          <Button variant="outline" onClick={onGoTags}>
+          <Button variant="outline" onClick={onGoTags} disabled={!counts!.money} title={counts!.money ? undefined : 'No money lines to price'}>
             See price tags <ArrowRight className="h-4 w-4" />
           </Button>
         )}

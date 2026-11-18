@@ -14,9 +14,11 @@ describe('seed: shape', () => {
     expect(count(contracts, (c) => c.supplierType === 'logistics')).toBe(5);
     expect(count(contracts, (c) => c.supplierType === 'facilities')).toBe(4);
   });
-  it('has 960 invoice lines, 300 service events, 22 renewals', () => {
+  it('has 960 invoice lines, 480 service events (300 software), 22 renewals', () => {
     expect(invoices).toHaveLength(960);
-    expect(serviceEvents).toHaveLength(300);
+    expect(serviceEvents).toHaveLength(480);
+    const swIds = new Set(sw.map((c) => c.id));
+    expect(serviceEvents.filter((e) => swIds.has(e.contractId))).toHaveLength(300);
     expect(renewals).toHaveLength(22);
   });
   it('has the hand-written files', () => {
@@ -24,6 +26,7 @@ describe('seed: shape', () => {
     expect(redlines).toHaveLength(6);
     expect(packageTemplates).toHaveLength(3);
     expect(pooledRates.length).toBeGreaterThanOrEqual(12);
+    expect(redlines.every((r) => r.interactive && r.changes.length > 0)).toBe(true);
   });
 });
 

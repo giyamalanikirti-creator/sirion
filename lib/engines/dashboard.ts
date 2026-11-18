@@ -44,18 +44,17 @@ export function creditWordingSplit() {
   ];
 }
 
-/** ₹ at stake per open redline (lakh). CloudDesk comes from the engine; the rest are display-only. */
-export function atStakeByRedline(cloudDeskOpen = true) {
-  const cd = redlinePriceTags('RL-CLOUDDESK').totalLakh;
+/** Estimated exposure per redline (lakh), from the engine, for the redlines given. */
+export function atStakeByRedline(ids: string[] = redlines.map((r) => r.id)) {
   return redlines
-    .filter((r) => r.interactive ? cloudDeskOpen : true)
-    .map((r) => ({ supplier: r.supplier, short: r.supplier.split(' ')[0], id: r.id, atStake: r.interactive ? cd : r.summary?.atStakeLakh ?? 0 }));
+    .filter((r) => ids.includes(r.id))
+    .map((r) => ({ supplier: r.supplier, short: r.supplier.split(' ')[0], id: r.id, atStake: redlinePriceTags(r.id).totalLakh }));
 }
 
-/** North-star KPI: money lines enforceable at signing. */
-export function northStar(cloudDeskSigned: boolean, cloudDeskEnforceable = 3, cloudDeskLines = 3) {
+/** North-star KPI: signed commercial terms with an automated check. Adds the deals signed in this demo to history. */
+export function northStar(signed: { enforceable: number; total: number }[] = []) {
   const ns = kpiHistory.northStar;
-  const enforceable = ns.enforceableBefore + (cloudDeskSigned ? cloudDeskEnforceable : 0);
-  const total = ns.totalBefore + (cloudDeskSigned ? cloudDeskLines : 0);
+  const enforceable = ns.enforceableBefore + signed.reduce((a, s) => a + s.enforceable, 0);
+  const total = ns.totalBefore + signed.reduce((a, s) => a + s.total, 0);
   return { enforceable, total, pct: enforceable / total };
 }

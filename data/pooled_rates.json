@@ -1,14 +1,162 @@
 [
-  { "supplierType": "software", "line": "credits", "wordingGroup": "claim_le_10", "companies": 31, "figure": 0.8, "label": "About 8 in 10 credits unclaimed" },
-  { "supplierType": "software", "line": "credits", "wordingGroup": "claim_11_30", "companies": 27, "figure": 0.6, "label": "About 6 in 10 credits unclaimed" },
-  { "supplierType": "software", "line": "credits", "wordingGroup": "claim_30_autofiled", "companies": 22, "figure": 0.12, "label": "About 1 in 10 credits unclaimed" },
-  { "supplierType": "software", "line": "renewal", "wordingGroup": "notice_60_90", "companies": 34, "figure": 0.4, "label": "About 4 in 10 renewals pass unreviewed" },
-  { "supplierType": "software", "line": "renewal", "wordingGroup": "notice_le_30", "companies": 29, "figure": 0.15, "label": "About 1 in 7 renewals pass unreviewed" },
-  { "supplierType": "software", "line": "price", "wordingGroup": "open_yearly", "companies": 26, "figure": 0.1, "label": "Average yearly rise about 10%" },
-  { "supplierType": "software", "line": "price", "wordingGroup": "cap_7", "companies": 21, "figure": 0.065, "label": "Average yearly rise about 6.5%" },
-  { "supplierType": "staffing", "line": "price", "wordingGroup": "open_yearly", "companies": 24, "figure": 0.09, "label": "Average yearly rise about 9%" },
-  { "supplierType": "staffing", "line": "credits", "wordingGroup": "claim_le_10", "companies": 20, "figure": 0.7, "label": "About 7 in 10 credits unclaimed" },
-  { "supplierType": "logistics", "line": "credits", "wordingGroup": "claim_11_30", "companies": 23, "figure": 0.55, "label": "About 5 in 10 credits unclaimed" },
-  { "supplierType": "logistics", "line": "renewal", "wordingGroup": "notice_60_90", "companies": 21, "figure": 0.35, "label": "About 1 in 3 renewals pass unreviewed" },
-  { "supplierType": "facilities", "line": "credits", "wordingGroup": "claim_le_10", "companies": 14, "figure": 0.75, "label": "About 7 in 10 credits unclaimed" }
+  {
+    "supplierType": "software",
+    "line": "credits",
+    "wordingGroup": "claim_le_10",
+    "companies": 31,
+    "figure": 0.8,
+    "label": "About 8 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "software",
+    "line": "credits",
+    "wordingGroup": "claim_11_30",
+    "companies": 27,
+    "figure": 0.6,
+    "label": "About 6 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "software",
+    "line": "credits",
+    "wordingGroup": "claim_30_autofiled",
+    "companies": 22,
+    "figure": 0.12,
+    "label": "About 1 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "software",
+    "line": "renewal",
+    "wordingGroup": "notice_60_90",
+    "companies": 34,
+    "figure": 0.4,
+    "label": "About 4 in 10 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "software",
+    "line": "renewal",
+    "wordingGroup": "notice_le_30",
+    "companies": 29,
+    "figure": 0.15,
+    "label": "About 1 in 7 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "software",
+    "line": "price",
+    "wordingGroup": "open_yearly",
+    "companies": 26,
+    "figure": 0.1,
+    "label": "Average yearly rise about 10%"
+  },
+  {
+    "supplierType": "software",
+    "line": "price",
+    "wordingGroup": "cap_7",
+    "companies": 21,
+    "figure": 0.065,
+    "label": "Average yearly rise about 6.5%"
+  },
+  {
+    "supplierType": "staffing",
+    "line": "price",
+    "wordingGroup": "open_yearly",
+    "companies": 24,
+    "figure": 0.09,
+    "label": "Average yearly rise about 9%"
+  },
+  {
+    "supplierType": "staffing",
+    "line": "credits",
+    "wordingGroup": "claim_le_10",
+    "companies": 20,
+    "figure": 0.7,
+    "label": "About 7 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "logistics",
+    "line": "credits",
+    "wordingGroup": "claim_11_30",
+    "companies": 23,
+    "figure": 0.55,
+    "label": "About 5 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "logistics",
+    "line": "renewal",
+    "wordingGroup": "notice_60_90",
+    "companies": 21,
+    "figure": 0.35,
+    "label": "About 1 in 3 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "facilities",
+    "line": "credits",
+    "wordingGroup": "claim_le_10",
+    "companies": 14,
+    "figure": 0.75,
+    "label": "About 7 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "logistics",
+    "line": "credits",
+    "wordingGroup": "claim_le_10",
+    "companies": 25,
+    "figure": 0.78,
+    "label": "About 8 in 10 credits unclaimed"
+  },
+  {
+    "supplierType": "logistics",
+    "line": "credits",
+    "wordingGroup": "automatic",
+    "companies": 22,
+    "figure": 0.06,
+    "label": "About 1 in 20 credits unclaimed"
+  },
+  {
+    "supplierType": "logistics",
+    "line": "renewal",
+    "wordingGroup": "notice_le_30",
+    "companies": 20,
+    "figure": 0.14,
+    "label": "About 1 in 7 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "staffing",
+    "line": "renewal",
+    "wordingGroup": "notice_60_90",
+    "companies": 23,
+    "figure": 0.38,
+    "label": "About 4 in 10 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "staffing",
+    "line": "renewal",
+    "wordingGroup": "notice_le_30",
+    "companies": 21,
+    "figure": 0.13,
+    "label": "About 1 in 8 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "staffing",
+    "line": "price",
+    "wordingGroup": "cap_5",
+    "companies": 22,
+    "figure": 0.044,
+    "label": "Average yearly rise about 4.4%"
+  },
+  {
+    "supplierType": "facilities",
+    "line": "renewal",
+    "wordingGroup": "notice_60_90",
+    "companies": 20,
+    "figure": 0.33,
+    "label": "About 1 in 3 renewals pass unreviewed"
+  },
+  {
+    "supplierType": "facilities",
+    "line": "renewal",
+    "wordingGroup": "notice_le_30",
+    "companies": 21,
+    "figure": 0.12,
+    "label": "About 1 in 8 renewals pass unreviewed"
+  }
 ]

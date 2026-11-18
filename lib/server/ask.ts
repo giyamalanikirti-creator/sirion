@@ -3,6 +3,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import { getContract, getRedline, wordingLibrary } from '../data';
 import { BENCHMARK, cost, groupOf, GROUPS, priceTag } from '../engines/costEngine';
 import { buildPackages, supplierAskFromRedline } from '../engines/givegetEngine';
+import { changedLines } from '../engines/redline';
 import { GIVE_LABEL } from '../engines/gives';
 import { formatLakh, GROUP_LABEL, LINE_LABEL } from '../format';
 import { ASK_LIMITS, type AskResponse, type Chip, GiveIdSchema, LineSchema, WordingGroupSchema } from '../schemas';
@@ -215,10 +216,69 @@ export function matchExample(question: string) {
   return undefined;
 }
 
-function cachedAnswer(question: string): AskResponse {
-  const ex = matchExample(question);
-  if (!ex) return { answer: CACHED_OFF_MESSAGE, sources: [], links: [], toolCalls: [], source: 'cached' };
-  return { answer: ex.answer, sources: ex.sources as Chip[], links: ex.links, toolCalls: ex.toolCalls, source: 'cached' };
+function fromRuns(answer: string, runs: ToolRun[]): AskResponse {
+  const seen = new Set<string>();
+  const sources = runs.flatMap((r) => r.chips).filter((c) => (seen.has(c.label) ? false : (seen.add(c.label), true)));
+  return { answer, sources, links: runs.flatMap((r) => r.links).slice(0, 2), toolCalls: runs.map((r) => r.name), source: 'cached' };
+}
+
+const basis = (o: { source: string; ownContracts: number; pooled: { companies: number } | null }) =>
+  o.source === 'pooled' && o.pooled ? `pooled data from ${o.pooled.companies} companies; ${o.ownContracts} own contracts` : `${o.ownContracts} own contracts`;
+
+/**
+ * Cached answers built from the same tools the live assistant uses, so every
+ * number comes from the engines. CloudDesk keeps its hand-written fixtures.
+ */
+export function engineAnswer(question: string, redlineId: string): AskResponse | undefined {
+  const r = getRedline(redlineId);
+  const q = norm(question);
+  const lines = changedLines(r);
+  const lineIn = (/renewal|notice/.test(q) && 'renewal') || (/credit|claim/.test(q) && 'credits') || (/price|fee|rate/.test(q) && 'price') || undefined;
+
+  if (/15[- ]?day/.test(q) || (/claim/.test(q) && /15/.test(q))) {
+    if (!lines.includes('credits')) return fromRuns(`${r.supplier} did not change the service-credit clause, so there is no claim window to trade here.`, []);
+    const run = runTool('run_what_if', { line: 'credits', wordingGroup: 'claim_11_30' }, redlineId);
+    const o = run.output as ReturnType<typeof tagView> & { comparedWithSupplierAsk: { costPerYear: string } };
+    return fromRuns(
+      `A 15-day claim would cost about ${o.costPerYear} a year, vs ${o.comparedWithSupplierAsk.costPerYear} for what ${r.supplier} asked. We have no own contracts with an 11–30 day window, so this uses ${basis(o)}. Confidence is ${o.confidence}.`,
+      [run],
+    );
+  }
+  if (/(without|no|exclude|drop).*(3[- ]?year|three[- ]?year|term)/.test(q)) {
+    const run = runTool('build_packages', { excludeGives: ['term_3y'] }, redlineId);
+    const o = run.output as { packages: { id: string; name: string; protectsPerYear: string; netPerYear: string; gives: string[]; approvals: string[] }[] };
+    if (!o.packages.length) return fromRuns('Without the 3-year term there is no package left to offer for this redline.', [run]);
+    const parts = o.packages.map((p) => `${p.id} “${p.name}” protects ${p.protectsPerYear} a year${p.gives.length ? ` for ${p.gives.join(' and ').toLowerCase()}` : ' with no give'}, net ${p.netPerYear}`);
+    return fromRuns(`Without the 3-year term, ${o.packages.length} package${o.packages.length === 1 ? '' : 's'} remain: ${parts.join('; ')}.`, [run]);
+  }
+  if (/cost money|money line|which changes/.test(q) && !lines.length) {
+    return fromRuns(
+      `None of ${r.supplier}'s ${r.changes.length} changes touch renewal, service credits or price, so there is nothing to price. They are legal changes and sit in the legal queue.`,
+      [],
+    );
+  }
+  if (lineIn && /(why|how)/.test(q)) {
+    if (!lines.includes(lineIn)) return fromRuns(`${r.supplier} did not change the ${lineIn} clause in this redline.`, []);
+    const run = runTool('get_price_tag', { line: lineIn }, redlineId);
+    const o = run.output as ReturnType<typeof tagView> & { supplierWording: string; currentWording: string; extraVsCurrentPerYear: string; measuredAgainst: string };
+    if (o.costLakh === null) return fromRuns(`Not enough history to price this line: ${o.proof.join(' ')}`, [run]);
+    return fromRuns(
+      `${r.supplier} asks for “${o.supplierWording.toLowerCase()}”. ${o.proof.join(' ')} That is ${o.costPerYear} a year vs the ${o.measuredAgainst}; against today's wording (${o.currentWording.toLowerCase()}) it adds ${o.extraVsCurrentPerYear}. Confidence is ${o.confidence} (${basis(o)}).`,
+      [run],
+    );
+  }
+  return undefined;
+}
+
+function cachedAnswer(question: string, redlineId: string): AskResponse {
+  if (redlineId === 'RL-CLOUDDESK') {
+    const ex = matchExample(question);
+    if (ex) return { answer: ex.answer, sources: ex.sources as Chip[], links: ex.links, toolCalls: ex.toolCalls, source: 'cached' };
+  } else {
+    const a = engineAnswer(question, redlineId);
+    if (a) return a;
+  }
+  return { answer: CACHED_OFF_MESSAGE, sources: [], links: [], toolCalls: [], source: 'cached' };
 }
 
 // ---------------------------------------------------------------------------
@@ -229,8 +289,10 @@ function systemPrompt(redlineId: string, role: string) {
   const r = getRedline(redlineId);
   const c = getContract(r.contractId);
   const ask = supplierAskFromRedline(r);
-  return `You are "Ask Cost of Yes", an assistant inside a procurement tool. You help ${role === 'lead' ? 'the procurement lead' : `a ${role} user`} with ONE negotiation: the ${c.supplier} renewal redline (${c.supplierType} supplier, ₹${(c.annualFeeInr / 1e5).toFixed(0)} lakh a year, ${c.seats} seats).
-The supplier asked for: renewal "${GROUP_LABEL[ask.renewal]}", credits "${GROUP_LABEL[ask.credits]}", price "${GROUP_LABEL[ask.price]}".
+  const lines = changedLines(r);
+  const asked = lines.length ? lines.map((l) => `${l} "${GROUP_LABEL[ask[l]]}"`).join(', ') : 'no changes to renewal, credits or price (legal changes only)';
+  return `You are "Ask Cost of Yes", an assistant inside a procurement tool. You help ${role === 'lead' ? 'the procurement lead' : `a ${role} user`} with ONE negotiation: the ${c.supplier} renewal redline (${c.supplierType} supplier, ${formatLakh(c.annualFeeInr / 1e5)} a year${c.seats ? `, ${c.seats} seats` : ''}).
+The supplier asked for: ${asked}. Lines it did not change keep today's wording.
 
 Rules:
 - Answer in 80 words or fewer, in plain English. No headings, no tables.
@@ -256,13 +318,13 @@ export async function answerQuestion(input: { messages: AskMessage[]; redlineId:
     throw new Error(`Keep questions under ${ASK_LIMITS.maxUserChars} characters`);
   }
 
-  if (!isLive()) return cachedAnswer(last.content);
+  if (!isLive()) return cachedAnswer(last.content, input.redlineId);
 
   try {
     return await withTimeout(liveLoop(history, input.redlineId, input.role), AI_TIMEOUT_MS * 2);
   } catch (err) {
     logAiFailure('ask', err);
-    return cachedAnswer(last.content);
+    return cachedAnswer(last.content, input.redlineId);
   }
 }
 
@@ -313,7 +375,7 @@ async function liveLoop(history: AskMessage[], redlineId: string, role: string):
 
   // Every ₹ figure in the answer must come from a tool result (or the user's own words).
   const allowed = new Set([...runs.flatMap((r) => r.money), ...history.flatMap((m) => m.content.match(MONEY_RE) ?? [])]);
-  allowed.add(`₹${(getContract(getRedline(redlineId).contractId).annualFeeInr / 1e5).toFixed(0)} lakh`);
+  allowed.add(formatLakh(getContract(getRedline(redlineId).contractId).annualFeeInr / 1e5));
   const stray = (answer.match(MONEY_RE) ?? []).filter((m) => !allowed.has(m));
   if (stray.length) throw new Error(`Answer quoted figures not in any tool result: ${stray.join(', ')}`);
 

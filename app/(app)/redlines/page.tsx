@@ -2,13 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { Filter, Inbox } from 'lucide-react';
 import { EmptyState, GROUP_TONE, PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { redlines } from '@/lib/data';
 import { redlinePriceTags } from '@/lib/engines/redline';
 import { formatDate, formatLakh } from '@/lib/format';
-import { atLeast, STATUS_LABEL, useDemo } from '@/lib/store';
+import { atLeast, STATUS_LABEL, STORY_REDLINE, useDemo } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 type View = 'waiting' | 'all' | 'supplier' | 'signed';
@@ -21,37 +20,30 @@ const VIEWS: { id: View; label: string }[] = [
 
 export default function InboxPage() {
   const router = useRouter();
-  const status = useDemo((s) => s.status);
+  const negotiations = useDemo((s) => s.negotiations);
   const completeStep = useDemo((s) => s.completeStep);
   const [view, setView] = useState<View>('all');
 
   const rows = useMemo(() => {
-    const cd = redlinePriceTags('RL-CLOUDDESK');
     return redlines.map((r) => {
-      if (r.interactive) {
-        const g = (k: string) => r.changes.filter((c) => c.expected.group === k).length;
-        const bucket: View = status === 'signed' ? 'signed' : status === 'with_supplier' ? 'supplier' : 'waiting';
-        return {
-          r, harmless: g('harmless'), legal: g('legal'), money: g('money'),
-          atStake: cd.totalLakh, label: STATUS_LABEL[status], bucket, isNew: status === 'received',
-          unsorted: !atLeast(status, 'sorted'), total: r.changes.length,
-        };
-      }
-      const s = r.summary!;
-      const bucket: View = r.status === 'With supplier' ? 'supplier' : 'waiting';
-      return { r, harmless: s.harmless, legal: s.legal, money: s.money, atStake: s.atStakeLakh, label: r.status ?? '', bucket, isNew: false, unsorted: false, total: s.harmless + s.legal + s.money };
+      const status = negotiations[r.id]?.status ?? 'received';
+      const g = (k: string) => r.changes.filter((c) => c.expected.group === k).length;
+      // Lead-action statuses are "waiting on me"; approval and supplier stages wait on others.
+      const bucket: View =
+        status === 'signed' ? 'signed' : status === 'with_supplier' ? 'supplier' : status === 'awaiting_approval' ? 'all' : 'waiting';
+      return {
+        r, status, harmless: g('harmless'), legal: g('legal'), money: g('money'),
+        atStake: redlinePriceTags(r.id).totalLakh, label: STATUS_LABEL[status], bucket, isNew: status === 'received',
+        unsorted: !atLeast(status, 'sorted'), total: r.changes.length,
+      };
     });
-  }, [status]);
+  }, [negotiations]);
 
   const shown = rows.filter((x) => view === 'all' || x.bucket === view);
   const counts = Object.fromEntries(VIEWS.map((v) => [v.id, rows.filter((x) => v.id === 'all' || x.bucket === v.id).length]));
 
-  const open = (id: string, interactive: boolean) => {
-    if (!interactive) {
-      toast('Demo: only CloudDesk is interactive');
-      return;
-    }
-    completeStep(1);
+  const open = (id: string) => {
+    if (id === STORY_REDLINE) completeStep(1);
     router.push(`/redlines/${id}`);
   };
 
@@ -104,19 +96,19 @@ export default function InboxPage() {
                       key={x.r.id}
                       tabIndex={0}
                       aria-label={`Open ${x.r.supplier} redline`}
-                      onClick={() => open(x.r.id, x.r.interactive)}
+                      onClick={() => open(x.r.id)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          open(x.r.id, x.r.interactive);
+                          open(x.r.id);
                         }
                       }}
-                      className={cn('h-12 cursor-pointer border-t border-line hover:bg-page-bg/70', x.r.interactive && 'bg-teal-900/[0.03]')}
+                      className={cn('h-12 cursor-pointer border-t border-line hover:bg-page-bg/70', x.isNew && 'bg-teal-900/[0.03]')}
                     >
                       <td className="px-6">
                         <div className="flex items-center gap-2">
                           {x.isNew && <span className="h-2 w-2 rounded-full bg-teal-900" aria-label="New" />}
-                          <span className={cn(x.r.interactive && 'font-medium text-teal-900')}>{x.r.supplier}</span>
+                          <span className="font-medium text-teal-900">{x.r.supplier}</span>
                         </div>
                       </td>
                       <td className="px-3 capitalize text-muted">{x.r.supplierType}</td>
@@ -133,10 +125,12 @@ export default function InboxPage() {
                         )}
                       </td>
                       <td className="px-3 text-right tabular-nums">
-                        {x.r.interactive && status === 'signed' ? (
+                        {x.status === 'signed' ? (
                           <span className="text-muted">Signed</span>
                         ) : x.unsorted ? (
                           <span className="text-muted">Not priced yet</span>
+                        ) : x.money === 0 ? (
+                          <span className="text-muted">No money lines</span>
                         ) : (
                           formatLakh(x.atStake)
                         )}

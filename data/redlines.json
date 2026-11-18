@@ -1,19 +1,346 @@
 [
   {
-    "id": "RL-CLOUDDESK", "contractId": "C-017", "supplier": "CloudDesk", "supplierType": "software",
-    "receivedAt": "2026-11-17T09:42:00Z", "interactive": true, "status": "New",
+    "id": "RL-CLOUDDESK",
+    "contractId": "C-017",
+    "supplier": "CloudDesk",
+    "supplierType": "software",
+    "receivedAt": "2026-11-17T09:42:00Z",
+    "interactive": true,
     "changes": [
-      { "no": 1, "clause": "18.2", "title": "Notices", "oldText": "All notices shall be sent to CloudDesk at Level 4, 12 MG Road, Bengaluru 560001.", "newText": "All notices shall be sent to CloudDesk at Tower B, 7th Floor, Outer Ring Road, Bengaluru 560103.", "expected": { "group": "harmless" } },
-      { "no": 2, "clause": "1.1", "title": "Definitions", "oldText": "\"effective date\" means the date on which this Agreement is signed by both parties.", "newText": "\"Effective Date\" means the date on which this Agreement is signed by both parties.", "expected": { "group": "harmless" } },
-      { "no": 3, "clause": "12.1", "title": "Limitation of liability", "oldText": "Each party's total liability shall not exceed the fees paid in the twelve (12) months before the claim.", "newText": "Each party's total liability shall not exceed the fees paid in the six (6) months before the claim.", "expected": { "group": "legal" } },
-      { "no": 4, "clause": "3.2", "title": "Renewal", "oldText": "This Agreement renews automatically for successive one-year terms unless either party gives thirty (30) days' written notice.", "newText": "This Agreement renews automatically for successive one-year terms unless either party gives ninety (90) days' written notice.", "expected": { "group": "money", "line": "renewal", "wordingGroup": "notice_60_90" } },
-      { "no": 5, "clause": "7.4", "title": "Service credits", "oldText": "Service credits are applied automatically to the next invoice.", "newText": "Service credits are payable only if Customer submits a written claim within ten (10) days of the end of the month in which the failure occurred.", "expected": { "group": "money", "line": "credits", "wordingGroup": "claim_le_10" } },
-      { "no": 6, "clause": "9.1", "title": "Fees", "oldText": "The Fees are fixed for the Initial Term and any Renewal Term.", "newText": "Supplier may revise the Fees once in each contract year by written notice.", "expected": { "group": "money", "line": "price", "wordingGroup": "open_yearly" } }
-    ]
+      {
+        "no": 1,
+        "clause": "18.2",
+        "title": "Notices",
+        "oldText": "All notices shall be sent to CloudDesk at Level 4, 12 MG Road, Bengaluru 560001.",
+        "newText": "All notices shall be sent to CloudDesk at Tower B, 7th Floor, Outer Ring Road, Bengaluru 560103.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "1.1",
+        "title": "Definitions",
+        "oldText": "\"effective date\" means the date on which this Agreement is signed by both parties.",
+        "newText": "\"Effective Date\" means the date on which this Agreement is signed by both parties.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 3,
+        "clause": "12.1",
+        "title": "Limitation of liability",
+        "oldText": "Each party's total liability shall not exceed the fees paid in the twelve (12) months before the claim.",
+        "newText": "Each party's total liability shall not exceed the fees paid in the six (6) months before the claim.",
+        "expected": {
+          "group": "legal"
+        }
+      },
+      {
+        "no": 4,
+        "clause": "3.2",
+        "title": "Renewal",
+        "oldText": "This Agreement renews automatically for successive one-year terms unless either party gives thirty (30) days' written notice.",
+        "newText": "This Agreement renews automatically for successive one-year terms unless either party gives ninety (90) days' written notice.",
+        "expected": {
+          "group": "money",
+          "line": "renewal",
+          "wordingGroup": "notice_60_90"
+        }
+      },
+      {
+        "no": 5,
+        "clause": "7.4",
+        "title": "Service credits",
+        "oldText": "Service credits are applied automatically to the next invoice.",
+        "newText": "Service credits are payable only if Customer submits a written claim within ten (10) days of the end of the month in which the failure occurred.",
+        "expected": {
+          "group": "money",
+          "line": "credits",
+          "wordingGroup": "claim_le_10"
+        }
+      },
+      {
+        "no": 6,
+        "clause": "9.1",
+        "title": "Fees",
+        "oldText": "The Fees are fixed for the Initial Term and any Renewal Term.",
+        "newText": "Supplier may revise the Fees once in each contract year by written notice.",
+        "expected": {
+          "group": "money",
+          "line": "price",
+          "wordingGroup": "open_yearly"
+        }
+      }
+    ],
+    "slug": "clouddesk"
   },
-  { "id": "RL-SWIFTSHIP", "contractId": "C-022", "supplier": "SwiftShip Logistics", "supplierType": "logistics", "receivedAt": "2026-11-14T11:05:00Z", "interactive": false, "status": "With supplier", "changes": [], "summary": { "harmless": 1, "legal": 0, "money": 2, "atStakeLakh": 5.8 } },
-  { "id": "RL-NIMBUS", "contractId": "C-004", "supplier": "Nimbus HR Cloud", "supplierType": "software", "receivedAt": "2026-11-12T15:30:00Z", "interactive": false, "status": "Waiting on me", "changes": [], "summary": { "harmless": 3, "legal": 1, "money": 1, "atStakeLakh": 3.2 } },
-  { "id": "RL-BRIGHTSTAFF", "contractId": "C-027", "supplier": "BrightStaff Services", "supplierType": "staffing", "receivedAt": "2026-11-10T08:15:00Z", "interactive": false, "status": "Awaiting approval", "changes": [], "summary": { "harmless": 2, "legal": 1, "money": 2, "atStakeLakh": 2.1 } },
-  { "id": "RL-CLEANCO", "contractId": "C-028", "supplier": "CleanCo Facilities", "supplierType": "facilities", "receivedAt": "2026-11-06T13:50:00Z", "interactive": false, "status": "With supplier", "changes": [], "summary": { "harmless": 4, "legal": 0, "money": 1, "atStakeLakh": 0.9 } },
-  { "id": "RL-DATAVAULT", "contractId": "C-003", "supplier": "DataVault", "supplierType": "software", "receivedAt": "2026-11-03T10:20:00Z", "interactive": false, "status": "With legal", "changes": [], "summary": { "harmless": 0, "legal": 2, "money": 0, "atStakeLakh": 0.0 } }
+  {
+    "id": "RL-SWIFTSHIP",
+    "contractId": "C-022",
+    "supplier": "SwiftShip Logistics",
+    "supplierType": "logistics",
+    "receivedAt": "2026-11-14T11:05:00Z",
+    "interactive": true,
+    "changes": [
+      {
+        "no": 1,
+        "clause": "21.1",
+        "title": "Notices",
+        "oldText": "Notices to SwiftShip shall be sent to legal@swiftship.example.",
+        "newText": "Notices to SwiftShip shall be sent to contracts@swiftship.example.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "4.1",
+        "title": "Renewal",
+        "oldText": "This Agreement renews only if Customer confirms in writing before the end of the Term.",
+        "newText": "This Agreement renews automatically for successive one-year terms unless either party gives ninety (90) days' written notice.",
+        "expected": {
+          "group": "money",
+          "line": "renewal",
+          "wordingGroup": "notice_60_90"
+        }
+      },
+      {
+        "no": 3,
+        "clause": "8.3",
+        "title": "Service credits",
+        "oldText": "Service credits are payable if Customer submits a written claim within fifteen (15) days of the end of the month in which the failure occurred.",
+        "newText": "Service credits are payable only if Customer submits a written claim within seven (7) days of the end of the month in which the failure occurred.",
+        "expected": {
+          "group": "money",
+          "line": "credits",
+          "wordingGroup": "claim_le_10"
+        }
+      }
+    ],
+    "slug": "swiftship"
+  },
+  {
+    "id": "RL-NIMBUS",
+    "contractId": "C-004",
+    "supplier": "Nimbus HR Cloud",
+    "supplierType": "software",
+    "receivedAt": "2026-11-12T15:30:00Z",
+    "interactive": true,
+    "changes": [
+      {
+        "no": 1,
+        "clause": "1.1",
+        "title": "Definitions",
+        "oldText": "\"business day\" means a day other than a Saturday, Sunday or public holiday in Bengaluru.",
+        "newText": "\"Business Day\" means a day other than a Saturday, Sunday or public holiday in Bengaluru.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "19.4",
+        "title": "Notices",
+        "oldText": "Notices to Nimbus shall be sent to 3rd Floor, Prestige Tech Park, Bengaluru.",
+        "newText": "Notices to Nimbus shall be sent to 9th Floor, Embassy Tech Village, Bengaluru.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 3,
+        "clause": "Schedule 2",
+        "title": "Heading",
+        "oldText": "Scehdule 2: Service Levels",
+        "newText": "Schedule 2: Service Levels",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 4,
+        "clause": "13.2",
+        "title": "Indemnity",
+        "oldText": "Supplier shall indemnify Customer against all third-party claims that the Service infringes intellectual property rights.",
+        "newText": "Supplier shall indemnify Customer against third-party claims that the Service infringes intellectual property rights, up to the fees paid in the twelve (12) months before the claim.",
+        "expected": {
+          "group": "legal"
+        }
+      },
+      {
+        "no": 5,
+        "clause": "9.2",
+        "title": "Fees",
+        "oldText": "Supplier may revise the Fees once in each contract year by written notice.",
+        "newText": "Supplier may revise the Fees once in each contract year by written notice, and once more in any year in which its third-party hosting costs increase.",
+        "expected": {
+          "group": "money",
+          "line": "price",
+          "wordingGroup": "open_yearly"
+        }
+      }
+    ],
+    "slug": "nimbus"
+  },
+  {
+    "id": "RL-BRIGHTSTAFF",
+    "contractId": "C-027",
+    "supplier": "BrightStaff Services",
+    "supplierType": "staffing",
+    "receivedAt": "2026-11-10T08:15:00Z",
+    "interactive": true,
+    "changes": [
+      {
+        "no": 1,
+        "clause": "Recital B",
+        "title": "Recitals",
+        "oldText": "The Customer wishes to engage the Supplier to provide contract personel.",
+        "newText": "The Customer wishes to engage the Supplier to provide contract personnel.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "1.1",
+        "title": "Definitions",
+        "oldText": "\"contractor personnel\" means individuals supplied by Supplier under this Agreement.",
+        "newText": "\"Contractor Personnel\" means individuals supplied by Supplier under this Agreement.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 3,
+        "clause": "11.1",
+        "title": "Non-solicitation",
+        "oldText": "Customer shall not directly hire Contractor Personnel during the Term and for six (6) months after it.",
+        "newText": "Customer shall not directly hire Contractor Personnel during the Term and for twenty-four (24) months after it.",
+        "expected": {
+          "group": "legal"
+        }
+      },
+      {
+        "no": 4,
+        "clause": "3.1",
+        "title": "Renewal",
+        "oldText": "This Agreement renews only if Customer confirms in writing before the end of the Term.",
+        "newText": "This Agreement renews automatically for successive one-year terms unless either party gives sixty (60) days' written notice.",
+        "expected": {
+          "group": "money",
+          "line": "renewal",
+          "wordingGroup": "notice_60_90"
+        }
+      },
+      {
+        "no": 5,
+        "clause": "5.2",
+        "title": "Fees",
+        "oldText": "The rates in Schedule 1 are fixed for the Term.",
+        "newText": "Supplier may revise the rates in Schedule 1 once in each contract year by written notice.",
+        "expected": {
+          "group": "money",
+          "line": "price",
+          "wordingGroup": "open_yearly"
+        }
+      }
+    ],
+    "slug": "brightstaff"
+  },
+  {
+    "id": "RL-CLEANCO",
+    "contractId": "C-028",
+    "supplier": "CleanCo Facilities",
+    "supplierType": "facilities",
+    "receivedAt": "2026-11-06T13:50:00Z",
+    "interactive": true,
+    "changes": [
+      {
+        "no": 1,
+        "clause": "Schedule 1",
+        "title": "Sites",
+        "oldText": "Site 2: Plot 14, Whitefield Main Road, Bengaluru.",
+        "newText": "Site 2: Plot 14A, Whitefield Main Road, Bengaluru.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "6.1",
+        "title": "Contacts",
+        "oldText": "Supplier's account manager is Ravi Shetty.",
+        "newText": "Supplier's account manager is Lata Menon.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 3,
+        "clause": "2.4",
+        "title": "Services",
+        "oldText": "The Supplier shall provide housekeeping servcies at each Site.",
+        "newText": "The Supplier shall provide housekeeping services at each Site.",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 4,
+        "clause": "10",
+        "title": "Numbering",
+        "oldText": "10.5 Insurance",
+        "newText": "10.4 Insurance",
+        "expected": {
+          "group": "harmless"
+        }
+      },
+      {
+        "no": 5,
+        "clause": "3.2",
+        "title": "Renewal",
+        "oldText": "This Agreement renews automatically unless either party gives thirty (30) days' written notice.",
+        "newText": "This Agreement renews automatically unless either party gives ninety (90) days' written notice.",
+        "expected": {
+          "group": "money",
+          "line": "renewal",
+          "wordingGroup": "notice_60_90"
+        }
+      }
+    ],
+    "slug": "cleanco"
+  },
+  {
+    "id": "RL-DATAVAULT",
+    "contractId": "C-003",
+    "supplier": "DataVault",
+    "supplierType": "software",
+    "receivedAt": "2026-11-03T10:20:00Z",
+    "interactive": true,
+    "changes": [
+      {
+        "no": 1,
+        "clause": "14.3",
+        "title": "Data breach notice",
+        "oldText": "Supplier shall notify Customer of any personal data breach within twenty-four (24) hours of becoming aware of it.",
+        "newText": "Supplier shall notify Customer of any personal data breach within seventy-two (72) hours of becoming aware of it.",
+        "expected": {
+          "group": "legal"
+        }
+      },
+      {
+        "no": 2,
+        "clause": "22.1",
+        "title": "Governing law",
+        "oldText": "This Agreement is governed by the laws of India, and the courts of Bengaluru have exclusive jurisdiction.",
+        "newText": "This Agreement is governed by the laws of Singapore, and disputes shall be finally resolved by arbitration under the SIAC Rules.",
+        "expected": {
+          "group": "legal"
+        }
+      }
+    ],
+    "slug": "datavault"
+  }
 ]

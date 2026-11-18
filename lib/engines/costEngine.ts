@@ -55,6 +55,22 @@ function confidenceFor(n: number): Confidence {
 }
 
 // ---------------------------------------------------------------------------
+// Inputs. Each input follows the same cascade (§6.2): own contracts of the
+// same supplier type if there are at least MIN_OWN_N, otherwise a pooled figure
+// from 20+ companies, otherwise "not enough history" (NaN).
+// ---------------------------------------------------------------------------
+
+export type InputSource = 'own' | 'pooled' | 'assumption' | 'none';
+export interface Input {
+  value: number;
+  n: number; // own contracts (or renewals) behind the value
+  source: InputSource;
+  pooled?: PooledRate;
+}
+
+const TYPE_LABEL: Record<SupplierType, string> = { software: 'software', staffing: 'staffing', logistics: 'logistics', facilities: 'facilities' };
+
+// ---------------------------------------------------------------------------
 // Renewal
 // ---------------------------------------------------------------------------
 
@@ -63,10 +79,19 @@ function renewalsInGroup(group: RenewalGroup, type: SupplierType = 'software') {
   return renewals.filter((r) => ids.has(r.contractId));
 }
 
-export function pUnreviewed(group: RenewalGroup): { p: number; unreviewed: number; total: number } {
-  const rs = renewalsInGroup(group);
+export function pUnreviewed(group: RenewalGroup, type: SupplierType = 'software'): { p: number; unreviewed: number; total: number } {
+  const rs = renewalsInGroup(group, type);
   const unreviewed = rs.filter((r) => !r.reviewed).length;
   return { p: rs.length ? unreviewed / rs.length : 0, unreviewed, total: rs.length };
+}
+
+/** Share of renewals with this wording that went through unreviewed. */
+export function unreviewedRate(group: RenewalGroup, type: SupplierType = 'software'): Input & { unreviewed: number; total: number } {
+  const own = pUnreviewed(group, type);
+  const pooled = pooledFor(type, 'renewal', group);
+  if (own.total >= MIN_OWN_N) return { value: own.p, n: own.total, source: 'own', pooled, ...own };
+  if (pooledUsable(pooled)) return { value: pooled.figure, n: own.total, source: 'pooled', pooled, ...own };
+  return { value: NaN, n: own.total, source: 'none', pooled, ...own };
 }
 
 /** Mean unused seat share over unreviewed software renewals (0.18). */
@@ -77,9 +102,15 @@ export function unusedShare(): { share: number; n: number } {
   return { share, n: rs.length };
 }
 
-export function renewalCost(fee: number, group: RenewalGroup): number {
+/** Overspend on an unreviewed renewal. Measured on software; an assumption for other types. */
+export function overspendShare(type: SupplierType): Input {
+  const us = unusedShare();
+  return { value: us.share, n: us.n, source: type === 'software' ? 'own' : 'assumption' };
+}
+
+export function renewalCost(fee: number, group: RenewalGroup, type: SupplierType = 'software'): number {
   if (group === 'opt_in') return 0;
-  return pUnreviewed(group).p * unusedShare().share * fee;
+  return unreviewedRate(group, type).value * overspendShare(type).value * fee;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,7 +120,7 @@ export function renewalCost(fee: number, group: RenewalGroup): number {
 export interface Recovery {
   recovery: number;
   n: number;
-  source: 'own' | 'pooled' | 'assumption' | 'none';
+  source: InputSource;
   pooled?: PooledRate;
 }
 
@@ -116,10 +147,11 @@ export function creditsOwedLakh(contractId: string): number {
   return ev.reduce((a, e) => a + e.creditOwedInr, 0) / 1e5;
 }
 
-export function creditsCost(owedLakh: number, group: CreditsGroup): number {
-  const r = recovery(group);
-  if (Number.isNaN(r.recovery)) return NaN;
-  return owedLakh * (recovery('automatic').recovery - r.recovery);
+export function creditsCost(owedLakh: number, group: CreditsGroup, type: SupplierType = 'software'): number {
+  if (group === 'automatic') return 0;
+  const r = recovery(group, type);
+  const auto = recovery('automatic', type);
+  return owedLakh * (auto.recovery - r.recovery);
 }
 
 // ---------------------------------------------------------------------------
@@ -135,26 +167,36 @@ export function observedRise(contractId: string): number {
   return mean(y2) / mean(y1) - 1;
 }
 
-export function meanObservedRise(group: PriceGroup): { rise: number; n: number } {
-  const cs = contractsInGroup('price', group);
+export function meanObservedRise(group: PriceGroup, type: SupplierType = 'software'): { rise: number; n: number } {
+  const cs = contractsInGroup('price', group, type);
   if (!cs.length) return { rise: NaN, n: 0 };
   return { rise: cs.reduce((a, c) => a + observedRise(c.id), 0) / cs.length, n: cs.length };
 }
 
-export function expectedRise(group: PriceGroup): number {
+/** Average yearly rise for a price wording, by the own → pooled → none cascade. */
+export function riseInput(group: 'cap_5' | 'open_yearly', type: SupplierType = 'software'): Input {
+  const own = meanObservedRise(group, type);
+  const pooled = pooledFor(type, 'price', group);
+  if (own.n >= MIN_OWN_N) return { value: own.rise, n: own.n, source: 'own', pooled };
+  if (pooledUsable(pooled)) return { value: pooled.figure, n: own.n, source: 'pooled', pooled };
+  return { value: NaN, n: own.n, source: 'none', pooled };
+}
+
+export function expectedRise(group: PriceGroup, type: SupplierType = 'software'): number {
   switch (group) {
     case 'fixed':
       return 0;
     case 'cap_7':
       // Suppliers price near the cap: scale the observed 5%-cap behaviour up to 7%.
-      return 0.07 * (meanObservedRise('cap_5').rise / 0.05);
+      return 0.07 * (riseInput('cap_5', type).value / 0.05);
     default:
-      return meanObservedRise(group).rise;
+      return riseInput(group, type).value;
   }
 }
 
-export function priceCost(fee: number, group: PriceGroup): number {
-  return (expectedRise(group) - expectedRise('cap_5')) * fee;
+export function priceCost(fee: number, group: PriceGroup, type: SupplierType = 'software'): number {
+  if (group === 'cap_5') return 0;
+  return (expectedRise(group, type) - expectedRise('cap_5', type)) * fee;
 }
 
 // ---------------------------------------------------------------------------
@@ -165,76 +207,98 @@ export const feeLakh = (c: Contract) => c.annualFeeInr / 1e5;
 
 export function cost(c: Contract, line: Line, group: WordingGroup): number {
   const fee = feeLakh(c);
-  if (line === 'renewal') return renewalCost(fee, group as RenewalGroup);
-  if (line === 'credits') return creditsCost(creditsOwedLakh(c.id), group as CreditsGroup);
-  return priceCost(fee, group as PriceGroup);
+  if (line === 'renewal') return renewalCost(fee, group as RenewalGroup, c.supplierType);
+  if (line === 'credits') return creditsCost(creditsOwedLakh(c.id), group as CreditsGroup, c.supplierType);
+  return priceCost(fee, group as PriceGroup, c.supplierType);
 }
 
 const pct1 = (x: number) => formatPct(x, 1);
+const backupOf = (p?: PooledRate) => (p && pooledUsable(p) ? { companies: p.companies, label: p.label } : undefined);
+
+/** Combine input sources: any missing → none; any pooled/assumption → low; all own → by sample size. */
+function combine(n: number, ...inputs: InputSource[]): { confidence: Confidence; source: PriceTag['source'] } {
+  if (inputs.includes('none')) return { confidence: 'none', source: 'pooled' };
+  if (inputs.includes('pooled')) return { confidence: 'low', source: 'pooled' };
+  if (inputs.includes('assumption')) return { confidence: 'low', source: 'assumption' };
+  return { confidence: confidenceFor(n), source: 'own' };
+}
+
+const NOT_ENOUGH = 'Not enough history: fewer than 8 own contracts and no pooled figure from 20+ companies.';
 
 export function priceTag(c: Contract, line: Line, group: WordingGroup): PriceTag {
   const fee = feeLakh(c);
+  const type = c.supplierType;
   const costLakh = cost(c, line, group);
   const isBenchmark = BENCHMARK[line] === group;
+  const T = TYPE_LABEL[type];
 
   if (line === 'renewal') {
     const g = group as RenewalGroup;
-    const n = contractsInGroup('renewal', g).length;
+    const n = contractsInGroup('renewal', g, type).length;
     if (g === 'opt_in') {
       return {
         line, group, costLakh: 0, confidence: 'high', n, source: 'own',
         proof: ['Opt-in is the benchmark: the contract cannot renew without our written yes, so it costs nothing.'],
       };
     }
-    const pu = pUnreviewed(g);
-    const us = unusedShare();
-    return {
-      line, group, costLakh, confidence: confidenceFor(n), n, source: 'own',
-      proof: [
-        `${pu.unreviewed} of ${pu.total} past renewals with this wording (${GROUP_LABEL[g].toLowerCase()}) went through without anyone reviewing them.`,
-        `Unreviewed renewals left on average ${formatPct(us.share)} of paid seats unused (${us.n} renewals).`,
-        `${pu.unreviewed}/${pu.total} × ${formatPct(us.share)} × ${formatLakh(fee)} fee = ${formatLakh(costLakh)} a year.`,
-      ],
-    };
+    const ur = unreviewedRate(g, type);
+    const os = overspendShare(type);
+    const { confidence, source } = combine(ur.total, ur.source, os.source);
+    if (confidence === 'none') return { line, group, costLakh: NaN, confidence, n, source, proof: [NOT_ENOUGH] };
+    const proof: string[] = [];
+    if (ur.source === 'own') {
+      proof.push(`${ur.unreviewed} of ${ur.total} past renewals with this wording (${GROUP_LABEL[g].toLowerCase()}) went through without anyone reviewing them.`);
+    } else {
+      proof.push(`We have fewer than ${MIN_OWN_N} past ${T} renewals with this wording, so this uses pooled data: ${ur.pooled!.label.toLowerCase()} across ${ur.pooled!.companies} companies.`);
+    }
+    if (os.source === 'own') {
+      proof.push(`Unreviewed renewals left on average ${formatPct(os.value)} of paid seats unused (${os.n} renewals).`);
+    } else {
+      proof.push(`Assumption: an unreviewed renewal overspends by about ${formatPct(os.value)} of the fee, as measured on our software renewals (${os.n} renewals).`);
+    }
+    const rate = ur.source === 'own' ? `${ur.unreviewed}/${ur.total}` : formatPct(ur.value);
+    proof.push(`${rate} × ${formatPct(os.value)} × ${formatLakh(fee)} fee = ${formatLakh(costLakh)} a year.`);
+    return { line, group, costLakh, confidence, n, source, proof, pooledBackup: ur.source === 'pooled' ? backupOf(ur.pooled) : undefined };
   }
 
   if (line === 'credits') {
     const g = group as CreditsGroup;
-    const r = recovery(g);
-    const auto = recovery('automatic');
+    const r = recovery(g, type);
+    const auto = recovery('automatic', type);
     const owed = creditsOwedLakh(c.id);
-    const pooledBackup = r.pooled ? { companies: r.pooled.companies, label: r.pooled.label } : undefined;
+    const pooledBackup = backupOf(r.pooled);
     if (isBenchmark) {
       return {
-        line, group, costLakh: 0, confidence: confidenceFor(r.n), n: r.n, source: 'own',
+        line, group, costLakh: 0, confidence: auto.source === 'own' ? confidenceFor(r.n) : 'low', n: r.n, source: auto.source === 'pooled' ? 'pooled' : 'own',
         proof: [
-          `Automatic credits are the benchmark: our ${r.n} contracts with this wording recovered ${formatPct(r.recovery)} of credits owed.`,
+          auto.source === 'own'
+            ? `Automatic credits are the benchmark: our ${r.n} contracts with this wording recovered ${formatPct(r.recovery)} of credits owed.`
+            : 'Automatic credits are the benchmark: credits arrive on the invoice without anyone claiming them.',
         ],
         pooledBackup,
       };
     }
-    if (r.source === 'none') {
-      return {
-        line, group, costLakh: NaN, confidence: 'none', n: r.n, source: 'pooled',
-        proof: ['Not enough history: fewer than 8 own contracts and no pooled figure from 20+ companies.'],
-      };
-    }
+    const { confidence, source } = combine(r.n, r.source, auto.source);
+    if (confidence === 'none') return { line, group, costLakh: NaN, confidence, n: r.n, source, proof: [NOT_ENOUGH] };
     const proof: string[] = [];
     if (r.source === 'own') {
-      proof.push(`Our ${r.n} software contracts with a claim window of 10 days or less recovered ${formatPct(r.recovery)} of credits owed.`);
+      proof.push(`Our ${r.n} ${T} contracts with a claim window of 10 days or less recovered ${formatPct(r.recovery)} of credits owed.`);
     } else if (r.source === 'pooled') {
-      proof.push(`We have ${r.n} own contracts with this wording, so this uses pooled data: ${r.pooled!.label.toLowerCase()} across ${r.pooled!.companies} companies (recovery ${formatPct(r.recovery)}).`);
+      proof.push(`We have ${r.n} own ${type === 'software' ? '' : `${T} `}contracts with this wording, so this uses pooled data: ${r.pooled!.label.toLowerCase()} across ${r.pooled!.companies} companies (recovery ${formatPct(r.recovery)}).`);
     } else {
       proof.push(`Assumption: claims filed automatically by the contract system recover about ${formatPct(r.recovery)} of credits.`);
     }
-    proof.push(`Automatic credits recover ${formatPct(auto.recovery)} (${auto.n} contracts).`);
+    proof.push(
+      auto.source === 'own'
+        ? `Automatic credits recover ${formatPct(auto.recovery)} (${auto.n} contracts).`
+        : `Automatic credits recover ${formatPct(auto.recovery)} (pooled: ${auto.pooled!.companies} companies).`,
+    );
     proof.push(`${c.supplier} earned ${formatLakh(owed)} in service credits over the last 12 months.`);
     proof.push(`${formatLakh(owed)} × (${formatPct(auto.recovery)} − ${formatPct(r.recovery)}) = ${formatLakh(costLakh)} a year.`);
     return {
-      line, group, costLakh,
-      confidence: r.source === 'own' ? confidenceFor(r.n) : 'low',
+      line, group, costLakh, confidence,
       n: r.n,
-      source: r.source,
+      source: r.source === 'assumption' ? 'assumption' : source,
       proof,
       pooledBackup: r.source === 'assumption' ? undefined : pooledBackup,
     };
@@ -242,45 +306,64 @@ export function priceTag(c: Contract, line: Line, group: WordingGroup): PriceTag
 
   // price
   const g = group as PriceGroup;
-  const base = meanObservedRise('cap_5');
-  const pooled = pooledFor('software', 'price', g);
+  const base = riseInput('cap_5', type);
+  const pooled = pooledFor(type, 'price', g);
+  const baseText =
+    base.source === 'own'
+      ? `${base.n} contracts`
+      : base.source === 'pooled'
+        ? `pooled: ${base.pooled!.companies} companies`
+        : 'not enough history';
   if (g === 'fixed') {
-    const n = contractsInGroup('price', 'fixed').length;
+    const n = contractsInGroup('price', 'fixed', type).length;
+    if (Number.isNaN(costLakh)) return { line, group, costLakh: 0, confidence: 'high', n, source: 'own', proof: ['A fixed price cannot rise during the term.'] };
     return {
-      line, group, costLakh, confidence: 'high', n, source: 'own',
+      line, group, costLakh, confidence: base.source === 'own' ? 'high' : 'low', n, source: base.source === 'own' ? 'own' : 'pooled',
       proof: [
         'A fixed price cannot rise during the term.',
-        `Compared with the 5% cap benchmark (observed ${pct1(base.rise)} a year, ${base.n} contracts), this is ${formatLakh(-costLakh)} a year better.`,
+        `Compared with the 5% cap benchmark (observed ${pct1(base.value)} a year, ${baseText}), this is ${formatLakh(-costLakh)} a year better.`,
       ],
     };
   }
   if (g === 'cap_5') {
     return {
-      line, group, costLakh: 0, confidence: confidenceFor(base.n), n: base.n, source: 'own',
-      proof: [`A 5% cap is the benchmark. Our ${base.n} capped contracts rose ${pct1(base.rise)} a year on average.`],
+      line, group, costLakh: 0, confidence: base.source === 'own' ? confidenceFor(base.n) : 'low', n: base.n, source: base.source === 'own' ? 'own' : 'pooled',
+      proof: [
+        base.source === 'own'
+          ? `A 5% cap is the benchmark. Our ${base.n} capped contracts rose ${pct1(base.value)} a year on average.`
+          : 'A 5% cap is the benchmark: prices can rise, but never more than 5% a year.',
+      ],
     };
   }
   if (g === 'cap_7') {
-    const n = contractsInGroup('price', 'cap_7').length;
+    const n = contractsInGroup('price', 'cap_7', type).length;
+    if (Number.isNaN(costLakh)) return { line, group, costLakh: NaN, confidence: 'none', n, source: 'pooled', proof: [NOT_ENOUGH] };
     return {
       line, group, costLakh, confidence: 'low', n, source: 'assumption',
       proof: [
-        `Suppliers price close to the cap: our ${base.n} contracts with a 5% cap rose ${pct1(base.rise)} (${pct1(base.rise / 0.05)} of the cap).`,
-        `Applied to a 7% cap that is an expected rise of ${pct1(expectedRise('cap_7'))} a year.`,
-        `(${pct1(expectedRise('cap_7'))} − ${pct1(base.rise)}) × ${formatLakh(fee)} = ${formatLakh(costLakh)} a year.`,
+        `Suppliers price close to the cap: contracts with a 5% cap rose ${pct1(base.value)} (${pct1(base.value / 0.05)} of the cap; ${baseText}).`,
+        `Applied to a 7% cap that is an expected rise of ${pct1(expectedRise('cap_7', type))} a year.`,
+        `(${pct1(expectedRise('cap_7', type))} − ${pct1(base.value)}) × ${formatLakh(fee)} = ${formatLakh(costLakh)} a year.`,
       ],
-      pooledBackup: pooled ? { companies: pooled.companies, label: pooled.label } : undefined,
+      pooledBackup: backupOf(pooled),
     };
   }
-  const open = meanObservedRise('open_yearly');
+  const open = riseInput('open_yearly', type);
+  const { confidence, source } = combine(open.n, open.source, base.source);
+  const n = contractsInGroup('price', 'open_yearly', type).length;
+  if (confidence === 'none') return { line, group, costLakh: NaN, confidence, n, source, proof: [NOT_ENOUGH] };
   return {
-    line, group, costLakh, confidence: confidenceFor(open.n), n: open.n, source: 'own',
+    line, group, costLakh, confidence, n, source,
     proof: [
-      `Our ${open.n} software contracts with an open yearly revision rose ${pct1(open.rise)} on average in year 2.`,
-      `Contracts with a 5% cap rose ${pct1(base.rise)} (${base.n} contracts).`,
-      `(${pct1(open.rise)} − ${pct1(base.rise)}) × ${formatLakh(fee)} fee = ${formatLakh(costLakh)} a year.`,
+      open.source === 'own'
+        ? `Our ${open.n} ${T} contracts with an open yearly revision rose ${pct1(open.value)} on average in year 2.`
+        : `We have ${open.n} own ${T} contracts with an open yearly revision, so this uses pooled data: ${open.pooled!.label.toLowerCase()} across ${open.pooled!.companies} companies.`,
+      base.source === 'own'
+        ? `Contracts with a 5% cap rose ${pct1(base.value)} (${base.n} contracts).`
+        : `Contracts with a 5% cap rose ${pct1(base.value)} (${baseText}).`,
+      `(${pct1(open.value)} − ${pct1(base.value)}) × ${formatLakh(fee)} fee = ${formatLakh(costLakh)} a year.`,
     ],
-    pooledBackup: pooled ? { companies: pooled.companies, label: pooled.label } : undefined,
+    pooledBackup: backupOf(pooled),
   };
 }
 
@@ -296,8 +379,8 @@ export interface GroupContractRow {
   bad: boolean;
 }
 
-export function groupContractRows(line: Line, group: WordingGroup): GroupContractRow[] {
-  const cs = contractsInGroup(line, group);
+export function groupContractRows(line: Line, group: WordingGroup, type: SupplierType = 'software'): GroupContractRow[] {
+  const cs = contractsInGroup(line, group, type);
   return cs.map((c) => {
     if (line === 'renewal') {
       const r = renewals.find((x) => x.contractId === c.id);

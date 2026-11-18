@@ -15,7 +15,8 @@ import { EmptyState } from '@/components/ui';
 import { redlines } from '@/lib/data';
 import { buildPackages } from '@/lib/engines/givegetEngine';
 import { redlinePriceTags } from '@/lib/engines/redline';
-import { atLeast, useDemo } from '@/lib/store';
+import { atLeast, hasMoneyLines, STORY_REDLINE, useDemo, useNegotiation } from '@/lib/store';
+import { RedlineProvider } from '@/components/board/context';
 import { useMediaQuery } from '@/lib/useMedia';
 import { cn } from '@/lib/utils';
 
@@ -32,7 +33,8 @@ function Board() {
   const search = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const status = useDemo((s) => s.status);
+  const redlineId = decodeURIComponent(id);
+  const status = useNegotiation(redlineId)?.status ?? 'received';
   const completeStep = useDemo((s) => s.completeStep);
   // The assistant stays closed so the evidence cards get the width; it opens when someone asks about an estimate.
   const [askOpen, setAskOpen] = useState(false);
@@ -43,38 +45,41 @@ function Board() {
   };
   const wide = useMediaQuery('(min-width: 1280px)');
 
-  const redline = redlines.find((r) => r.id === decodeURIComponent(id));
+  const redline = redlines.find((r) => r.id === redlineId);
   const fromUrl = search.get('tab') as Tab | null;
   const tab: Tab = fromUrl && TABS.some((t) => t.id === fromUrl) ? fromUrl : 'changes';
-  const signingEnabled = atLeast(status, 'agreed');
+  const money = redline ? hasMoneyLines(redline.id) : false;
+  const signingEnabled = money ? atLeast(status, 'agreed') : atLeast(status, 'sorted');
 
   const setTab = (t: Tab) => router.replace(`${pathname}?tab=${t}`, { scroll: false });
 
   useEffect(() => {
-    if (redline?.interactive) completeStep(1);
+    if (redline?.id === STORY_REDLINE) completeStep(1);
   }, [redline, completeStep]);
 
   const data = useMemo(() => {
-    if (!redline?.interactive) return null;
+    if (!redline) return null;
     return { ...redlinePriceTags(redline.id), packages: buildPackages({ redlineId: redline.id }) };
   }, [redline]);
 
   if (!redline) return <EmptyState title="Redline not found"><Link className="text-teal-900 underline" href="/redlines">Back to the inbox</Link></EmptyState>;
-  if (!redline.interactive || !data) {
-    return (
-      <EmptyState title={`${redline.supplier}`}>
-        Demo: only CloudDesk is interactive. <Link className="text-teal-900 underline" href="/redlines/RL-CLOUDDESK">Open CloudDesk</Link>
-      </EmptyState>
-    );
-  }
+  if (!data) return null;
 
   return (
+    <RedlineProvider value={redline.id}>
     <div className="flex gap-6">
       <div className="min-w-0 flex-1 space-y-4">
         <Link href="/redlines" className="inline-flex items-center gap-1 text-sm text-muted hover:text-teal-900">
           <ArrowLeft className="h-4 w-4" /> Redline inbox
         </Link>
-        <BoardHeader contract={data.contract} totalLakh={data.totalLakh} vsCurrentLakh={data.vsCurrentLakh} pctOfFee={data.pctOfFee} />
+        <BoardHeader
+          contract={data.contract}
+          totalLakh={data.totalLakh}
+          vsCurrentLakh={data.vsCurrentLakh}
+          pctOfFee={data.pctOfFee}
+          moneyLines={data.lines.length}
+          unpriced={data.unpriced.length}
+        />
         <StatusBanner onGoSigning={() => setTab('signing')} />
 
         <div className="flex items-center justify-between gap-3 border-b border-line">
@@ -144,6 +149,7 @@ function Board() {
         </div>
       )}
     </div>
+    </RedlineProvider>
   );
 }
 

@@ -5621,8 +5621,8 @@
     "date": "2024-11-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-02",
@@ -5630,8 +5630,8 @@
     "date": "2024-12-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-03",
@@ -5639,8 +5639,8 @@
     "date": "2025-01-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-04",
@@ -5648,8 +5648,8 @@
     "date": "2025-02-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-05",
@@ -5657,8 +5657,8 @@
     "date": "2025-03-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-06",
@@ -5666,8 +5666,8 @@
     "date": "2025-04-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-07",
@@ -5675,8 +5675,8 @@
     "date": "2025-05-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-08",
@@ -5684,8 +5684,8 @@
     "date": "2025-06-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-09",
@@ -5693,8 +5693,8 @@
     "date": "2025-07-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-10",
@@ -5702,8 +5702,8 @@
     "date": "2025-08-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-11",
@@ -5711,8 +5711,8 @@
     "date": "2025-09-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-12",
@@ -5720,8 +5720,8 @@
     "date": "2025-10-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-13",
@@ -5729,8 +5729,8 @@
     "date": "2025-11-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-14",
@@ -5738,8 +5738,8 @@
     "date": "2025-12-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-15",
@@ -5747,8 +5747,8 @@
     "date": "2026-01-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-16",
@@ -5756,8 +5756,8 @@
     "date": "2026-02-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-17",
@@ -5765,8 +5765,8 @@
     "date": "2026-03-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-18",
@@ -5774,8 +5774,8 @@
     "date": "2026-04-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-19",
@@ -5783,8 +5783,8 @@
     "date": "2026-05-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-20",
@@ -5792,8 +5792,8 @@
     "date": "2026-06-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-21",
@@ -5801,8 +5801,8 @@
     "date": "2026-07-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-22",
@@ -5810,8 +5810,8 @@
     "date": "2026-08-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-23",
@@ -5819,8 +5819,8 @@
     "date": "2026-09-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-027-24",
@@ -5828,8 +5828,8 @@
     "date": "2026-10-01",
     "item": "Contract staff (monthly)",
     "qty": 1,
-    "agreedUnitPriceInr": 100000,
-    "invoicedUnitPriceInr": 100000
+    "agreedUnitPriceInr": 250000,
+    "invoicedUnitPriceInr": 250000
   },
   {
     "id": "INV-028-01",

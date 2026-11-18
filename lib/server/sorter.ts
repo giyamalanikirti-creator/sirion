@@ -3,7 +3,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { getRedline } from '../data';
 import { SortModelOutputSchema, SortResponseSchema } from '../schemas';
 import type { ChangeClass, SortResult } from '../types';
-import fixture from '@/data/fixtures/sort_clouddesk.json';
+import fixtures from '@/data/fixtures/sort_fixtures.json';
 import { getClient, isLive, logAiFailure, MODEL_FAST, withTimeout } from './anthropic';
 
 const SYSTEM = `You sort supplier contract changes for a procurement team.
@@ -19,8 +19,10 @@ For harmless and legal changes, line and wordingGroup are null.
 confidence is 0 to 1. reason is at most 20 words.
 Classify exactly the changes given, one result per change number. Never invent changes.`;
 
-function fixtureResults(): ChangeClass[] {
-  return fixture.results as ChangeClass[];
+function fixtureResults(redlineId: string): ChangeClass[] {
+  const all = fixtures as Record<string, ChangeClass[]>;
+  if (!all[redlineId]) throw new Error(`No sort fixture for ${redlineId}`);
+  return all[redlineId];
 }
 
 function agreesWithExpected(redlineId: string, results: ChangeClass[]): boolean {
@@ -36,8 +38,7 @@ function agreesWithExpected(redlineId: string, results: ChangeClass[]): boolean 
 
 export async function sortRedline(redlineId: string): Promise<SortResult> {
   const r = getRedline(redlineId);
-  if (!r.interactive) throw new Error('Only the CloudDesk redline is interactive in this demo');
-  const cached: SortResult = { results: fixtureResults(), source: 'cached' };
+  const cached: SortResult = { results: fixtureResults(redlineId), source: 'cached' };
   if (!isLive()) return cached;
 
   try {

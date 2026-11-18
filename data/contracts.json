@@ -444,7 +444,7 @@
     "id": "C-027",
     "supplier": "BrightStaff Services",
     "supplierType": "staffing",
-    "annualFeeInr": 1200000,
+    "annualFeeInr": 3000000,
     "startDate": "2025-01-01",
     "endDate": "2027-12-31",
     "renewalWording": "opt_in",

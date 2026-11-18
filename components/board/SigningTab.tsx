@@ -4,22 +4,24 @@ import { AlertTriangle, Check, FileSignature, ReceiptText, UserRound, X } from '
 import { Button, EmptyState, KpiTile, SirionCard, StatusPill } from '@/components/ui';
 import { firstInvoiceCheck } from '@/lib/engines/invoiceCheck';
 import { finalDeal } from '@/lib/engines/negotiation';
+import { getRedline } from '@/lib/data';
+import { COUNTER_PHRASE } from '@/lib/format';
+import { hasMoneyLines, legalChanges } from '@/lib/store';
+import { useBoard } from './context';
 import { formatDate, formatLakh, LINE_LABEL } from '@/lib/format';
-import { atLeast, useDemo } from '@/lib/store';
+import { atLeast } from '@/lib/store';
 
 export function SigningTab() {
-  const status = useDemo((s) => s.status);
-  const pick = useDemo((s) => s.supplierPick);
-  const counter = useDemo((s) => s.counter);
-  const sign = useDemo((s) => s.sign);
-  const signedAt = useDemo((s) => s.signedAt);
-  const invoiceChecked = useDemo((s) => s.invoiceChecked);
-  const runInvoiceCheck = useDemo((s) => s.runInvoiceCheck);
+  const { id, n, sign, runInvoiceCheck } = useBoard();
+  const { status, supplierPick: pick, counter, signedAt, invoiceChecked } = n;
+  const redline = getRedline(id);
 
+  if (!hasMoneyLines(id)) return <LegalOnlySigning />;
   if (!atLeast(status, 'agreed') || !pick) {
-    return <EmptyState title="Signing opens once the deal is agreed">CloudDesk needs to pick a package, and you need to accept any counter-offer.</EmptyState>;
+    return <EmptyState title="Signing opens once the deal is agreed">{redline.supplier} needs to pick a package, and you need to accept any counter-offer.</EmptyState>;
   }
-  const deal = finalDeal(pick, counter ? [counter] : []);
+  const deal = finalDeal(pick, counter ? [counter] : [], id);
+  const check = firstInvoiceCheck(redline.contractId);
   const signed = status === 'signed';
 
   return (
@@ -29,14 +31,14 @@ export function SigningTab() {
           <KpiTile small label="Automated checks" value={`${deal.enforceableCount} of ${deal.totalLines}`} caption="commercial terms Sirion can verify" />
         </SirionCard>
         <SirionCard menu={false}>
-          <KpiTile small label="Estimated value protected" value={formatLakh(deal.protectedLakh)} caption="a year vs CloudDesk’s redline (estimate)" />
+          <KpiTile small label="Estimated value protected" value={formatLakh(deal.protectedLakh)} caption={`a year vs ${redline.supplier}’s redline (estimate)`} />
         </SirionCard>
         <SirionCard menu={false}>
           <KpiTile small label="Estimated net" value={formatLakh(deal.netLakh)} caption={`a year after our give (${formatLakh(deal.giveCostLakh)})`} />
         </SirionCard>
       </div>
 
-      <SirionCard title={`Agreed wording · package ${deal.packageId}${counter ? ' with CloudDesk’s 7% cap' : ''}`} bodyClassName="p-0">
+      <SirionCard title={`Agreed wording · package ${deal.packageId}${counter ? ` with ${redline.supplier}’s ${COUNTER_PHRASE[counter.group].replace(/^an? /, '')}` : ''}`} bodyClassName="p-0">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-sm">
             <thead>
@@ -85,13 +87,12 @@ export function SigningTab() {
         </Button>
       </div>
 
-      {signed && <InvoiceCheck checked={invoiceChecked} onRun={runInvoiceCheck} estimatedLakh={deal.protectedLakh} />}
+      {signed && check && <InvoiceCheck c={check} checked={invoiceChecked} onRun={runInvoiceCheck} estimatedLakh={deal.protectedLakh} />}
     </div>
   );
 }
 
-function InvoiceCheck({ checked, onRun, estimatedLakh }: { checked: boolean; onRun: () => void; estimatedLakh: number }) {
-  const c = firstInvoiceCheck();
+function InvoiceCheck({ c, checked, onRun, estimatedLakh }: { c: NonNullable<ReturnType<typeof firstInvoiceCheck>>; checked: boolean; onRun: () => void; estimatedLakh: number }) {
   const rupees = (n: number) => `₹${n.toLocaleString('en-IN')}`;
   return (
     <SirionCard
@@ -156,5 +157,49 @@ function Fact({ n, label, value, sub, strong, danger }: { n: number; label: stri
       <div className={'mt-1.5 text-sm ' + (danger ? 'text-[20px] font-light text-danger' : strong ? 'text-[20px] font-light text-teal-900' : 'text-ink')}>{value}</div>
       {sub && <div className="mt-1 text-xs text-muted">{sub}</div>}
     </li>
+  );
+}
+
+/** Redlines with legal changes only: sign once legal has decided every change. */
+function LegalOnlySigning() {
+  const { id, n, sign } = useBoard();
+  const redline = getRedline(id);
+  const items = legalChanges(id);
+  const pending = items.filter((c) => !n.legalDecisions[c.no]);
+  const signed = n.status === 'signed';
+  if (!n.sortResult) return <EmptyState title="Sort the changes first">Signing opens once the changes are sorted.</EmptyState>;
+  return (
+    <div className="space-y-4">
+      <SirionCard title={`Legal decisions · ${redline.supplier}`} bodyClassName="p-0">
+        <table className="w-full text-sm">
+          <tbody>
+            {items.map((c) => (
+              <tr key={c.no} className="h-12 border-t border-line first:border-t-0">
+                <td className="px-6">Clause {c.clause} · {c.title}</td>
+                <td className="px-6 text-right">
+                  {n.legalDecisions[c.no] ? (
+                    <StatusPill tone={n.legalDecisions[c.no] === 'rejected' ? 'danger' : 'teal'}>{n.legalDecisions[c.no]}</StatusPill>
+                  ) : (
+                    <StatusPill tone="indigo">Waiting on legal</StatusPill>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </SirionCard>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
+        <div className="text-sm text-muted">
+          {signed
+            ? `Sent for signature${n.signedAt ? ` on ${formatDate(n.signedAt)}` : ''}. No money lines changed, so the north star is unaffected.`
+            : pending.length
+              ? `Waiting for legal on ${pending.length} change${pending.length === 1 ? '' : 's'}. Switch to the Legal role to decide.`
+              : 'Legal has decided every change. No money lines changed, so nothing needs pricing.'}
+        </div>
+        <Button onClick={sign} disabled={signed || pending.length > 0}>
+          <FileSignature className="h-4 w-4" /> {signed ? 'Sent for signature' : 'Send for signature'}
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -3,7 +3,8 @@
 import { Check } from 'lucide-react';
 import { StatusPill } from '@/components/ui';
 import { formatLakh, formatPct } from '@/lib/format';
-import { atLeast, STATUS_LABEL, type Status, useDemo } from '@/lib/store';
+import { atLeast, STATUS_LABEL, type Status } from '@/lib/store';
+import { useBoard } from './context';
 import type { Contract } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -16,11 +17,18 @@ const STEPS: { label: string; doneAt: Status }[] = [
   { label: 'Signed', doneAt: 'signed' },
 ];
 
+const LEGAL_ONLY_STEPS: { label: string; doneAt: Status }[] = [
+  { label: 'Sorted', doneAt: 'sorted' },
+  { label: 'Signed', doneAt: 'signed' },
+];
+
 export function BoardHeader({
-  contract, totalLakh, vsCurrentLakh, pctOfFee,
-}: { contract: Contract; totalLakh: number; vsCurrentLakh: number; pctOfFee: number }) {
-  const status = useDemo((s) => s.status);
-  const current = STEPS.findIndex((s) => !atLeast(status, s.doneAt));
+  contract, totalLakh, vsCurrentLakh, pctOfFee, moneyLines, unpriced,
+}: { contract: Contract; totalLakh: number; vsCurrentLakh: number; pctOfFee: number; moneyLines: number; unpriced: number }) {
+  const { n } = useBoard();
+  const status = n.status;
+  const steps = moneyLines ? STEPS : LEGAL_ONLY_STEPS;
+  const current = steps.findIndex((s) => !atLeast(status, s.doneAt));
   return (
     <section className="rounded-2xl border border-line bg-white px-6 py-5 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -32,15 +40,18 @@ export function BoardHeader({
             </StatusPill>
           </div>
           <p className="mt-1 text-sm text-muted">
-            Renewal redline · helpdesk software · {formatLakh(contract.annualFeeInr / 1e5)}/yr · {contract.seats} seats · owner {contract.businessOwner}
+            Renewal redline · {contract.supplierType} · {formatLakh(contract.annualFeeInr / 1e5)}/yr{contract.seats ? ` · ${contract.seats} seats` : ''} · owner {contract.businessOwner}
           </p>
         </div>
-        {atLeast(status, 'sorted') ? (
+        {atLeast(status, 'sorted') && !moneyLines ? (
+          <div className="ml-auto max-w-[280px] text-right text-sm text-muted">No money lines: every change is with legal. Nothing to price.</div>
+        ) : atLeast(status, 'sorted') ? (
           <div className="ml-auto text-right">
             <div className="text-[26px] font-light leading-tight text-teal-900">{formatLakh(totalLakh)} a year</div>
             <div className="text-sm text-ink">Estimated annual exposure vs procurement benchmarks</div>
             <div className="text-xs text-muted">
-              {formatPct(pctOfFee)} of fee · {formatLakh(vsCurrentLakh)} a year more than the current contract
+              {formatPct(pctOfFee)} of fee · {vsCurrentLakh > 0.005 ? `${formatLakh(vsCurrentLakh)} a year more than the current contract` : 'no extra cost vs the current contract'}
+              {unpriced > 0 && ` · ${unpriced} line not priced (not enough history)`}
             </div>
           </div>
         ) : (
@@ -49,7 +60,7 @@ export function BoardHeader({
       </div>
 
       <ol className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2" aria-label="Progress">
-        {STEPS.map((s, i) => {
+        {steps.map((s, i) => {
           const done = atLeast(status, s.doneAt);
           const isCurrent = i === current;
           return (
@@ -66,7 +77,7 @@ export function BoardHeader({
                 {done && <Check className="h-3 w-3" />}
                 {s.label}
               </span>
-              {i < STEPS.length - 1 && <span className="hidden h-px w-5 bg-line sm:block" />}
+              {i < steps.length - 1 && <span className="hidden h-px w-5 bg-line sm:block" />}
             </li>
           );
         })}

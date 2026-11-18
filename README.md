@@ -40,6 +40,20 @@ Use the **Demo guide** button (bottom left). Each step has a "Go" link that also
 9. Signing → **Send for signature** (3 of 3 terms with an automated check; north star 62% → 66%)
 10. **Run the first invoice check**: credit expected ₹25,000, found ₹0, dispute owned by the procurement lead
 
+### The other five redlines
+
+Every redline in the inbox is interactive, each with its own status, approvals, supplier portal, legal decisions and signature. CloudDesk starts as **New** so the story begins there; the others arrived earlier and start already sorted and priced.
+
+| Supplier | Type | Changes | What it shows |
+| --- | --- | --- | --- |
+| SwiftShip Logistics | logistics | 1 harmless, 2 money | Thin own history: both price tags come from pooled data and are marked low confidence |
+| Nimbus HR Cloud | software | 3 harmless, 1 legal, 1 money | The ask is in the same wording group as today: ₹1.5 lakh exposure vs benchmark, ₹0 vs current. "Hold firm" (no give) ties with the 3-year term and is recommended |
+| BrightStaff Services | staffing | 2 harmless, 1 legal, 2 money | Pooled data for staffing; try finance rejecting package A |
+| CleanCo Facilities | facilities | 4 harmless, 1 money | Only one trade fits, so "Hold firm" (keep 30 days' notice) is offered next to the 3-year term |
+| DataVault | software | 2 legal | No money lines: legal decides both changes, then it signs without packages |
+
+The supplier portal is at `/portal` (pick a supplier) and `/portal/<supplier>`. In cached mode, the assistant answers each redline's suggested questions from the same tools it uses live, so every number still comes from the engines.
+
 ## How it is built
 
 - **Next.js 16** (App Router, TypeScript), Tailwind v4, Recharts, lucide-react, Radix primitives, Zustand (persisted to localStorage), zod.

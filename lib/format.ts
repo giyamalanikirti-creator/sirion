@@ -50,6 +50,15 @@ export const CLAIM_CHOICE_LABEL: Record<string, string> = {
   automatic: 'automatic credits',
 };
 
+/** How a supplier's counter reads in a sentence ("asked for a 7% price cap"). */
+export const COUNTER_PHRASE: Record<string, string> = {
+  cap_7: 'a 7% price cap',
+  cap_5: 'a 5% price cap',
+  notice_le_30: 'auto-renewal with 30 days’ notice',
+  notice_60_90: '60 days’ notice on renewal',
+  claim_30_autofiled: '30-day credit claims, filed automatically',
+};
+
 export const LINE_LABEL: Record<string, string> = {
   renewal: 'Renewal',
   credits: 'Service credits',

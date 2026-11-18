@@ -3,46 +3,46 @@
 import { useEffect } from 'react';
 import { ArrowRight, Check, FileEdit, Send, ShieldCheck, Star } from 'lucide-react';
 import { Button, EmptyState, StatusPill } from '@/components/ui';
-import { getContract } from '@/lib/data';
+import { getContract, getRedline } from '@/lib/data';
 import { priceTag } from '@/lib/engines/costEngine';
 import { breaksAnnualExit, recommendPackage } from '@/lib/engines/givegetEngine';
 import { CLAIM_CHOICE_LABEL, formatLakh, GROUP_LABEL, LINE_LABEL } from '@/lib/format';
-import { atLeast, useDemo } from '@/lib/store';
-import type { Line, PricedPackage } from '@/lib/types';
+import { atLeast, financePackages } from '@/lib/store';
+import { useBoard } from './context';
+import type { PricedPackage } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-const LINES: Line[] = ['renewal', 'credits', 'price'];
-
 export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
-  const status = useDemo((s) => s.status);
-  const sortResult = useDemo((s) => s.sortResult);
-  const selected = useDemo((s) => s.selectedPackages);
-  const toggle = useDemo((s) => s.togglePackage);
-  const viewPackages = useDemo((s) => s.viewPackages);
-  const sendForApproval = useDemo((s) => s.sendForApproval);
-  const financeDecision = useDemo((s) => s.financeDecision);
-  const keepAnnualExit = useDemo((s) => s.keepAnnualExit);
-  const setKeepAnnualExit = useDemo((s) => s.setKeepAnnualExit);
-  const creditDraft = useDemo((s) => s.creditDraft);
+  const { id, n, togglePackage: toggle, viewPackages, sendForApproval, setKeepAnnualExit } = useBoard();
+  const { status, sortResult, selectedPackages: selected, financeDecision, keepAnnualExit, creditDraft } = n;
+  const redline = getRedline(id);
+  const needFinance = financePackages(id, selected);
   const locked = atLeast(status, 'awaiting_approval');
 
   useEffect(() => {
     viewPackages();
-  }, [viewPackages, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, status]);
 
   if (!sortResult) {
     return <EmptyState title="Sort the changes first">Packages are built from the price tags of the money lines.</EmptyState>;
+  }
+  if (!packages.length) {
+    return <EmptyState title="No packages needed">This redline has no money lines, so there is nothing to trade. Legal handles its changes.</EmptyState>;
   }
 
   const sorted = [...packages].sort((a, b) => a.id.localeCompare(b.id));
   const rec = recommendPackage(packages, { keepAnnualExit });
   const t = rec.tradeOff;
+  // Same net value, but one of them commits us for years: say so instead of hiding it in the ranking.
+  const tie = packages.find((p) => p.id !== rec.recommended.id && Math.abs(p.netLakh - rec.recommended.netLakh) <= 0.005 && p.commitmentLakh > 0);
 
   // Draft counteroffer from the credits price tag: what a claim window leaves exposed vs a package that gets automatic credits.
-  const cd = getContract('C-017');
-  const draftTag = creditDraft ? priceTag(cd, 'credits', creditDraft) : undefined;
-  const askTag = priceTag(cd, 'credits', 'claim_le_10');
-  const autoPkg = packages.find((p) => p.id === 'B');
+  const cd = getContract(redline.contractId);
+  const askCredits = redline.changes.find((c) => c.expected.line === 'credits')?.expected.wordingGroup;
+  const draftTag = creditDraft && askCredits ? priceTag(cd, 'credits', creditDraft) : undefined;
+  const askTag = askCredits ? priceTag(cd, 'credits', askCredits) : undefined;
+  const autoPkg = packages.find((p) => p.wordings.credits === 'automatic' && p.gives.some((g) => g.id === 'payment_30'));
 
   return (
     <div className="space-y-4">
@@ -55,7 +55,11 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
                 {t.committed.id} nets an estimated {formatLakh(t.netGapLakh)} a year more than {t.flexible.id} and requires a three-year commitment ({formatLakh(t.commitmentLakh)}).
               </p>
             ) : (
-              <p className="mt-1 text-[17px] text-teal-title">Package {rec.recommended.id} nets the most.</p>
+              <p className="mt-1 text-[17px] text-teal-title">
+                {tie
+                  ? `${rec.recommended.id} and ${tie.id} net the same estimated ${formatLakh(tie.netLakh)} a year; ${tie.id} also needs a three-year commitment (${formatLakh(tie.commitmentLakh)}).`
+                  : `Package ${rec.recommended.id} nets the most.`}
+              </p>
             )}
             <p className="mt-1 text-sm text-muted">
               Recommended: <strong className="font-medium text-ink">{rec.recommended.id} · {rec.recommended.name}</strong>
@@ -75,7 +79,7 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
         </div>
       </section>
 
-      {draftTag && creditDraft && (
+      {draftTag && askTag && creditDraft && (
         <section className="flex flex-wrap items-start gap-4 rounded-2xl border border-line bg-white px-6 py-4 text-sm shadow-card">
           <FileEdit className="mt-0.5 h-4 w-4 shrink-0 text-teal-900" />
           <div className="flex-1">
@@ -84,16 +88,16 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
               {creditDraft === 'claim_11_30' && <span className="font-normal text-muted"> (priced with the 11–30 day pooled cohort)</span>}
             </div>
             <p className="mt-0.5 text-muted">
-              Leaves an estimated {formatLakh(draftTag.costLakh)} a year exposed on credits (vs {formatLakh(askTag.costLakh)} for CloudDesk’s 10 days).
+              Leaves an estimated {formatLakh(draftTag.costLakh)} a year exposed on credits (vs {formatLakh(askTag.costLakh)} for {redline.supplier}’s ask).
               {autoPkg && <> Package {autoPkg.id} gets automatic credits instead ({formatLakh(0)} exposure) in exchange for paying {cd.paymentDays - 30} days faster, about {formatLakh(autoPkg.giveCostLakh)} a year.</>}
             </p>
           </div>
         </section>
       )}
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className={`grid gap-4 ${sorted.length >= 3 ? 'xl:grid-cols-3' : 'lg:grid-cols-2'}`}>
         {sorted.map((p) => {
           const on = selected.includes(p.id);
-          const rejected = p.id === 'A' && financeDecision?.A === 'rejected';
+          const rejected = financeDecision === 'rejected' && p.approvals.includes('finance');
           const isRec = rec.recommended.id === p.id;
           const breaksExit = breaksAnnualExit(p);
           return (
@@ -127,12 +131,13 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
               </header>
 
               <div className="mt-4 text-[30px] font-light leading-none text-teal-900">{formatLakh(p.protectedLakh)}</div>
-              <div className="text-sm text-muted">a year protected vs CloudDesk’s redline · net {formatLakh(p.netLakh)}</div>
+              <div className="text-sm text-muted">a year protected vs {redline.supplier}’s redline · net {formatLakh(p.netLakh)}</div>
               {p.commitmentLakh > 0 && <div className="mt-1 text-xs font-medium text-ink">Commitment: {formatLakh(p.commitmentLakh)} over 3 years</div>}
 
               <div className="mt-5">
                 <div className="mb-1.5 text-[11px] uppercase tracking-wide text-muted">We give</div>
                 <ul className="space-y-1 text-sm">
+                  {p.gives.length === 0 && <li className="text-muted">Nothing. We ask {redline.supplier} to drop the edit.</li>}
                   {p.gives.map((g) => (
                     <li key={g.id} className="flex items-start justify-between gap-2">
                       <span>{g.label}</span>
@@ -146,7 +151,7 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
               <div className="mt-4">
                 <div className="mb-1.5 text-[11px] uppercase tracking-wide text-muted">We get</div>
                 <ul className="space-y-1 text-sm">
-                  {LINES.map((l) => (
+                  {p.lines.map((l) => (
                     <li key={l} className="flex items-start justify-between gap-2">
                       <span><span className="text-muted">{LINE_LABEL[l]}:</span> {GROUP_LABEL[p.wordings[l]]}</span>
                       <span className="shrink-0 tabular-nums text-teal-900">{formatLakh(p.protectedByLine[l])}</span>
@@ -170,12 +175,12 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
         {locked ? (
           <div className="flex items-center gap-2 text-sm text-teal-900">
             <ShieldCheck className="h-4 w-4" />
-            {status === 'awaiting_approval' ? 'Sent for approval. Waiting on the business owner' + (selected.includes('A') ? ' and finance.' : '.') : 'Approved packages are locked.'}
+            {status === 'awaiting_approval' ? 'Sent for approval. Waiting on the business owner' + (needFinance.length ? ' and finance.' : '.') : 'Approved packages are locked.'}
           </div>
         ) : (
           <div className="text-sm text-muted">
             Offering {selected.length} package{selected.length === 1 ? '' : 's'}: {selected.join(', ')}.{' '}
-            {selected.includes('A') ? 'Package A needs finance (3-year commitment).' : 'No finance step needed.'}
+            {needFinance.length ? `Package ${needFinance.join(', ')} needs finance (3-year commitment).` : 'No finance step needed.'}
           </div>
         )}
         {!locked ? (

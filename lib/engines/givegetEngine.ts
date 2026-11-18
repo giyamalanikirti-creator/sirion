@@ -1,39 +1,63 @@
 import { getContract, getRedline, packageTemplates as defaultTemplates } from '../data';
-import type {
-  Contract, CreditsGroup, GiveId, Line, PackageTemplate, PriceGroup, PricedPackage, Redline, RenewalGroup,
-} from '../types';
-import { cost } from './costEngine';
+import type { Contract, GiveId, Line, PackageTemplate, PricedPackage, Redline, WordingGroup, Wordings } from '../types';
+import { BENCHMARK, cost } from './costEngine';
 import { giveCost } from './gives';
+import { changedLines, currentWordings, priced, supplierAsk } from './redline';
 
 export const LINES: Line[] = ['renewal', 'credits', 'price'];
 
-export type SupplierAsk = { renewal: RenewalGroup; credits: CreditsGroup; price: PriceGroup };
+/** Rank by net value; on a tie, the package that commits us to less wins. */
+const byNetThenCommitment = (a: PricedPackage | Omit<PricedPackage, 'rank'>, b: PricedPackage | Omit<PricedPackage, 'rank'>) =>
+  Math.abs(b.netLakh - a.netLakh) > 0.005 ? b.netLakh - a.netLakh : a.commitmentLakh - b.commitmentLakh;
 
-/** The wording the supplier asked for on each money line, read from the redline. */
+export type SupplierAsk = Wordings;
+
+/** The wording the supplier asked for on each money line (untouched lines keep today's wording). */
 export function supplierAskFromRedline(r: Redline): SupplierAsk {
-  const ask: Partial<SupplierAsk> = {};
-  for (const ch of r.changes) {
-    if (ch.expected.group === 'money' && ch.expected.line && ch.expected.wordingGroup) {
-      (ask as Record<string, string>)[ch.expected.line] = ch.expected.wordingGroup;
-    }
-  }
-  if (!ask.renewal || !ask.credits || !ask.price) throw new Error(`Redline ${r.id} is missing a money line`);
-  return ask as SupplierAsk;
+  return supplierAsk(r);
 }
 
-export function pricePackage(c: Contract, ask: SupplierAsk, t: PackageTemplate): Omit<PricedPackage, 'rank'> {
-  const protectedByLine = {} as Record<Line, number>;
-  for (const line of LINES) {
-    protectedByLine[line] = cost(c, line, ask[line]) - cost(c, line, t.wordings[line]);
+/** Which money line a give trades on (a give on a line the supplier didn't touch means nothing). */
+const GIVE_LINE: Partial<Record<GiveId, Line>> = { notice_60: 'renewal', claim_30_autofiled: 'credits' };
+
+function giveApplies(c: Contract, lines: Line[], g: GiveId): boolean {
+  if (g === 'payment_30') return c.paymentDays > 30;
+  const line = GIVE_LINE[g];
+  return !line || lines.includes(line);
+}
+
+/**
+ * "Hold firm": no give. On each line we keep today's wording where it beats the
+ * supplier's ask, and propose the benchmark where today's wording is already weak.
+ * Offered only when fewer than two trades remain.
+ */
+export function holdFirmTemplate(c: Contract, ask: SupplierAsk = currentWordings(c)): PackageTemplate {
+  const today = currentWordings(c);
+  const w = { ...today } as Record<Line, WordingGroup>;
+  for (const l of LINES) {
+    const better = priced(cost(c, l, today[l])) < priced(cost(c, l, ask[l])) - 0.005;
+    w[l] = better ? today[l] : BENCHMARK[l];
   }
-  const gives = t.gives.map((g) => giveCost(c, g));
-  const protectedLakh = LINES.reduce((a, l) => a + protectedByLine[l], 0);
+  return { id: 'D', name: 'Hold firm', gives: [], wordings: w as Wordings };
+}
+
+/**
+ * Price a template against a redline. The template's wording applies only to the
+ * lines the supplier changed; gives that make no sense here are dropped.
+ */
+export function pricePackage(c: Contract, ask: SupplierAsk, t: PackageTemplate, lines: Line[] = LINES): Omit<PricedPackage, 'rank'> {
+  const wordings = { ...ask } as Record<Line, WordingGroup>;
+  for (const l of lines) wordings[l] = t.wordings[l];
+  const protectedByLine = { renewal: 0, credits: 0, price: 0 } as Record<Line, number>;
+  for (const l of lines) protectedByLine[l] = priced(cost(c, l, ask[l]) - cost(c, l, wordings[l]));
+  const gives = t.gives.filter((g) => giveApplies(c, lines, g)).map((g) => giveCost(c, g));
+  const protectedLakh = lines.reduce((a, l) => a + protectedByLine[l], 0);
   const giveCostLakh = gives.reduce((a, g) => a + g.cashCostLakh, 0);
   const commitmentLakh = gives.reduce((a, g) => a + g.commitmentLakh, 0);
   const approvals: PricedPackage['approvals'] = ['lead'];
   if (gives.some((g) => g.needsFinance)) approvals.push('finance');
   return {
-    id: t.id, name: t.name, gives, wordings: t.wordings,
+    id: t.id, name: t.name, gives, wordings: wordings as Wordings, lines,
     protectedLakh, protectedByLine, giveCostLakh, commitmentLakh,
     netLakh: protectedLakh - giveCostLakh, approvals,
   };
@@ -45,15 +69,24 @@ export interface BuildOptions {
   templates?: PackageTemplate[];
 }
 
-/** Price every template, drop those using an excluded give, rank by net. */
+/** Price every template, drop those that trade nothing, rank by net. */
 export function buildPackages(opts: BuildOptions = {}): PricedPackage[] {
   const r = getRedline(opts.redlineId ?? 'RL-CLOUDDESK');
   const c = getContract(r.contractId);
-  const ask = supplierAskFromRedline(r);
+  const lines = changedLines(r);
+  if (!lines.length) return [];
+  const ask = supplierAsk(r, c);
   const exclude = new Set(opts.excludeGives ?? []);
   const templates = (opts.templates ?? defaultTemplates).filter((t) => !t.gives.some((g) => exclude.has(g)));
-  const priced = templates.map((t) => pricePackage(c, ask, t));
-  const ranked = [...priced].sort((a, b) => b.netLakh - a.netLakh);
+  let priced = templates
+    .map((t) => pricePackage(c, ask, t, lines))
+    // A trade needs a give and must win something back on the changed lines.
+    .filter((p) => p.gives.length > 0 && p.protectedLakh > 0.005);
+  if (priced.length < 2) {
+    const keep = pricePackage(c, ask, holdFirmTemplate(c, ask), lines);
+    if (keep.protectedLakh > 0.005) priced = [...priced, keep];
+  }
+  const ranked = [...priced].sort(byNetThenCommitment);
   return priced.map((p) => ({ ...p, rank: ranked.findIndex((x) => x.id === p.id) + 1 }));
 }
 
@@ -74,13 +107,13 @@ export function breaksAnnualExit(p: PricedPackage): boolean {
  * always names the commitment rather than hiding it inside "net".
  */
 export function recommendPackage(packages: PricedPackage[], prefs: Preferences = {}) {
-  const byNet = [...packages].sort((a, b) => b.netLakh - a.netLakh);
+  const byNet = [...packages].sort(byNetThenCommitment);
   const eligible = byNet.filter((p) => !(prefs.keepAnnualExit && breaksAnnualExit(p)));
   const top = byNet[0];
   const flexible = byNet.find((p) => !breaksAnnualExit(p));
   const recommended = eligible[0] ?? top;
   const tradeOff =
-    top && flexible && top.id !== flexible.id
+    top && flexible && top.id !== flexible.id && breaksAnnualExit(top)
       ? { committed: top, flexible, netGapLakh: top.netLakh - flexible.netLakh, commitmentLakh: top.commitmentLakh }
       : undefined;
   return { recommended, excluded: byNet.filter((p) => !eligible.includes(p)), tradeOff };

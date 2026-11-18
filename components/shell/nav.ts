@@ -8,7 +8,7 @@ const ALL: Record<string, NavItem> = {
   inbox: { href: '/redlines', label: 'Redline inbox', icon: Inbox },
   approvals: { href: '/approvals', label: 'Approvals', icon: CheckSquare },
   legal: { href: '/legal', label: 'Legal queue', icon: Scale },
-  portal: { href: '/portal/clouddesk', label: 'Supplier portal', icon: Store },
+  portal: { href: '/portal', label: 'Supplier portal', icon: Store },
   insights: { href: '/insights', label: 'Insights', icon: LineChart },
   story: { href: '/story', label: 'Story', icon: BookOpen },
 };

@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import examples from '@/data/fixtures/ask_examples.json';
 import reasons from '@/data/fixtures/reasons_clouddesk.json';
-import sortFixture from '@/data/fixtures/sort_clouddesk.json';
+import sortFixtures from '@/data/fixtures/sort_fixtures.json';
+const sortFixture = { results: sortFixtures['RL-CLOUDDESK'] };
 import { getRedline } from '@/lib/data';
 import { priceTag } from '@/lib/engines/costEngine';
 import { buildPackages } from '@/lib/engines/givegetEngine';
@@ -115,5 +116,31 @@ describe('ask tools run the engines', () => {
   it('rejects a wording group from the wrong line', () => {
     const r = runTool('run_what_if', { line: 'price', wordingGroup: 'automatic' }, 'RL-CLOUDDESK');
     expect(r.output).toHaveProperty('error');
+  });
+});
+
+describe('cached answers for the other suppliers come from the engines', () => {
+  const ask = (q: string, redlineId: string) => answerQuestion({ messages: [{ role: 'user', content: q }], redlineId, role: 'lead' });
+  it('every suggested question has a cached answer', async () => {
+    const { suggestedQuestions } = await import('@/lib/askSuggestions');
+    const { redlines } = await import('@/lib/data');
+    for (const r of redlines) {
+      for (const q of suggestedQuestions(r.id)) {
+        const a = await ask(q, r.id);
+        expect(a.answer, `${r.id}: ${q}`).not.toBe(CACHED_OFF_MESSAGE);
+      }
+    }
+  });
+  it('SwiftShip credits and what-if quote engine figures', async () => {
+    const t = redlinePriceTags('RL-SWIFTSHIP').tags.find((x) => x.line === 'credits')!;
+    const a = await ask(`Why is the credits line ${formatLakh(t.costLakh)}?`, 'RL-SWIFTSHIP');
+    expect(a.answer).toContain(formatLakh(t.costLakh));
+    expect(a.answer).toContain('pooled data from 25 companies');
+    const w = await ask('What if we accept a 15-day claim window?', 'RL-SWIFTSHIP');
+    expect(w.answer).toContain(formatLakh(priceTag(getContract('C-022'), 'credits', 'claim_11_30').costLakh));
+  });
+  it('DataVault explains that nothing costs money', async () => {
+    const a = await ask("Do any of DataVault's changes cost money?", 'RL-DATAVAULT');
+    expect(a.answer).toMatch(/nothing to price/);
   });
 });

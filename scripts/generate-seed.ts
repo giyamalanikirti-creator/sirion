@@ -101,7 +101,8 @@ interface OtherRow {
 }
 const OTHERS: OtherRow[] = [
   { id: 'C-022', name: 'SwiftShip Logistics', type: 'logistics', fixed: { annualFeeInr: 3_600_000, renewalWording: 'opt_in', noticeDays: null, creditWording: 'claim_based', claimWindowDays: 15, priceWording: 'capped', priceCapPct: 5, paymentDays: 45 } },
-  { id: 'C-027', name: 'BrightStaff Services', type: 'staffing' },
+  // BrightStaff's fee is pinned so its interactive redline has a realistic size (overrides don't change the PRNG sequence).
+  { id: 'C-027', name: 'BrightStaff Services', type: 'staffing', fixed: { annualFeeInr: 3_000_000 } },
   { id: 'C-028', name: 'CleanCo Facilities', type: 'facilities' },
   { id: 'C-029', name: 'TalentBridge Staffing', type: 'staffing' },
   { id: 'C-030', name: 'RapidRoute Freight', type: 'logistics' },
@@ -254,6 +255,26 @@ for (const s of SOFTWARE) {
     reviewed: s.unreviewedUnused === undefined,
     seatsPaid: s.seats,
     seatsUsed: Math.round(s.seats * (1 - unused)),
+  });
+}
+
+// ---------- Service events for non-software contracts (appended last so earlier data is unchanged) ----------
+// 15 contracts × 12 months. Recovery here never feeds an own-data figure (fewer than 8 contracts per type);
+// it gives each supplier a credits history. SwiftShip's total is pinned for its interactive redline.
+const SWIFTSHIP_OWED = [45_000, 0, 60_000, 30_000, 0, 75_000, 40_000, 0, 90_000, 35_000, 0, 115_000]; // ₹4,90,000
+for (const c of contracts.filter((x) => x.supplierType !== 'software')) {
+  const fee = c.annualFeeInr;
+  MONTHS.forEach((month, k) => {
+    const owed = c.id === 'C-022' ? SWIFTSHIP_OWED[k] : rand() < 0.35 ? Math.round((fee * between(0.003, 0.01)) / 1000) * 1000 : 0;
+    const ratio = c.creditWording === 'automatic' ? between(0.88, 1) : between(0.1, 0.5);
+    serviceEvents.push({
+      contractId: c.id,
+      month,
+      target: 98,
+      actual: owed > 0 ? Math.round(between(95.5, 97.9) * 100) / 100 : Math.round(between(98, 99.6) * 100) / 100,
+      creditOwedInr: owed,
+      creditReceivedInr: Math.round((owed * ratio) / 100) * 100,
+    });
   });
 }
 
