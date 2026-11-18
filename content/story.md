@@ -2,6 +2,8 @@
 
 **Every supplier redline has a price. Cost of Yes shows it before anyone says yes.**
 
+> **The demo in one line.** CloudDesk asks for a 10-day claim window → the buyer sees why that exposes ₹3.2 lakh a year → tests 15 days (₹2.4 lakh, on thin pooled data) → trades faster payment for automatic credits → watches Sirion check the first invoice and catch a missing ₹25,000 credit.
+
 Cost of Yes is a concept for the **negotiation** stage of the contract lifecycle. When a supplier sends back a renewal with changes, it sorts the changes, puts a ₹ price tag on every money line with proof, builds give-get packages, routes approvals, lets the supplier choose in a portal, and makes sure every money line that gets signed can be checked by a system afterwards.
 
 ## Why this stage
@@ -23,11 +25,24 @@ In the demo, CloudDesk (a fictional helpdesk software supplier on a ₹60 lakh a
 | 1 | 18.2 Notices | New office address | Harmless |
 | 2 | 1.1 Definitions | "effective date" → "Effective Date" | Harmless |
 | 3 | 12.1 Liability | Cap from 12 to 6 months of fees | Legal |
-| 4 | 3.2 Renewal | Notice from 30 to 90 days | Money: about ₹4.5 lakh a year |
-| 5 | 7.4 Service credits | Automatic → claim in writing within 10 days | Money: about ₹3.2 lakh a year |
-| 6 | 9.1 Fees | Fixed → supplier may revise yearly | Money: about ₹3.8 lakh a year |
+| 4 | 3.2 Renewal | Notice from 30 to 90 days | Money: ₹4.5 lakh a year exposure |
+| 5 | 7.4 Service credits | Automatic → claim in writing within 10 days | Money: ₹3.2 lakh a year exposure |
+| 6 | 9.1 Fees | Fixed → supplier may revise yearly | Money: ₹3.8 lakh a year exposure |
 
-Saying yes to all six would cost about **₹11.6 lakh a year, 19% of the fee**, and three of the six lines would end up with wording no system can check.
+### What the ₹11.6 lakh is measured against
+
+Each price tag is the **estimated annual exposure vs a procurement benchmark**: opt-in renewal, automatic credits and a 5% price cap. That is what the three money edits would cost compared with the terms procurement wants as standard, about **₹11.6 lakh a year, 19% of the fee**.
+
+The cost of accepting the redline **compared with the current contract** is a different number, and every price tag shows it next to the benchmark figure:
+
+| Line | Current wording | CloudDesk asks | Benchmark used | Extra vs current |
+|---|---|---|---|---|
+| Renewal | Auto-renew, 30 days (₹1.1 lakh) | 90 days (₹4.5 lakh) | Opt-in (₹0) | ₹3.4 lakh |
+| Credits | Automatic (₹0) | 10-day claim (₹3.2 lakh) | Automatic (₹0) | ₹3.2 lakh |
+| Price | Fixed (₹2.8 lakh better) | Yearly revision (₹3.8 lakh) | 5% cap (₹0) | ₹6.6 lakh |
+| **Total** | | **₹11.6 lakh vs benchmark** | | **₹13.3 lakh vs current** |
+
+Three of the six lines would also end up with wording no system can check.
 
 The people involved each see only part of this:
 
@@ -56,11 +71,13 @@ The people involved each see only part of this:
    - *Credits:* how much of the credits owed were actually recovered under this wording (22% vs 94% for automatic), times the credits CloudDesk earned last year (₹4.5 lakh).
    - *Price:* the average year-two price rise under this wording (11%) vs under a 5% cap (4.6%), times the fee.
    - Confidence follows the sample size: 20+ contracts is high, 8–19 medium. Below 8, the engine uses pooled data from 20+ companies, or says "not enough history".
-3. **Package.** The engine prices give-get packages: a 3-year term (Certainty), faster payment (Pay faster), or a middle ground on notice and claims (Meet halfway). Each shows what it protects, what the give costs, and which approvals it needs.
+   - Each card shows **current wording / supplier asks / benchmark used** side by side, and the service-credit card lets the lead **try a different claim window** in place. A 15-day window comes out at ₹2.4 lakh vs ₹3.2 lakh for 10 days. We have no own contracts with 15 days, so it uses the broader 11–30 day pooled cohort (27 companies) and says confidence is low. The lead can save it as a draft counteroffer.
+3. **Package.** The engine prices give-get packages: a 3-year term (Certainty), faster payment (Pay faster), or a middle ground on notice and claims (Meet halfway). Each shows what it protects, what the give costs, and which approvals it needs. The decision is stated above the cards: *A nets an estimated ₹1.3 lakh a year more than B and requires a three-year commitment (₹1.8 crore).* The value of flexibility is not priced, so the lead can set **"Must retain annual exit"**, which moves the recommendation to B. The draft 15-day counteroffer sits next to them: it still leaves ₹2.4 lakh exposed, while B gets automatic credits for paying 15 days faster (about ₹22,000 a year).
 4. **Approve.** The business owner approves in one tap. Finance sees only the 3-year commitment (₹1.8 crore). Faster payment costs about ₹22,000 a year, under the ₹5 lakh limit, so it needs no finance step.
 5. **Supplier menu.** CloudDesk sees the packages in plain words, each line with a reason written for them. No ₹ figures. It picks "Pay faster" and asks for a 7% cap instead of 5%.
 6. **Counter.** The engine prices the counter at ₹1.1 lakh a year, inside the lead's ₹1.5 lakh range per line. The lead accepts.
-7. **Sign.** All three money lines are enforceable and linked to a Sirion tracker: a renewal alert, a credit check on every invoice, and an invoice price check against the cap. About **₹9.4 lakh a year is protected, ₹9.2 lakh net** of the payment give.
+7. **Sign.** All three money lines are enforceable and linked to a Sirion tracker: a renewal alert, a credit check on every invoice, and an invoice price check against the cap. An estimated **₹9.4 lakh a year is protected, ₹9.2 lakh net** of the payment give.
+8. **Check the first invoice (simulated).** In January 2027 uptime is 98.9% against a 99.5% target. The signed clause says credits apply automatically, so Sirion expects a ₹25,000 credit (5% of the ₹5 lakh monthly fee) on the February invoice, finds ₹0, and opens a dispute owned by the procurement lead. This is what the buyer actually gets on Monday morning.
 
 The assistant ("Ask Cost of Yes") can only calculate and draft. Every number it says must come from a tool that runs the same engines as the screen, and it always says how many contracts a number rests on.
 
@@ -73,11 +90,12 @@ The assistant ("Ask Cost of Yes") can only calculate and draft. Every number it 
 
 ## Success metrics
 
-**North star: money lines enforceable at signing.** The share of signed money lines (renewal, credits, price) whose wording a system can check. In the demo it moves from 18 of 29 (62%) to 21 of 32 (66%) when CloudDesk signs.
+**North star: signed commercial terms with an automated check.** The share of signed renewal, credit and price terms whose wording Sirion can verify after signature. In the demo it moves from 18 of 29 (62%) to 21 of 32 (66%) when CloudDesk signs.
 
 Supporting metrics:
 
-- **₹ protected per redline**, net of gives (CloudDesk: ₹9.2 lakh a year).
+- **Estimated value protected per redline**, net of gives (CloudDesk: ₹9.2 lakh a year). This stays an estimate.
+- **Actual credits recovered**, counted only when a credit appears on an invoice. Kept separate from the estimate on purpose (CloudDesk's first check: ₹0 of ₹25,000 expected, dispute open).
 - **Rounds to sign**: fewer back-and-forth rounds when the supplier picks from a menu.
 - **Time from redline to approval**: owner and finance approve from a card, not a document.
 - **Prediction accuracy**: last year's price tags vs what happened. In the demo, 5 of 6 landed within 25%; HelpHub's renewal was 33% under and is flagged for review.

@@ -682,3 +682,17 @@ Read BUILD_SPEC §12. Make sure npm run build passes, no secrets are in the repo
 - Vercel function limits: https://vercel.com/docs/functions/limits and https://vercel.com/changelog/higher-defaults-and-limits-for-vercel-functions-running-fluid-compute
 - Claude Code memory and CLAUDE.md: https://code.claude.com/docs/en/memory
 - Product brief: "Cost of Yes: detailed brief for the Sirion assignment" (Claude doc, 18 Nov 2026)
+
+---
+
+## 16. Revision 1 (review feedback)
+
+These changes supersede the matching parts of §6–§8 and §13. Golden numbers in §6.6 are unchanged.
+
+1. **Headline wording.** Price tags and the ₹11.6 lakh total are labelled "estimated annual exposure vs procurement benchmarks". Each price tag shows current wording / supplier asks / benchmark used. The cost of accepting the redline vs the current contract is shown alongside: renewal ₹3.4 lakh, credits ₹3.2 lakh, price ₹6.6 lakh, total **₹13.26 lakh** (`redlinePriceTags().vsCurrentLakh`, tested).
+2. **Package decision.** Above the cards: "A nets an estimated ₹1.3 lakh a year more than B and requires a three-year commitment (₹1.8 crore)". A "Must retain annual exit" preference (store `keepAnnualExit`) moves the recommendation to B (`recommendPackage`, tested). The value of flexibility is stated as unpriced.
+3. **Front door.** The dashboard opens with a CloudDesk card and one button, "Review supplier changes". CloudDesk's ₹ figure and change groups stay hidden on the dashboard, inbox and board header until the changes are sorted. The disabled "Create dashboard" button is removed.
+4. **Claim-window what-if on the credits card.** 10 days / 15 days / 30 days auto-filed / automatic, side by side with the supplier's ask, with cohort, source and confidence. "Use as draft counteroffer" saves it (`creditDraft`) and the Packages tab compares it with package B.
+5. **First invoice check (simulated).** After signing: signed clause S1, January 2027 uptime 98.9% vs 99.5%, credit expected ₹25,000 (5% of the ₹5 lakh monthly fee per full 0.5% short), found ₹0, dispute owned by the procurement lead (`data/first_invoice_check.json`, `firstInvoiceCheck`, tested). The north star is renamed "Signed commercial terms with an automated check". Estimated value protected and actual credits recovered are shown as separate measures.
+6. **Smaller changes.** After sorting, routine edits collapse into one row and the credits change comes first. The Ask panel is closed by default so the price-tag cards get the width; "Ask about this estimate" on each card opens it with that question (cached answers exist for all three lines).
+7. **Demo script** is now 10 steps, ending with the invoice check (see README). Insights is linked from the guide as "Afterwards".

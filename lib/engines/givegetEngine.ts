@@ -56,3 +56,32 @@ export function buildPackages(opts: BuildOptions = {}): PricedPackage[] {
   const ranked = [...priced].sort((a, b) => b.netLakh - a.netLakh);
   return priced.map((p) => ({ ...p, rank: ranked.findIndex((x) => x.id === p.id) + 1 }));
 }
+
+export interface Preferences {
+  /** The buyer must be able to leave at the end of each year (rules out multi-year terms). */
+  keepAnnualExit?: boolean;
+}
+
+const BREAKS_ANNUAL_EXIT: GiveId[] = ['term_3y'];
+
+export function breaksAnnualExit(p: PricedPackage): boolean {
+  return p.gives.some((g) => BREAKS_ANNUAL_EXIT.includes(g.id));
+}
+
+/**
+ * Recommend a package and explain the trade-off in one sentence.
+ * The value of flexibility (annual exit) is not priced, so the comparison
+ * always names the commitment rather than hiding it inside "net".
+ */
+export function recommendPackage(packages: PricedPackage[], prefs: Preferences = {}) {
+  const byNet = [...packages].sort((a, b) => b.netLakh - a.netLakh);
+  const eligible = byNet.filter((p) => !(prefs.keepAnnualExit && breaksAnnualExit(p)));
+  const top = byNet[0];
+  const flexible = byNet.find((p) => !breaksAnnualExit(p));
+  const recommended = eligible[0] ?? top;
+  const tradeOff =
+    top && flexible && top.id !== flexible.id
+      ? { committed: top, flexible, netGapLakh: top.netLakh - flexible.netLakh, commitmentLakh: top.commitmentLakh }
+      : undefined;
+  return { recommended, excluded: byNet.filter((p) => !eligible.includes(p)), tradeOff };
+}

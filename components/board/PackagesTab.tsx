@@ -1,9 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ArrowRight, Check, Send, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, FileEdit, Send, ShieldCheck, Star } from 'lucide-react';
 import { Button, EmptyState, StatusPill } from '@/components/ui';
-import { formatLakh, GROUP_LABEL, LINE_LABEL } from '@/lib/format';
+import { getContract } from '@/lib/data';
+import { priceTag } from '@/lib/engines/costEngine';
+import { breaksAnnualExit, recommendPackage } from '@/lib/engines/givegetEngine';
+import { CLAIM_CHOICE_LABEL, formatLakh, GROUP_LABEL, LINE_LABEL } from '@/lib/format';
 import { atLeast, useDemo } from '@/lib/store';
 import type { Line, PricedPackage } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -18,6 +21,9 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
   const viewPackages = useDemo((s) => s.viewPackages);
   const sendForApproval = useDemo((s) => s.sendForApproval);
   const financeDecision = useDemo((s) => s.financeDecision);
+  const keepAnnualExit = useDemo((s) => s.keepAnnualExit);
+  const setKeepAnnualExit = useDemo((s) => s.setKeepAnnualExit);
+  const creditDraft = useDemo((s) => s.creditDraft);
   const locked = atLeast(status, 'awaiting_approval');
 
   useEffect(() => {
@@ -29,16 +35,67 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
   }
 
   const sorted = [...packages].sort((a, b) => a.id.localeCompare(b.id));
+  const rec = recommendPackage(packages, { keepAnnualExit });
+  const t = rec.tradeOff;
+
+  // Draft counteroffer from the credits price tag: what a claim window leaves exposed vs a package that gets automatic credits.
+  const cd = getContract('C-017');
+  const draftTag = creditDraft ? priceTag(cd, 'credits', creditDraft) : undefined;
+  const askTag = priceTag(cd, 'credits', 'claim_le_10');
+  const autoPkg = packages.find((p) => p.id === 'B');
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted">
-        Each package gives CloudDesk something it values and gets our wording back on the money lines. Ranked by net value per year.
-      </p>
+      <section className="rounded-2xl border border-teal-900/30 bg-white px-6 py-5 shadow-card">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="text-[11px] uppercase tracking-wide text-muted">The decision</div>
+            {t ? (
+              <p className="mt-1 text-[17px] leading-snug text-teal-title">
+                {t.committed.id} nets an estimated {formatLakh(t.netGapLakh)} a year more than {t.flexible.id} and requires a three-year commitment ({formatLakh(t.commitmentLakh)}).
+              </p>
+            ) : (
+              <p className="mt-1 text-[17px] text-teal-title">Package {rec.recommended.id} nets the most.</p>
+            )}
+            <p className="mt-1 text-sm text-muted">
+              Recommended: <strong className="font-medium text-ink">{rec.recommended.id} · {rec.recommended.name}</strong>
+              {keepAnnualExit ? ' (keeps the annual exit).' : ' (highest net).'} The value of keeping an annual exit has not been priced yet, so weigh it yourself.
+            </p>
+          </div>
+          <label className={cn('flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm', keepAnnualExit ? 'border-teal-900 bg-teal-900/5 text-teal-900' : 'border-line text-ink', locked ? 'opacity-60' : 'cursor-pointer')}>
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-[#0C5E69]"
+              checked={keepAnnualExit}
+              disabled={locked}
+              onChange={(e) => setKeepAnnualExit(e.target.checked)}
+            />
+            Must retain annual exit
+          </label>
+        </div>
+      </section>
+
+      {draftTag && creditDraft && (
+        <section className="flex flex-wrap items-start gap-4 rounded-2xl border border-line bg-white px-6 py-4 text-sm shadow-card">
+          <FileEdit className="mt-0.5 h-4 w-4 shrink-0 text-teal-900" />
+          <div className="flex-1">
+            <div className="font-medium text-ink">
+              Your draft counteroffer: {CLAIM_CHOICE_LABEL[creditDraft]}
+              {creditDraft === 'claim_11_30' && <span className="font-normal text-muted"> (priced with the 11–30 day pooled cohort)</span>}
+            </div>
+            <p className="mt-0.5 text-muted">
+              Leaves an estimated {formatLakh(draftTag.costLakh)} a year exposed on credits (vs {formatLakh(askTag.costLakh)} for CloudDesk’s 10 days).
+              {autoPkg && <> Package {autoPkg.id} gets automatic credits instead ({formatLakh(0)} exposure) in exchange for paying {cd.paymentDays - 30} days faster, about {formatLakh(autoPkg.giveCostLakh)} a year.</>}
+            </p>
+          </div>
+        </section>
+      )}
       <div className="grid gap-4 xl:grid-cols-3">
         {sorted.map((p) => {
           const on = selected.includes(p.id);
           const rejected = p.id === 'A' && financeDecision?.A === 'rejected';
+          const isRec = rec.recommended.id === p.id;
+          const breaksExit = breaksAnnualExit(p);
           return (
             <article
               key={p.id}
@@ -49,8 +106,12 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
             >
               <header className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="text-xs text-muted">Package {p.id} · rank {p.rank}</div>
+                  <div className="text-xs text-muted">Package {p.id} · #{p.rank} by net</div>
                   <h3 className="text-[17px] text-teal-title">{p.name}</h3>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {isRec && <StatusPill tone="teal"><Star className="h-3 w-3" /> Recommended</StatusPill>}
+                    {breaksExit && <StatusPill tone={keepAnnualExit ? 'danger' : 'lime'}>No annual exit for 3 years</StatusPill>}
+                  </div>
                 </div>
                 <label className={cn('flex items-center gap-2 text-xs', locked ? 'text-muted' : 'cursor-pointer text-ink')}>
                   <input
@@ -66,7 +127,8 @@ export function PackagesTab({ packages }: { packages: PricedPackage[] }) {
               </header>
 
               <div className="mt-4 text-[30px] font-light leading-none text-teal-900">{formatLakh(p.protectedLakh)}</div>
-              <div className="text-sm text-muted">protected a year · net {formatLakh(p.netLakh)}</div>
+              <div className="text-sm text-muted">a year protected vs CloudDesk’s redline · net {formatLakh(p.netLakh)}</div>
+              {p.commitmentLakh > 0 && <div className="mt-1 text-xs font-medium text-ink">Commitment: {formatLakh(p.commitmentLakh)} over 3 years</div>}
 
               <div className="mt-5">
                 <div className="mb-1.5 text-[11px] uppercase tracking-wide text-muted">We give</div>

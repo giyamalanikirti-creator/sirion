@@ -7,6 +7,7 @@ import { priceTag } from '@/lib/engines/costEngine';
 import { buildPackages } from '@/lib/engines/givegetEngine';
 import { getContract } from '@/lib/data';
 import { formatLakh } from '@/lib/format';
+import { redlinePriceTags } from '@/lib/engines/redline';
 import { AskResponseSchema, isSupplierSafe, SortResponseSchema } from '@/lib/schemas';
 import { answerQuestion, CACHED_OFF_MESSAGE, matchExample, runTool, SUPPLIER_REFUSAL } from '@/lib/server/ask';
 import { writeReasons } from '@/lib/server/reasons';
@@ -47,6 +48,13 @@ describe('fixtures', () => {
     expect(examples[2].answer).toContain(formatLakh(pk[0].protectedLakh));
     expect(examples[2].answer).toContain(formatLakh(pk[1].protectedLakh));
     expect(examples[2].answer).toContain(formatLakh(pk[0].netLakh));
+    expect(examples[3].answer).toContain(formatLakh(priceTag(cd, 'renewal', 'notice_60_90').costLakh));
+    expect(examples[3].answer).toContain(formatLakh(priceTag(cd, 'renewal', 'notice_le_30').costLakh));
+    expect(examples[4].answer).toContain(formatLakh(priceTag(cd, 'price', 'open_yearly').costLakh));
+    expect(examples[4].answer).toContain(formatLakh(-priceTag(cd, 'price', 'fixed').costLakh));
+    const { comparisons } = redlinePriceTags();
+    expect(examples[3].answer).toContain(formatLakh(comparisons[0].vsCurrentLakh));
+    expect(examples[4].answer).toContain(formatLakh(comparisons[2].vsCurrentLakh));
   });
 });
 
@@ -67,6 +75,9 @@ describe('cached AI routes', () => {
       expect(r.answer).toBe(ex.answer);
     }
     expect(matchExample('what if we accept a 15 day claim?')).toBe(examples[1]);
+    expect(matchExample('Why is the renewal line ₹4.5 lakh?')).toBe(examples[3]);
+    expect(matchExample('Why is the price line ₹3.8 lakh?')).toBe(examples[4]);
+    expect(matchExample('Why is the credits line ₹3.2 lakh?')).toBe(examples[0]);
   });
   it('ask returns the off message for other questions', async () => {
     const r = await answerQuestion({ messages: [{ role: 'user', content: 'What is our biggest contract?' }], redlineId: 'RL-CLOUDDESK', role: 'lead' });
@@ -87,6 +98,8 @@ describe('ask tools run the engines', () => {
   it('get_price_tag', () => {
     const r = runTool('get_price_tag', { line: 'credits' }, 'RL-CLOUDDESK');
     expect(r.output).toMatchObject({ costPerYear: '₹3.2 lakh', ownContracts: 14, confidence: 'medium' });
+    const price = runTool('get_price_tag', { line: 'price' }, 'RL-CLOUDDESK');
+    expect(price.output).toMatchObject({ currentWording: 'Fixed price', currentWordingVsBenchmark: '₹2.8 lakh better than benchmark', extraVsCurrentPerYear: '₹6.6 lakh' });
   });
   it('run_what_if 15-day', () => {
     const r = runTool('run_what_if', { line: 'credits', wordingGroup: 'claim_11_30' }, 'RL-CLOUDDESK');

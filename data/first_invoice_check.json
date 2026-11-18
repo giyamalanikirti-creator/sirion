@@ -1,0 +1,16 @@
+{
+  "contractId": "C-017",
+  "signedWordingId": "S1",
+  "invoiceId": "CD-INV-2027-02",
+  "invoiceDate": "2027-02-05",
+  "serviceMonth": "January 2027",
+  "uptimeTarget": 99.5,
+  "uptimeActual": 98.9,
+  "stepPct": 0.5,
+  "creditPctPerStep": 0.05,
+  "creditRule": "5% of the monthly fee for each full 0.5% of uptime below the 99.5% target",
+  "creditFoundOnInvoiceInr": 0,
+  "owner": "Riya Kapoor, Procurement lead",
+  "action": "Dispute sent to CloudDesk billing; credit due on the next invoice",
+  "dueInDays": 7
+}

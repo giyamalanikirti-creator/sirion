@@ -34,7 +34,13 @@ function Board() {
   const pathname = usePathname();
   const status = useDemo((s) => s.status);
   const completeStep = useDemo((s) => s.completeStep);
-  const [askOpen, setAskOpen] = useState(true);
+  // The assistant stays closed so the evidence cards get the width; it opens when someone asks about an estimate.
+  const [askOpen, setAskOpen] = useState(false);
+  const [askRequest, setAskRequest] = useState<{ text: string; id: number } | undefined>();
+  const askAbout = (text: string) => {
+    setAskOpen(true);
+    setAskRequest({ text, id: Date.now() });
+  };
   const wide = useMediaQuery('(min-width: 1280px)');
 
   const redline = redlines.find((r) => r.id === decodeURIComponent(id));
@@ -68,7 +74,7 @@ function Board() {
         <Link href="/redlines" className="inline-flex items-center gap-1 text-sm text-muted hover:text-teal-900">
           <ArrowLeft className="h-4 w-4" /> Redline inbox
         </Link>
-        <BoardHeader contract={data.contract} totalLakh={data.totalLakh} pctOfFee={data.pctOfFee} />
+        <BoardHeader contract={data.contract} totalLakh={data.totalLakh} vsCurrentLakh={data.vsCurrentLakh} pctOfFee={data.pctOfFee} />
         <StatusBanner onGoSigning={() => setTab('signing')} />
 
         <div className="flex items-center justify-between gap-3 border-b border-line">
@@ -102,14 +108,24 @@ function Board() {
               onClick={() => setAskOpen(true)}
               className="mb-1 hidden shrink-0 items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-sm text-teal-900 xl:flex"
             >
-              <MessageSquare className="h-4 w-4" /> Ask
+              <MessageSquare className="h-4 w-4" /> Ask Cost of Yes
             </button>
           )}
         </div>
 
         <div role="tabpanel">
           {tab === 'changes' && <ChangesTab redline={redline} tags={data.tags} onGoTags={() => setTab('tags')} />}
-          {tab === 'tags' && <PriceTagsTab tags={data.tags} totalLakh={data.totalLakh} onGoPackages={() => setTab('packages')} />}
+          {tab === 'tags' && (
+            <PriceTagsTab
+              tags={data.tags}
+              comparisons={data.comparisons}
+              totalLakh={data.totalLakh}
+              vsCurrentLakh={data.vsCurrentLakh}
+              contract={data.contract}
+              onGoPackages={() => setTab('packages')}
+              onAsk={askAbout}
+            />
+          )}
           {tab === 'packages' && <PackagesTab packages={data.packages} />}
           {tab === 'signing' && <SigningTab />}
         </div>
@@ -117,14 +133,14 @@ function Board() {
         {/* Ask panel below the board on smaller screens */}
         {!wide && (
           <div className="h-[640px]">
-            <AskPanel redlineId={redline.id} />
+            <AskPanel redlineId={redline.id} request={askRequest} />
           </div>
         )}
       </div>
 
       {wide && askOpen && (
         <div className="sticky top-[88px] h-[calc(100vh-112px)] w-[360px] shrink-0">
-          <AskPanel redlineId={redline.id} onClose={() => setAskOpen(false)} />
+          <AskPanel redlineId={redline.id} request={askRequest} onClose={() => setAskOpen(false)} />
         </div>
       )}
     </div>

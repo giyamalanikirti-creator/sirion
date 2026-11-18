@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import type { Counter, PackageId, SortResult } from './types';
+import type { Counter, CreditsGroup, PackageId, SortResult } from './types';
 
 export type Role = 'lead' | 'owner' | 'finance' | 'legal' | 'supplier';
 
@@ -59,6 +59,11 @@ interface DemoState {
   counter?: Counter;
   legalDecision?: 'accepted' | 'rejected' | 'redlined';
   signedAt?: string;
+  /** Buyer preference: keep the right to leave every year (rules out a 3-year term). */
+  keepAnnualExit: boolean;
+  /** Credits what-if the lead saved as a draft counteroffer (from the price tag card). */
+  creditDraft?: CreditsGroup;
+  invoiceChecked: boolean;
   completedSteps: number[];
 
   setRole: (r: Role) => void;
@@ -75,6 +80,9 @@ interface DemoState {
   acceptCounter: () => Result;
   sign: () => Result;
   decideLegal: (d: 'accepted' | 'rejected' | 'redlined') => void;
+  setKeepAnnualExit: (v: boolean) => void;
+  saveCreditDraft: (g: CreditsGroup | undefined) => void;
+  runInvoiceCheck: () => Result;
   reset: () => void;
 }
 
@@ -89,6 +97,9 @@ const initial = {
   counter: undefined,
   legalDecision: undefined,
   signedAt: undefined,
+  keepAnnualExit: false,
+  creditDraft: undefined,
+  invoiceChecked: false,
   completedSteps: [] as number[],
 };
 
@@ -113,7 +124,7 @@ export const useDemo = create<DemoState>()(
         if (needsFinanceStep(s.selectedPackages) && !s.financeDecision) return;
         const selected = s.financeDecision?.A === 'rejected' ? s.selectedPackages.filter((p) => p !== 'A') : s.selectedPackages;
         set({ status: 'approved', selectedPackages: selected });
-        step(5);
+        step(6);
       };
 
       return {
@@ -152,7 +163,7 @@ export const useDemo = create<DemoState>()(
           if (s === 'received' || s === 'sorted') return fail('Sort the changes and check the price tags first');
           if (atLeast(s, 'awaiting_approval')) return fail('Already sent for approval');
           set({ status: 'awaiting_approval' });
-          step(4);
+          step(5);
           toast.success('Sent to the business owner for approval');
           return { ok: true };
         },
@@ -190,22 +201,22 @@ export const useDemo = create<DemoState>()(
           const s = get();
           if (s.status !== 'with_supplier') return fail('There is nothing to respond to yet');
           set({ supplierPick: pick, counter, status: counter ? 'countered' : 'agreed' });
-          step(6);
-          if (!counter) step(7);
+          step(7);
+          if (!counter) step(8);
           toast.success('Sent to Procurement');
           return { ok: true };
         },
         acceptCounter: () => {
           if (get().status !== 'countered') return fail('No counter-offer to accept');
           set({ status: 'agreed' });
-          step(7);
+          step(8);
           toast.success('Counter accepted. Ready to sign.');
           return { ok: true };
         },
         sign: () => {
           if (get().status !== 'agreed') return fail('The deal is not agreed yet');
           set({ status: 'signed', signedAt: new Date().toISOString() });
-          step(8);
+          step(9);
           toast.success('Sent for signature. Trackers are live in Sirion.');
           return { ok: true };
         },
@@ -215,6 +226,31 @@ export const useDemo = create<DemoState>()(
             legalDecision === 'rejected' ? 'Rejected: liability cap stays at 12 months’ fees' : legalDecision === 'accepted' ? 'Accepted' : 'Sent back with a redline',
           );
         },
+        setKeepAnnualExit: (keepAnnualExit) => {
+          const s = get();
+          if (atLeast(s.status, 'awaiting_approval')) {
+            toast('Packages are locked once they are sent for approval');
+            return;
+          }
+          // A 3-year term breaks the annual exit, so package A leaves the offer (and comes back when the preference is off).
+          const without = s.selectedPackages.filter((p) => p !== 'A');
+          const selectedPackages = keepAnnualExit ? (without.length ? without : s.selectedPackages) : ([...new Set([...s.selectedPackages, 'A'])].sort() as PackageId[]);
+          set({ keepAnnualExit, selectedPackages });
+          if (keepAnnualExit && s.selectedPackages.includes('A')) toast('Package A removed from the offer: it has no annual exit for 3 years');
+        },
+        saveCreditDraft: (creditDraft) => {
+          set({ creditDraft });
+          if (creditDraft) {
+            step(4);
+            toast.success('Saved as a draft counteroffer. Compare it with the packages.');
+          }
+        },
+        runInvoiceCheck: () => {
+          if (get().status !== 'signed') return fail('Sign the deal first: the check runs on the first invoice after signature');
+          set({ invoiceChecked: true });
+          step(10);
+          return { ok: true };
+        },
         reset: () => {
           set({ ...initial });
           toast('Demo reset');
@@ -223,12 +259,14 @@ export const useDemo = create<DemoState>()(
     },
     {
       name: 'cost-of-yes-demo',
-      version: 1,
+      version: 2,
+      // Older saved demos predate the new steps: start them fresh.
+      migrate: () => ({}) as never,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
       partialize: (s) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { setRole, completeStep, sort, markPriced, togglePackage, viewPackages, sendForApproval, approveOwner, decideFinance, sendToSupplier, supplierSubmit, acceptCounter, sign, decideLegal, reset, ...data } = s;
+        const { setRole, completeStep, sort, markPriced, togglePackage, viewPackages, sendForApproval, approveOwner, decideFinance, sendToSupplier, supplierSubmit, acceptCounter, sign, decideLegal, setKeepAnnualExit, saveCreditDraft, runInvoiceCheck, reset, ...data } = s;
         return data;
       },
     },

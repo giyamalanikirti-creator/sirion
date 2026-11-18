@@ -10,15 +10,16 @@ import { Button } from '../ui';
 const BOARD = '/redlines/RL-CLOUDDESK';
 
 export const DEMO_STEPS: { n: number; role: Role; title: string; detail: string; href: string }[] = [
-  { n: 1, role: 'lead', title: 'Open the inbox, click CloudDesk', detail: '6 changes, 3 money lines, ₹11.6 lakh a year at stake', href: '/redlines' },
-  { n: 2, role: 'lead', title: 'Changes tab → Sort', detail: '2 harmless logged · 1 to legal · 3 money lines', href: `${BOARD}?tab=changes` },
-  { n: 3, role: 'lead', title: 'Price tags tab', detail: '₹4.5 / ₹3.2 / ₹3.8 lakh with proof; open a drawer', href: `${BOARD}?tab=tags` },
-  { n: 4, role: 'lead', title: 'Ask a what-if → Packages → Send for approval', detail: '15-day claim = ₹2.4 lakh (pooled, 27 companies)', href: `${BOARD}?tab=packages` },
-  { n: 5, role: 'owner', title: 'Owner approves; finance approves A', detail: 'B’s give is under the ₹5 lakh limit', href: '/approvals' },
-  { n: 6, role: 'supplier', title: 'Supplier picks B, suggests a 7% cap', detail: 'No ₹ shown to the supplier', href: '/portal/clouddesk' },
-  { n: 7, role: 'lead', title: 'Accept the counter', detail: '₹1.1 lakh, inside the ₹1.5 lakh range', href: BOARD },
-  { n: 8, role: 'lead', title: 'Signing tab → Send for signature', detail: '3 of 3 enforceable · ₹9.2 lakh net · 62% → 66%', href: `${BOARD}?tab=signing` },
-  { n: 9, role: 'lead', title: 'Insights', detail: 'Predicted vs actual, one miss flagged', href: '/insights' },
+  { n: 1, role: 'lead', title: 'Dashboard → Review supplier changes', detail: 'CloudDesk returned the ₹60 lakh renewal with six edits', href: '/' },
+  { n: 2, role: 'lead', title: 'Sort the changes', detail: 'Routine edits fold away; the 10-day claim rises to the top', href: `${BOARD}?tab=changes` },
+  { n: 3, role: 'lead', title: 'Price tags: why 10 days costs ₹3.2 lakh', detail: 'Current wording vs CloudDesk’s ask vs benchmark', href: `${BOARD}?tab=tags` },
+  { n: 4, role: 'lead', title: 'Try a 15-day claim window, save as draft', detail: '₹2.4 lakh vs ₹3.2 lakh · 0 own contracts · pooled, 27 companies', href: `${BOARD}?tab=tags` },
+  { n: 5, role: 'lead', title: 'Packages: compare, then send for approval', detail: 'B trades faster payment for automatic credits', href: `${BOARD}?tab=packages` },
+  { n: 6, role: 'owner', title: 'Owner approves; finance decides on A', detail: 'B’s give is under the ₹5 lakh limit', href: '/approvals' },
+  { n: 7, role: 'supplier', title: 'Supplier picks B, suggests a 7% cap', detail: 'No ₹ shown to the supplier', href: '/portal/clouddesk' },
+  { n: 8, role: 'lead', title: 'Accept the counter', detail: '₹1.1 lakh, inside the ₹1.5 lakh range', href: BOARD },
+  { n: 9, role: 'lead', title: 'Signing → Send for signature', detail: '3 of 3 commercial terms get an automated check', href: `${BOARD}?tab=signing` },
+  { n: 10, role: 'lead', title: 'First invoice check', detail: 'Credit expected ₹25,000 · found ₹0 · owner assigned', href: `${BOARD}?tab=signing` },
 ];
 
 export function DemoGuide() {
@@ -26,14 +27,13 @@ export function DemoGuide() {
   const router = useRouter();
   const done = useDemo((s) => s.completedSteps);
   const status = useDemo((s) => s.status);
-  const role = useDemo((s) => s.role);
-  const setRole = useDemo((s) => s.setRole);
+    const setRole = useDemo((s) => s.setRole);
   const reset = useDemo((s) => s.reset);
 
   // Step 5 needs finance after the owner: route to the right role.
   const go = (step: (typeof DEMO_STEPS)[number]) => {
     let r = step.role;
-    if (step.n === 5) r = useDemo.getState().ownerApproved ? 'finance' : 'owner';
+    if (step.n === 6) r = useDemo.getState().ownerApproved ? 'finance' : 'owner';
     setRole(r);
     router.push(step.href);
     setOpen(false);
@@ -81,7 +81,9 @@ export function DemoGuide() {
             })}
           </ol>
           <div className="flex items-center justify-between border-t border-line px-5 py-3">
-            <span className="text-xs text-muted">Viewing as {role}</span>
+            <button type="button" onClick={() => { setRole('lead'); router.push('/insights'); setOpen(false); }} className="text-xs text-teal-900 hover:underline">
+              Afterwards: Insights →
+            </button>
             <Button variant="outline" size="sm" onClick={() => { reset(); router.push('/'); }}>
               <RotateCcw className="h-3.5 w-3.5" /> Reset demo
             </Button>
@@ -96,7 +98,7 @@ export function DemoGuide() {
       >
         <Compass className="h-4 w-4" />
         Demo guide
-        {next && <span className="rounded-full bg-white/20 px-1.5 text-xs">{next.n}/9</span>}
+        {next && <span className="rounded-full bg-white/20 px-1.5 text-xs">{next.n}/{DEMO_STEPS.length}</span>}
       </button>
     </div>
   );

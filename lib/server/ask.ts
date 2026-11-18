@@ -1,7 +1,7 @@
 import 'server-only';
 import type Anthropic from '@anthropic-ai/sdk';
 import { getContract, getRedline, wordingLibrary } from '../data';
-import { GROUPS, priceTag } from '../engines/costEngine';
+import { BENCHMARK, cost, groupOf, GROUPS, priceTag } from '../engines/costEngine';
 import { buildPackages, supplierAskFromRedline } from '../engines/givegetEngine';
 import { GIVE_LABEL } from '../engines/gives';
 import { formatLakh, GROUP_LABEL, LINE_LABEL } from '../format';
@@ -122,7 +122,16 @@ export function runTool(name: string, input: unknown, redlineId: string): ToolRu
     const { line } = z.object({ line: LineSchema }).parse(input);
     const t = priceTag(c, line, ask[line]);
     const pooledTag = t.source === 'pooled' ? t : undefined;
-    const out = { ...tagView(t), supplierWording: GROUP_LABEL[ask[line]] };
+    const currentGroup = groupOf(c, line);
+    const currentCost = cost(c, line, currentGroup);
+    const out = {
+      ...tagView(t),
+      measuredAgainst: `procurement benchmark: ${GROUP_LABEL[BENCHMARK[line]]}`,
+      supplierWording: GROUP_LABEL[ask[line]],
+      currentWording: GROUP_LABEL[currentGroup],
+      currentWordingVsBenchmark: currentCost < -0.005 ? `${formatLakh(-currentCost)} better than benchmark` : formatLakh(currentCost),
+      extraVsCurrentPerYear: formatLakh(t.costLakh - currentCost),
+    };
     return {
       name, output: out,
       chips: tagChips(pooledTag ?? t, `Price tag: ${LINE_LABEL[line].toLowerCase()}`),
@@ -200,6 +209,8 @@ export function matchExample(question: string) {
   for (const ex of examples) if (norm(ex.question) === q) return ex;
   if (/credit/.test(q) && /(why|3\.?2|how)/.test(q)) return examples[0];
   if (/15[- ]?day/.test(q) || (/claim/.test(q) && /15/.test(q))) return examples[1];
+  if (/renewal|notice/.test(q) && /(why|4\.?5|how)/.test(q)) return examples[3];
+  if (/(price|fee)/.test(q) && /(why|3\.?8|how)/.test(q) && !/package/.test(q)) return examples[4];
   if (/(without|no|exclude|drop).*(3[- ]?year|three[- ]?year|term)/.test(q)) return examples[2];
   return undefined;
 }
@@ -225,6 +236,7 @@ Rules:
 - Answer in 80 words or fewer, in plain English. No headings, no tables.
 - Every number you state must come from a tool result in this conversation. Never compute or estimate numbers yourself; call a tool. Quote ₹ amounts exactly as the tool formats them.
 - Always say how many own contracts (or pooled companies) a number rests on.
+- Price tags are estimated yearly exposure vs a procurement benchmark, not vs the current contract. Say which one you mean; the tool also gives the extra cost vs the current wording.
 - If a tool returns confidence "none" or "not enough history", say "not enough history".
 - You cannot send, approve or sign anything. You can only calculate and draft. Say so if asked to act.
 - Only discuss this negotiation. For other questions say that AskSirion covers portfolio questions.

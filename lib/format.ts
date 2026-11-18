@@ -42,6 +42,14 @@ export const GROUP_LABEL: Record<string, string> = {
   open_yearly: 'Open yearly revision',
 };
 
+/** How a saved credits what-if reads in the counteroffer (the lead picked a window, not a cohort). */
+export const CLAIM_CHOICE_LABEL: Record<string, string> = {
+  claim_le_10: '10-day claim window',
+  claim_11_30: '15-day claim window',
+  claim_30_autofiled: '30-day claim window, filed automatically',
+  automatic: 'automatic credits',
+};
+
 export const LINE_LABEL: Record<string, string> = {
   renewal: 'Renewal',
   credits: 'Service credits',

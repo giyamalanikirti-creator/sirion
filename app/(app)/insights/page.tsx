@@ -1,20 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
 import { AlertTriangle, Lock } from 'lucide-react';
 import { GroupedBars, TrendChart } from '@/components/charts';
 import { PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { kpiHistory, learning, pooledRates } from '@/lib/data';
 import { GROUP_LABEL, LINE_LABEL, formatLakh } from '@/lib/format';
 import { MIN_POOLED_COMPANIES } from '@/lib/settings';
-import { useDemo } from '@/lib/store';
 
 const MISS = 0.25;
 
 export default function InsightsPage() {
-  const completeStep = useDemo((s) => s.completeStep);
-  useEffect(() => completeStep(9), [completeStep]);
-
   const rows = learning.map((r) => {
     const err = (r.actual - r.predicted) / r.predicted;
     return { ...r, label: r.supplier.split(' ')[0], err, miss: Math.abs(err) > MISS };

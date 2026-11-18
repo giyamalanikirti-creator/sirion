@@ -1,7 +1,8 @@
 'use client';
 
-import { Check, FileSignature, X } from 'lucide-react';
+import { AlertTriangle, Check, FileSignature, ReceiptText, UserRound, X } from 'lucide-react';
 import { Button, EmptyState, KpiTile, SirionCard, StatusPill } from '@/components/ui';
+import { firstInvoiceCheck } from '@/lib/engines/invoiceCheck';
 import { finalDeal } from '@/lib/engines/negotiation';
 import { formatDate, formatLakh, LINE_LABEL } from '@/lib/format';
 import { atLeast, useDemo } from '@/lib/store';
@@ -12,6 +13,8 @@ export function SigningTab() {
   const counter = useDemo((s) => s.counter);
   const sign = useDemo((s) => s.sign);
   const signedAt = useDemo((s) => s.signedAt);
+  const invoiceChecked = useDemo((s) => s.invoiceChecked);
+  const runInvoiceCheck = useDemo((s) => s.runInvoiceCheck);
 
   if (!atLeast(status, 'agreed') || !pick) {
     return <EmptyState title="Signing opens once the deal is agreed">CloudDesk needs to pick a package, and you need to accept any counter-offer.</EmptyState>;
@@ -23,13 +26,13 @@ export function SigningTab() {
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
         <SirionCard menu={false}>
-          <KpiTile small label="Enforceable" value={`${deal.enforceableCount} of ${deal.totalLines}`} caption="money lines with a Sirion check" />
+          <KpiTile small label="Automated checks" value={`${deal.enforceableCount} of ${deal.totalLines}`} caption="commercial terms Sirion can verify" />
         </SirionCard>
         <SirionCard menu={false}>
-          <KpiTile small label="Protected" value={formatLakh(deal.protectedLakh)} caption="a year vs CloudDesk’s redline" />
+          <KpiTile small label="Estimated value protected" value={formatLakh(deal.protectedLakh)} caption="a year vs CloudDesk’s redline (estimate)" />
         </SirionCard>
         <SirionCard menu={false}>
-          <KpiTile small label="Net" value={formatLakh(deal.netLakh)} caption={`a year after our give (${formatLakh(deal.giveCostLakh)})`} />
+          <KpiTile small label="Estimated net" value={formatLakh(deal.netLakh)} caption={`a year after our give (${formatLakh(deal.giveCostLakh)})`} />
         </SirionCard>
       </div>
 
@@ -74,13 +77,84 @@ export function SigningTab() {
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
         <div className="text-sm text-muted">
           {signed
-            ? `Sent for signature ${signedAt ? formatDate(signedAt) : ''}. All three trackers are live; the dashboard north star now counts these lines.`
+            ? `Sent for signature${signedAt ? ` on ${formatDate(signedAt)}` : ''}. All three trackers are live; the dashboard north star now counts these lines.`
             : 'Every money line has wording a system can check. Send it for signature to switch the trackers on.'}
         </div>
         <Button onClick={sign} disabled={signed}>
           <FileSignature className="h-4 w-4" /> {signed ? 'Sent for signature' : 'Send for signature'}
         </Button>
       </div>
+
+      {signed && <InvoiceCheck checked={invoiceChecked} onRun={runInvoiceCheck} estimatedLakh={deal.protectedLakh} />}
     </div>
+  );
+}
+
+function InvoiceCheck({ checked, onRun, estimatedLakh }: { checked: boolean; onRun: () => void; estimatedLakh: number }) {
+  const c = firstInvoiceCheck();
+  const rupees = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+  return (
+    <SirionCard
+      title={<span className="flex items-center gap-2"><ReceiptText className="h-4 w-4" /> Monday morning: the first invoice check</span>}
+      action={<StatusPill tone="grey">Simulated</StatusPill>}
+    >
+      {!checked ? (
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <p className="max-w-2xl text-sm text-muted">
+            Invoice {c.invoiceId} from {c.supplier} arrived on {formatDate(c.invoiceDate)}. Sirion compares it with the signed credit clause and last
+            month’s service levels.
+          </p>
+          <Button onClick={onRun}>Run the check</Button>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          <ol className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <Fact n={1} label="Signed clause" value={`“${c.clause.text}”`} />
+            <Fact n={2} label={`Service failure · ${c.serviceMonth}`} value={`Uptime ${c.uptimeActual}% vs ${c.uptimeTarget}% target (${c.shortfall}% short)`} />
+            <Fact n={3} label="Credit expected" value={rupees(c.expectedInr)} sub={c.creditRule} strong />
+            <Fact n={4} label={`Credit found on ${c.invoiceId}`} value={rupees(c.foundInr)} danger={c.foundInr < c.expectedInr} />
+          </ol>
+          {c.status === 'discrepancy' && (
+            <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-danger/30 bg-danger/[0.04] px-4 py-3 text-sm">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
+                <div>
+                  <div className="font-medium text-ink">{rupees(c.gapInr)} credit missing from the invoice</div>
+                  <div className="text-muted">{c.action} · due in {c.dueInDays} days</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-ink">
+                <UserRound className="h-4 w-4 text-muted" /> Owner: {c.owner}
+              </div>
+            </div>
+          )}
+          <div className="grid gap-3 border-t border-line pt-4 text-sm md:grid-cols-2">
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-muted">Estimated value protected</div>
+              <div>{formatLakh(estimatedLakh)} a year. Forecast from contract history; it stays an estimate.</div>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-wide text-muted">Actual credits recovered</div>
+              <div>
+                {rupees(c.foundInr)} of {rupees(c.expectedInr)} expected so far. Counted only when a credit appears on an invoice.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </SirionCard>
+  );
+}
+
+function Fact({ n, label, value, sub, strong, danger }: { n: number; label: string; value: string; sub?: string; strong?: boolean; danger?: boolean }) {
+  return (
+    <li className="rounded-xl border border-line p-3">
+      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-page-bg text-[10px]">{n}</span>
+        {label}
+      </div>
+      <div className={'mt-1.5 text-sm ' + (danger ? 'text-[20px] font-light text-danger' : strong ? 'text-[20px] font-light text-teal-900' : 'text-ink')}>{value}</div>
+      {sub && <div className="mt-1 text-xs text-muted">{sub}</div>}
+    </li>
   );
 }

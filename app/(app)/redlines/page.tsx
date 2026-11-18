@@ -8,7 +8,7 @@ import { EmptyState, GROUP_TONE, PageHeader, SirionCard, StatusPill } from '@/co
 import { redlines } from '@/lib/data';
 import { redlinePriceTags } from '@/lib/engines/redline';
 import { formatDate, formatLakh } from '@/lib/format';
-import { STATUS_LABEL, useDemo } from '@/lib/store';
+import { atLeast, STATUS_LABEL, useDemo } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 type View = 'waiting' | 'all' | 'supplier' | 'signed';
@@ -34,11 +34,12 @@ export default function InboxPage() {
         return {
           r, harmless: g('harmless'), legal: g('legal'), money: g('money'),
           atStake: cd.totalLakh, label: STATUS_LABEL[status], bucket, isNew: status === 'received',
+          unsorted: !atLeast(status, 'sorted'), total: r.changes.length,
         };
       }
       const s = r.summary!;
       const bucket: View = r.status === 'With supplier' ? 'supplier' : 'waiting';
-      return { r, harmless: s.harmless, legal: s.legal, money: s.money, atStake: s.atStakeLakh, label: r.status ?? '', bucket, isNew: false };
+      return { r, harmless: s.harmless, legal: s.legal, money: s.money, atStake: s.atStakeLakh, label: r.status ?? '', bucket, isNew: false, unsorted: false, total: s.harmless + s.legal + s.money };
     });
   }, [status]);
 
@@ -93,7 +94,7 @@ export default function InboxPage() {
                     <th className="px-3 py-3 font-normal">Type</th>
                     <th className="px-3 py-3 font-normal">Received</th>
                     <th className="px-3 py-3 font-normal">Changes</th>
-                    <th className="px-3 py-3 text-right font-normal">₹ at stake / yr</th>
+                    <th className="px-3 py-3 text-right font-normal" title="Estimated yearly exposure vs procurement benchmarks">Est. exposure / yr</th>
                     <th className="px-6 py-3 font-normal">Status</th>
                   </tr>
                 </thead>
@@ -121,14 +122,24 @@ export default function InboxPage() {
                       <td className="px-3 capitalize text-muted">{x.r.supplierType}</td>
                       <td className="px-3 text-muted">{formatDate(x.r.receivedAt)}</td>
                       <td className="px-3">
+                        {x.unsorted ? (
+                          <span className="text-muted">{x.total} changes · not sorted yet</span>
+                        ) : (
                         <div className="flex gap-1">
                           <StatusPill tone={GROUP_TONE.harmless}>{x.harmless} harmless</StatusPill>
                           <StatusPill tone={GROUP_TONE.legal}>{x.legal} legal</StatusPill>
                           <StatusPill tone={GROUP_TONE.money}>{x.money} money</StatusPill>
                         </div>
+                        )}
                       </td>
                       <td className="px-3 text-right tabular-nums">
-                        {x.r.interactive && status === 'signed' ? <span className="text-muted">Protected</span> : formatLakh(x.atStake)}
+                        {x.r.interactive && status === 'signed' ? (
+                          <span className="text-muted">Signed</span>
+                        ) : x.unsorted ? (
+                          <span className="text-muted">Not priced yet</span>
+                        ) : (
+                          formatLakh(x.atStake)
+                        )}
                       </td>
                       <td className="px-6">
                         <StatusPill tone={x.label === 'Signed' ? 'teal' : x.label === 'New' ? 'periwinkle' : 'grey'} dot>

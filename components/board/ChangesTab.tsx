@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, Loader2, Scale, Sparkles, Tag, UserRound } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronDown, Loader2, Scale, Sparkles, Tag, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AiBadge, Button, EmptyState, GROUP_TONE, StatusPill } from '@/components/ui';
 import { wordDiff } from '@/lib/diff';
@@ -50,42 +50,7 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
     }
   };
 
-  const counts = sortResult && {
-    harmless: sortResult.results.filter((r) => r.group === 'harmless').length,
-    legal: sortResult.results.filter((r) => r.group === 'legal').length,
-    money: sortResult.results.filter((r) => r.group === 'money').length,
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
-        {sortResult ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <CheckCircle2 className="h-4 w-4 text-teal-900" />
-            <span>
-              {redline.changes.length} changes sorted: {counts!.harmless} harmless approved and logged · {counts!.legal} sent to legal ·{' '}
-              <strong className="font-medium text-teal-900">{counts!.money} money lines</strong> priced
-            </span>
-            <AiBadge source={sortResult.source} />
-          </div>
-        ) : (
-          <div className="text-sm text-muted">
-            {redline.changes.length} changes from CloudDesk. Sort them into harmless, legal and money before anyone reads every line.
-          </div>
-        )}
-        {!sortResult ? (
-          <Button onClick={runSort} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {loading ? 'Sorting…' : 'Sort changes'}
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={onGoTags}>
-            See price tags <ArrowRight className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      {redline.changes.map((ch) => {
+  const renderCard = (ch: Redline['changes'][number]) => {
         const cls = sortResult?.results.find((r) => r.no === ch.no);
         const tag = cls?.group === 'money' ? tags.find((t) => t.line === cls.line) : undefined;
         const needsPerson = cls && cls.confidence < 0.7;
@@ -127,14 +92,82 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
                   </span>
                 ) : (
                   <button type="button" onClick={onGoTags} className="flex items-center gap-1.5 font-medium text-teal-900 hover:underline">
-                    <Tag className="h-4 w-4" /> Price tag ready{tag ? `: ${formatLakh(tag.costLakh)} a year` : ''}
+                    <Tag className="h-4 w-4" /> Price tag ready{tag ? `: ${formatLakh(tag.costLakh)} a year exposure` : ''}
                   </button>
                 )}
               </footer>
             )}
           </article>
         );
-      })}
+  };
+
+  // After sorting: the service-credit change first, then the other money lines, then legal.
+  // Routine (harmless) edits fold into one collapsed row.
+  const LINE_ORDER = ['credits', 'renewal', 'price'];
+  const rank = (no: number) => {
+    const c = sortResult?.results.find((r) => r.no === no);
+    if (!c) return 99;
+    if (c.group === 'money') return LINE_ORDER.indexOf(c.line ?? '');
+    return c.group === 'legal' ? 10 : 20;
+  };
+  const isRoutine = (no: number) => {
+    const c = sortResult?.results.find((r) => r.no === no);
+    return !!c && c.group === 'harmless' && c.confidence >= 0.7;
+  };
+  const ordered = sortResult
+    ? [...redline.changes].filter((c) => !isRoutine(c.no)).sort((a, b) => rank(a.no) - rank(b.no))
+    : redline.changes;
+  const routine = sortResult ? redline.changes.filter((c) => isRoutine(c.no)) : [];
+
+  const counts = sortResult && {
+    harmless: sortResult.results.filter((r) => r.group === 'harmless').length,
+    legal: sortResult.results.filter((r) => r.group === 'legal').length,
+    money: sortResult.results.filter((r) => r.group === 'money').length,
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
+        {sortResult ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <CheckCircle2 className="h-4 w-4 text-teal-900" />
+            <span>
+              {redline.changes.length} changes sorted: {counts!.harmless} harmless approved and logged · {counts!.legal} sent to legal ·{' '}
+              <strong className="font-medium text-teal-900">{counts!.money} money lines</strong> priced
+            </span>
+            <AiBadge source={sortResult.source} />
+          </div>
+        ) : (
+          <div className="text-sm text-muted">
+            {redline.changes.length} changes from CloudDesk. Sort them into harmless, legal and money before anyone reads every line.
+          </div>
+        )}
+        {!sortResult ? (
+          <Button onClick={runSort} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {loading ? 'Sorting…' : 'Sort changes'}
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={onGoTags}>
+            See price tags <ArrowRight className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
+      {ordered.map(renderCard)}
+      {routine.length > 0 && (
+        <details className="group rounded-2xl border border-line bg-white shadow-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm">
+            <span className="flex items-center gap-2 text-teal-900">
+              <CheckCircle2 className="h-4 w-4" />
+              {routine.length} routine edits approved by Cost of Yes and logged
+              <span className="text-muted">({routine.map((c) => c.title.toLowerCase()).join(', ')})</span>
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="space-y-4 border-t border-line p-4">{routine.map(renderCard)}</div>
+        </details>
+      )}
       {redline.changes.length === 0 && <EmptyState title="No changes in this redline" />}
     </div>
   );

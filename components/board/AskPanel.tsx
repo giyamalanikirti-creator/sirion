@@ -19,15 +19,22 @@ type Turn = { question: string; response?: AskResponse; error?: string };
 const chipIcon = (kind?: string) =>
   kind === 'pooled' ? <Users className="h-3 w-3" /> : kind === 'data' ? <Database className="h-3 w-3" /> : <Wrench className="h-3 w-3" />;
 
-export function AskPanel({ redlineId, onClose }: { redlineId: string; onClose?: () => void }) {
+export function AskPanel({
+  redlineId, onClose, request,
+}: { redlineId: string; onClose?: () => void; request?: { text: string; id: number } }) {
   const role = useDemo((s) => s.role);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
 
+  // Keep the latest question at the top of the panel so its heading stays visible.
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const list = listRef.current;
+    const last = list?.querySelector<HTMLElement>('[data-turn]:last-of-type');
+    if (list && last) list.scrollTo({ top: last.offsetTop - list.offsetTop - 8, behavior: 'smooth' });
   }, [turns]);
 
   const ask = async (q: string) => {
@@ -59,10 +66,20 @@ export function AskPanel({ redlineId, onClose }: { redlineId: string; onClose?: 
     }
   };
 
+  // A card asked about its estimate: send that question once per request.
+  const handled = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!request || handled.current === request.id) return;
+    handled.current = request.id;
+    rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    ask(request.text);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request]);
+
   const lastSource = [...turns].reverse().find((t) => t.response)?.response?.source;
 
   return (
-    <aside aria-label="Ask Cost of Yes" className="flex h-full flex-col rounded-[22px] border border-line bg-white shadow-card">
+    <aside ref={rootRef} aria-label="Ask Cost of Yes" className="flex h-full flex-col rounded-[22px] border border-line bg-white shadow-card">
       <header className="flex items-center justify-between px-5 pb-2 pt-5">
         <div className="flex items-center gap-2">
           <Logo className="h-7 w-7" color="#0C5E69" />
@@ -75,7 +92,7 @@ export function AskPanel({ redlineId, onClose }: { redlineId: string; onClose?: 
         )}
       </header>
 
-      <div className="flex-1 space-y-5 overflow-y-auto px-5 pb-4" aria-live="polite">
+      <div ref={listRef} className="relative flex-1 space-y-5 overflow-y-auto px-5 pb-4" aria-live="polite">
         {turns.length === 0 && (
           <div className="pt-2">
             <p className="text-sm text-muted">
@@ -99,7 +116,7 @@ export function AskPanel({ redlineId, onClose }: { redlineId: string; onClose?: 
         )}
 
         {turns.map((t, i) => (
-          <div key={i} className="space-y-3">
+          <div key={i} data-turn className="space-y-3">
             <h3 className="text-[19px] font-normal leading-snug text-teal-title">{t.question}</h3>
             {!t.response && !t.error && (
               <div className="flex items-center gap-2 text-sm text-muted">

@@ -16,7 +16,9 @@ const STEPS: { label: string; doneAt: Status }[] = [
   { label: 'Signed', doneAt: 'signed' },
 ];
 
-export function BoardHeader({ contract, totalLakh, pctOfFee }: { contract: Contract; totalLakh: number; pctOfFee: number }) {
+export function BoardHeader({
+  contract, totalLakh, vsCurrentLakh, pctOfFee,
+}: { contract: Contract; totalLakh: number; vsCurrentLakh: number; pctOfFee: number }) {
   const status = useDemo((s) => s.status);
   const current = STEPS.findIndex((s) => !atLeast(status, s.doneAt));
   return (
@@ -33,10 +35,17 @@ export function BoardHeader({ contract, totalLakh, pctOfFee }: { contract: Contr
             Renewal redline · helpdesk software · {formatLakh(contract.annualFeeInr / 1e5)}/yr · {contract.seats} seats · owner {contract.businessOwner}
           </p>
         </div>
-        <div className="text-right">
-          <div className="text-[26px] font-light leading-tight text-teal-900">{formatLakh(totalLakh)} a year</div>
-          <div className="text-sm text-muted">at stake if we say yes ({formatPct(pctOfFee)} of fee)</div>
-        </div>
+        {atLeast(status, 'sorted') ? (
+          <div className="ml-auto text-right">
+            <div className="text-[26px] font-light leading-tight text-teal-900">{formatLakh(totalLakh)} a year</div>
+            <div className="text-sm text-ink">Estimated annual exposure vs procurement benchmarks</div>
+            <div className="text-xs text-muted">
+              {formatPct(pctOfFee)} of fee · {formatLakh(vsCurrentLakh)} a year more than the current contract
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-[260px] text-right text-sm text-muted">Sort the changes to see which ones cost money.</div>
+        )}
       </div>
 
       <ol className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-2" aria-label="Progress">
