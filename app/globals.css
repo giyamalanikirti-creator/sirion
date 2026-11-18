@@ -2,19 +2,27 @@
 
 /* Sirion-style tokens (BUILD_SPEC §4.2). Light UI only, like the reference. */
 :root {
-  --teal-900: #0c5e69;
-  --teal-700: #0f6671;
-  --teal-title: #1e5a57;
+  /* Cost of Yes design tokens (redesign brief). Status colours always ship with a text label. */
+  --teal-900: #005d68;   /* primary actions, selected navigation */
+  --teal-700: #004a53;   /* hover / pressed */
+  --teal-title: #172b3a; /* titles use ink */
+  --teal-tint: #e6f2f3;  /* selected nav, subtle accents */
   --periwinkle: #828bfc;
   --mint: #b1d0ca;
   --indigo: #4364b2;
   --lime: #e0e767;
-  --page-bg: #f6f6f6;
+  --page-bg: #f5f7fa;    /* cool grey canvas */
   --card: #ffffff;
-  --border: #e6ebeb;
-  --text: #1f2a2e;
-  --text-muted: #7d9093;
-  --danger: #c2410c;
+  --border: #d6dfe5;
+  --text: #172b3a;       /* ink */
+  --text-muted: #465b68; /* secondary text */
+  --danger: #b42318;
+  --agreement: #1f5fa8;  /* current agreement */
+  --agreement-bg: #e8f1fb;
+  --proposed: #a15c07;   /* supplier's proposed change */
+  --proposed-bg: #fdf0d9;
+  --positive: #1d7a4b;   /* confirmed positive outcome */
+  --positive-bg: #e4f4ea;
 }
 
 @theme inline {
@@ -31,8 +39,16 @@
   --color-ink: var(--text);
   --color-muted: var(--text-muted);
   --color-danger: var(--danger);
+  --color-teal-tint: var(--teal-tint);
+  --color-agreement: var(--agreement);
+  --color-agreement-bg: var(--agreement-bg);
+  --color-proposed: var(--proposed);
+  --color-proposed-bg: var(--proposed-bg);
+  --color-positive: var(--positive);
+  --color-positive-bg: var(--positive-bg);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --shadow-card: 0 1px 2px rgba(16, 40, 44, 0.04), 0 2px 8px rgba(16, 40, 44, 0.04);
+  --shadow-card: 0 1px 2px rgba(23, 43, 58, 0.04);
+  --shadow-float: 0 8px 24px rgba(23, 43, 58, 0.14), 0 2px 6px rgba(23, 43, 58, 0.08);
 }
 
 html, body {
@@ -42,8 +58,13 @@ html, body {
 
 body {
   font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Financial values line up in columns. */
+.tabular-nums, td, .num { font-variant-numeric: tabular-nums; }
 
 :focus-visible {
   outline: 2px solid var(--teal-700);
@@ -51,12 +72,12 @@ body {
 }
 
 /* Diff highlights in redline cards */
-.diff-del { background: #fde8e1; color: #9a3412; text-decoration: line-through; border-radius: 3px; padding: 0 2px; }
-.diff-ins { background: #dcefeb; color: #0c5e69; border-radius: 3px; padding: 0 2px; }
+.diff-del { background: var(--agreement-bg); color: var(--agreement); border-radius: 3px; padding: 0 2px; box-shadow: inset 0 -1px 0 var(--agreement); }
+.diff-ins { background: var(--proposed-bg); color: var(--proposed); border-radius: 3px; padding: 0 2px; box-shadow: inset 0 -1px 0 var(--proposed); }
 
 /* Markdown on /story */
-.prose-story h1 { font-size: 1.5rem; color: var(--teal-title); margin: 0 0 1rem; font-weight: 400; }
-.prose-story h2 { font-size: 1.15rem; color: var(--teal-title); margin: 2.25rem 0 0.75rem; font-weight: 500; scroll-margin-top: 80px; }
+.prose-story h1 { font-size: 1.5rem; color: var(--text); margin: 0 0 1rem; font-weight: 600; }
+.prose-story h2 { font-size: 1.15rem; color: var(--text); margin: 2.25rem 0 0.75rem; font-weight: 600; scroll-margin-top: 80px; }
 .prose-story h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; font-weight: 600; }
 .prose-story p, .prose-story li { line-height: 1.65; font-size: 0.925rem; }
 .prose-story p { margin: 0.6rem 0; }

@@ -7,6 +7,7 @@ import sortFixtures from '@/data/fixtures/sort_fixtures.json';
 import { getRedline, redlines } from './data';
 import { buildPackages } from './engines/givegetEngine';
 import { changedLines } from './engines/redline';
+import { DEFAULT_PROFILE, type Profile } from './account';
 import type { ChangeClass, Counter, CreditsGroup, PackageId, SortResult } from './types';
 
 export type Role = 'lead' | 'owner' | 'finance' | 'legal' | 'supplier';
@@ -124,6 +125,13 @@ interface DemoState {
   signedIn: boolean;
   welcomeDismissed: boolean;
   data: DataSettings;
+  /** The signed-in user's profile (name and title only; never permissions). */
+  profile: Profile;
+  guideOpen: boolean;
+
+  updateProfile: (p: Profile) => void;
+  setGuideOpen: (open: boolean) => void;
+  signOut: () => void;
 
   signIn: () => void;
   dismissWelcome: () => void;
@@ -187,7 +195,12 @@ export const useDemo = create<DemoState>()(
         signedIn: false,
         welcomeDismissed: false,
         data: { usePeerBenchmarks: true, contributeOutcomes: false },
+        profile: DEFAULT_PROFILE,
+        guideOpen: false,
 
+        updateProfile: (profile) => set({ profile: { fullName: profile.fullName.trim(), preferredName: profile.preferredName.trim(), jobTitle: profile.jobTitle.trim() } }),
+        setGuideOpen: (guideOpen) => set({ guideOpen }),
+        signOut: () => set({ signedIn: false, role: 'lead' }),
         signIn: () => set({ signedIn: true, role: 'lead' }),
         dismissWelcome: () => set({ welcomeDismissed: true }),
         setData: (p) => {
@@ -201,7 +214,7 @@ export const useDemo = create<DemoState>()(
           if (!n.creditDraft) return fail('Save a draft on the Financial impact tab first');
           if (atLeast(n.status, 'awaiting_approval')) return fail('Offers are locked once they are sent for approval');
           patch(id, { draftInOffers: true, selectedPackages: [...new Set([...n.selectedPackages, 'E' as PackageId])].sort() as PackageId[] });
-          toast.success('Your counter is now offer E');
+          toast.success('Your draft is now offer E in the comparison');
           return { ok: true };
         },
 
@@ -340,7 +353,7 @@ export const useDemo = create<DemoState>()(
           patch(id, { creditDraft, draftInOffers: false, selectedPackages: n.selectedPackages.filter((p) => p !== 'E') });
           if (creditDraft) {
             step(id, 4);
-            toast.success('Saved as a draft counteroffer. Compare it with the packages.');
+            toast.success('Saved to your draft offer');
           }
         },
         runInvoiceCheck: (id) => {
@@ -350,7 +363,7 @@ export const useDemo = create<DemoState>()(
           return { ok: true };
         },
         reset: () => {
-          set({ role: 'lead', negotiations: initialNegotiations(), completedSteps: [], signedIn: false, welcomeDismissed: false, data: { usePeerBenchmarks: true, contributeOutcomes: false } });
+          set({ role: 'lead', negotiations: initialNegotiations(), completedSteps: [], signedIn: false, welcomeDismissed: false, data: { usePeerBenchmarks: true, contributeOutcomes: false }, profile: DEFAULT_PROFILE, guideOpen: false });
           toast('Demo reset');
         },
       };
@@ -364,7 +377,7 @@ export const useDemo = create<DemoState>()(
       skipHydration: true,
       partialize: (s) => ({
         role: s.role, negotiations: s.negotiations, completedSteps: s.completedSteps,
-        signedIn: s.signedIn, welcomeDismissed: s.welcomeDismissed, data: s.data,
+        signedIn: s.signedIn, welcomeDismissed: s.welcomeDismissed, data: s.data, profile: s.profile,
       }),
       // Redlines added after a demo was saved still get a starting state.
       merge: (persisted, current) => {

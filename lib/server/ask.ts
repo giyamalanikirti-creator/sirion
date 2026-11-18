@@ -241,7 +241,7 @@ export function engineAnswer(question: string, redlineId: string): AskResponse |
     const o = run.output as ReturnType<typeof tagView> & { comparedWithSupplierAsk: { costPerYear: string } };
     if (o.costLakh === null) {
       return fromRuns(
-        `Insufficient data to estimate a 15-day window: we have ${o.ownContracts} own contracts with an 11–30 day window, and peer benchmarks are turned off for this workspace. You can still draft it as a counter.`,
+        `Insufficient internal history to estimate a 15-day window: we have ${o.ownContracts} own contracts with an 11–30 day window, and peer benchmarks are turned off for this workspace. You can still draft it as a counter.`,
         [run],
       );
     }

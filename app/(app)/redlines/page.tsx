@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Filter, Inbox } from 'lucide-react';
+import { Inbox } from 'lucide-react';
 import { EmptyState, GROUP_TONE, PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { redlines } from '@/lib/data';
 import { redlinePriceTags } from '@/lib/engines/redline';
@@ -49,7 +49,7 @@ export default function InboxPage() {
 
   return (
     <>
-      <PageHeader title="Redline inbox" subtitle="Supplier changes waiting on procurement, sorted and priced before anyone says yes." />
+      <PageHeader title="Negotiations" subtitle="Supplier redlines waiting on procurement. Each one is analysed and priced before anyone says yes." />
       <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
         <nav aria-label="Saved views" className="flex gap-2 overflow-x-auto lg:flex-col">
           <div className="hidden px-3 pb-1 text-[11px] uppercase tracking-wide text-muted lg:block">Saved views</div>
@@ -72,8 +72,7 @@ export default function InboxPage() {
 
         <SirionCard
           title={<span className="flex items-center gap-2"><Inbox className="h-4 w-4" /> Redlines</span>}
-          action={<span className="hidden items-center gap-1 text-sm text-muted sm:flex"><Filter className="h-4 w-4" /> Filters</span>}
-          bodyClassName="p-0"
+                    bodyClassName="p-0"
         >
           {shown.length === 0 ? (
             <div className="p-6"><EmptyState title="Nothing here">No redlines in this view right now.</EmptyState></div>
@@ -112,10 +111,10 @@ export default function InboxPage() {
                         </div>
                       </td>
                       <td className="px-3 capitalize text-muted">{x.r.supplierType}</td>
-                      <td className="px-3 text-muted">{formatDate(x.r.receivedAt)}</td>
+                      <td className="whitespace-nowrap px-3 text-muted">{formatDate(x.r.receivedAt)}</td>
                       <td className="px-3">
                         {x.unsorted ? (
-                          <span className="text-muted">{x.total} changes · not sorted yet</span>
+                          <span className="text-muted">{x.total} changes · not analysed yet</span>
                         ) : (
                         <div className="flex gap-1">
                           <StatusPill tone={GROUP_TONE.harmless}>{x.harmless} harmless</StatusPill>

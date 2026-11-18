@@ -16,7 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <HydratedCtx.Provider value={hydrated}>
       {children}
-      <Toaster position="bottom-right" toastOptions={{ style: { fontFamily: 'var(--font-sans)' } }} />
+      <Toaster position="bottom-right" toastOptions={{ duration: 2500, style: { fontFamily: 'var(--font-sans)' } }} />
     </HydratedCtx.Provider>
   );
 }
@@ -27,7 +27,7 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
     return (
       <div className="grid gap-6 md:grid-cols-2" aria-busy="true" aria-label="Loading">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-64 animate-pulse rounded-2xl border border-line bg-white" />
+          <div key={i} className="h-64 animate-pulse rounded-lg border border-line bg-white" />
         ))}
       </div>
     );

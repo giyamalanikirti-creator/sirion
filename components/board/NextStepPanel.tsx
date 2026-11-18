@@ -57,10 +57,10 @@ function SupplierPreview({ open, onOpenChange }: { open: boolean; onOpenChange: 
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
-        <Dialog.Content className="fixed inset-x-4 top-8 bottom-8 z-50 mx-auto flex max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#f7f8f8] shadow-2xl outline-none">
+        <Dialog.Content className="fixed inset-x-4 top-8 bottom-8 z-50 mx-auto flex max-w-5xl flex-col overflow-hidden rounded-lg bg-[#f7f8f8] shadow-2xl outline-none">
           <div className="flex items-start justify-between border-b border-line bg-white px-6 py-4">
             <div>
-              <Dialog.Title className="text-[17px] text-ink">Preview: what {r.supplier} will see</Dialog.Title>
+              <Dialog.Title className="text-[18px] font-semibold text-ink">Supplier view: what {r.supplier} will see</Dialog.Title>
               <Dialog.Description className="text-sm text-muted">
                 Plain terms and a reason for each. No ₹ figures, no estimates, no peer data, no internal notes.
               </Dialog.Description>
@@ -129,16 +129,16 @@ export function NextStepPanel({ onGoTab }: { onGoTab: (t: BoardTab) => void }) {
   return (
     <section
       aria-label="Next step"
-      className="sticky top-16 z-20 -mx-1 rounded-2xl border border-teal-900/25 bg-white/95 px-5 py-4 shadow-card backdrop-blur"
+      className="sticky top-[64px] z-20 rounded-lg border border-line bg-white/95 px-5 py-3 shadow-[0_1px_0_rgba(23,43,58,0.04)] backdrop-blur"
     >
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium', TURN_TONE[step.turn])}>
               {step.turn === 'done' ? <CheckCircle2 className="h-3 w-3" /> : waitingOnOthers ? <Clock className="h-3 w-3" /> : null}
               {step.whose}
             </span>
-            <h2 className="text-[16px] font-normal text-ink">{step.title}</h2>
+            <h2 className="text-[16px] font-semibold text-ink">{step.title}</h2>
           </div>
           {(step.detail || step.next) && (
             <p className="mt-1 text-sm text-muted">
@@ -147,10 +147,10 @@ export function NextStepPanel({ onGoTab }: { onGoTab: (t: BoardTab) => void }) {
             </p>
           )}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
           {step.action === 'sendSupplier' && (
             <Button variant="outline" onClick={() => setPreview(true)}>
-              <Eye className="h-4 w-4" /> Preview what {r.supplier} will see
+              <Eye className="h-4 w-4" /> Preview supplier view
             </Button>
           )}
           {step.action === 'respondCounter' && (

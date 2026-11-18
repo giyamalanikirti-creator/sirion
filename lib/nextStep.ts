@@ -43,7 +43,7 @@ export function nextStep(redlineId: string, n: Negotiation): NextStep {
 
   if (n.status === 'received') {
     return {
-      turn: 'you', whose: 'Your turn', action: 'analyse', actionLabel: `Analyse ${inWords(total)} change${total === 1 ? '' : 's'}`,
+      turn: 'you', whose: 'Your turn', action: 'analyse', actionLabel: `Analyse ${total} change${total === 1 ? '' : 's'}`,
       title: `Find out which of ${name}’s ${inWords(total)} changes affect what you pay`,
       detail: 'Routine edits are logged, legal changes go to legal, and every commercial change gets an estimated cost.',
       next: money ? 'You see the financial impact of each commercial change.' : 'Legal reviews the changes.',
@@ -113,12 +113,12 @@ export function nextStep(redlineId: string, n: Negotiation): NextStep {
       return {
         turn: 'you', whose: 'Your turn', action: 'sendSupplier', actionLabel: `Send to ${name}`,
         title: `Send the approved offers (${n.selectedPackages.join(', ')}) to ${name}`,
-        detail: n.financeDecision === 'rejected' ? 'Finance rejected the three-year commitment, so that offer is not included.' : 'Preview what they will see first: plain terms and reasons, no ₹ figures.',
+        detail: n.financeDecision === 'rejected' ? 'Finance rejected the three-year commitment, so that offer is not included.' : 'Preview the supplier view first: plain terms and reasons, no ₹ figures.',
         next: `${name} picks one offer and may suggest one change.`,
       };
     case 'with_supplier':
       return {
-        turn: 'supplier', whose: `${name}’s turn`, action: 'viewSupplier', actionLabel: `View as ${name}`,
+        turn: 'supplier', whose: `${name}’s turn`, action: 'viewSupplier', actionLabel: 'View as supplier',
         title: `Waiting for ${name} to choose an offer`,
         detail: 'They see each offer in plain words with a reason per term. No ₹ figures, no peer data.',
         next: 'You review their choice and any change they suggest.',

@@ -27,19 +27,20 @@ Without a key (or with `DEMO_MODE=cached`) every AI feature uses saved fixtures,
 
 The question the user carries through: **“CloudDesk wants to change our renewal terms. Which changes should I accept, and what should I ask for in return?”**
 
-Each screen has one next-action button in a sticky panel at the top. It says whose turn it is, what they are deciding and what happens next. You can finish the story with that button alone; the demo guide is optional, behind **Walk me through the demo**.
+Each negotiation screen has one progress indicator (which is also how you move between stages) and one status strip saying whose turn it is, what they are deciding and what happens next, with the single primary action. The walkthrough is optional, under **Help → Walk me through the demo**.
 
-1. **Continue as Riya Kapoor** (stand-in for company single sign-on). The welcome panel says who you are and what you are deciding; beside it, **How this workspace uses data** shows the read-only sources and the admin's two peer-data switches (use: on; contribute: off).
-2. **Review CloudDesk’s changes** → **Analyse six changes**: “Three changes could affect what you pay. One needs legal review. Two are routine.” The service-credit change leads, in plain English; the clause text is one click away.
-3. **See the financial impact**: accepting all three could cost about ₹13.3 lakh more a year than the current contract (₹11.6 lakh vs procurement benchmarks). The credits card separates the evidence used from the peer comparison.
-4. On the credits card, **Try 15 days**: ₹2.4 lakh vs ₹3.2 lakh, from 27 participating companies, confidence low. **Save as my draft counter** → **Review my draft** → **Add it as offer E**.
-5. **Compare offers**: commit for three years, pay 15 days sooner, offer more time to claim credits, or your counter. **Send offers for approval**.
-6. The panel says it is the business owner's turn, then Finance's. Use **View as business owner** / **View as Finance** to play them.
-7. **Preview what CloudDesk will see** → **Send to CloudDesk** → **View as CloudDesk**: pick “Pay faster” and suggest a 7% cap.
-8. **Accept** the counter (₹1.1 lakh, inside your ₹1.5 lakh range) → **Send for signature**.
-9. **Run the first invoice check**: the signed agreement requires an automatic ₹25,000 credit, the invoice shows ₹0, and Riya is assigned to follow up.
+1. **Continue as Riya Kapoor** (stand-in for company SSO). The Overview opens on the active task, **Review CloudDesk’s renewal**, with the scenario in three sentences and **Review the 6 changes**.
+2. **Analyse 6 changes**: three affect what you pay, one needs legal review, two are routine. Each change states its practical effect above two aligned document columns (blue: current signed contract; amber: CloudDesk’s proposal).
+3. **Financial impact**: “Accepting all three changes could cost an estimated ₹13.3 lakh more per year than your current contract” (₹11.6 lakh vs benchmarks as the secondary comparison). One row per clause; **Evidence** opens a drawer.
+4. **Explore alternatives**: starts on CloudDesk’s 10-day proposal. **15 days** → ₹2.4 lakh, from an 11–30 day cohort of 27 participating companies, low confidence → **Save to draft offer** → **View my draft** → **Add to comparison as offer E**.
+5. **Compare offers**: a table aligning what we give, what we get, annual value, the ₹1.8 crore commitment, approvals and automated checks. **We must keep an annual exit** changes what is available. **Send offers for approval**.
+6. The strip shows the business owner’s turn, then Finance’s; **View as business owner** / **View as Finance** play them.
+7. **Preview supplier view** → **Send to CloudDesk** → **View as supplier**: pick “Pay faster”, suggest a 7% cap.
+8. **Accept** (₹1.1 lakh, inside the ₹1.5 lakh range) → **Send for signature** → **Run the first invoice check**: ₹25,000 expected, ₹0 found, **Credit flagged for follow-up**, assigned to Riya.
 
-To see the evidence change, switch **Use aggregate peer benchmarks** off: the 15-day estimate becomes “Insufficient data to estimate” (you can still draft it), and SwiftShip's estimates disappear.
+**Account:** the RK button opens the account menu (Edit my profile, Workspace data access, Sign out). Profile edits persist in the browser, update initials and greetings everywhere, and never change permissions.
+
+To see the evidence change, open **Workspace data access** and switch **Use aggregate peer benchmarks** off: the 15-day estimate becomes “Insufficient internal history to estimate” (you can still draft it), and SwiftShip's estimates disappear.
 
 ### The other five redlines
 

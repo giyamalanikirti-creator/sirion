@@ -9,7 +9,8 @@ import { COUNTER_PHRASE } from '@/lib/format';
 import { hasMoneyLines, legalChanges } from '@/lib/store';
 import { useBoard } from './context';
 import { formatDate, formatLakh, LINE_LABEL } from '@/lib/format';
-import { atLeast } from '@/lib/store';
+import { atLeast, useDemo } from '@/lib/store';
+import { callName } from '@/lib/account';
 
 export function SigningTab() {
   const { id, n } = useBoard();
@@ -76,7 +77,7 @@ export function SigningTab() {
         </div>
       </SirionCard>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-white px-6 py-4 shadow-card">
         <div className="text-sm text-muted">
           {signed
             ? `Sent for signature${signedAt ? ` on ${formatDate(signedAt)}` : ''}. ${deal.enforceableCount} of ${deal.totalLines} trackers are live; the dashboard north star now counts these terms.`
@@ -94,6 +95,8 @@ export function SigningTab() {
 
 function InvoiceCheck({ c, checked, estimatedLakh }: { c: NonNullable<ReturnType<typeof firstInvoiceCheck>>; checked: boolean; estimatedLakh: number }) {
   const rupees = (v: number) => `₹${v.toLocaleString('en-IN')}`;
+  // The follow-up owner is the signed-in lead, so profile edits show up here too.
+  const profile = useDemo((s) => s.profile);
   return (
     <SirionCard
       title={<span className="flex items-center gap-2"><ReceiptText className="h-4 w-4" /> The first invoice after signing</span>}
@@ -106,22 +109,22 @@ function InvoiceCheck({ c, checked, estimatedLakh }: { c: NonNullable<ReturnType
       ) : (
         <div className="space-y-5">
           {c.status === 'discrepancy' && (
-            <div className="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-danger/30 bg-danger/[0.04] px-4 py-3">
+            <div className="flex flex-wrap items-start justify-between gap-4 rounded-md border border-danger/30 bg-danger/[0.04] px-4 py-3">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
                 <p className="text-[15px] leading-snug text-ink">
                   The signed agreement requires an automatic {rupees(c.expectedInr)} credit. The first invoice shows {rupees(c.foundInr)}.{' '}
-                  {c.owner.split(',')[0].split(' ')[0]} has been assigned to follow up.
+                  {callName(profile)} has been assigned to follow up.
                 </p>
               </div>
               <div className="flex items-center gap-2 text-sm text-ink">
-                <UserRound className="h-4 w-4 text-muted" /> {c.owner} · due in {c.dueInDays} days
+                <UserRound className="h-4 w-4 text-muted" /> {profile.fullName}, {profile.jobTitle} · due in {c.dueInDays} days
               </div>
             </div>
           )}
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-line p-4">
+            <div className="rounded-md border border-line p-4">
               <div className="text-[11px] uppercase tracking-wide text-muted">Signed clause · service credits</div>
               <p className="mt-2 text-[15px] text-ink">“{c.clause.text}”</p>
               <dl className="mt-4 space-y-1.5 border-t border-line pt-3 text-sm">
@@ -130,7 +133,7 @@ function InvoiceCheck({ c, checked, estimatedLakh }: { c: NonNullable<ReturnType
                 <div className="flex justify-between gap-3 font-medium"><dt>Credit the clause requires</dt><dd className="text-teal-900">{rupees(c.expectedInr)}</dd></div>
               </dl>
             </div>
-            <div className="rounded-xl border border-line p-4">
+            <div className="rounded-md border border-line p-4">
               <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-muted">
                 <span>Invoice {c.invoiceId}</span>
                 <span>{formatDate(c.invoiceDate)}</span>
@@ -199,7 +202,7 @@ function LegalOnlySigning() {
           </tbody>
         </table>
       </SirionCard>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-white px-6 py-4 shadow-card">
         <div className="text-sm text-muted">
           {signed
             ? `Sent for signature${n.signedAt ? ` on ${formatDate(n.signedAt)}` : ''}. No money lines changed, so the north star is unaffected.`

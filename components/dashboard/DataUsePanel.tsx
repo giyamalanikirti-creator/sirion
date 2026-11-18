@@ -42,7 +42,7 @@ export function DataUsePanel({ className }: { className?: string }) {
   ];
 
   return (
-    <section className={cn('rounded-2xl border border-line bg-white p-5 shadow-card', className)} aria-labelledby="data-use-title">
+    <section className={cn('rounded-lg border border-line bg-white p-5 shadow-card', className)} aria-labelledby="data-use-title">
       <h2 id="data-use-title" className="flex items-center gap-2 text-[15px] text-teal-title">
         <Database className="h-4 w-4" /> How this workspace uses data
       </h2>

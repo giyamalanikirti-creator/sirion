@@ -24,16 +24,16 @@ export function RoleSwitcher({ compact }: { compact?: boolean }) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
         className={cn(
-          'inline-flex h-9 items-center gap-1.5 rounded-full border border-line bg-white px-3 text-sm text-ink hover:bg-page-bg',
+          'mr-1 inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-2.5 text-[13px] text-ink hover:bg-page-bg data-[state=open]:bg-page-bg',
         )}
         aria-label="Switch role"
       >
-        {!compact && <span className="hidden text-muted sm:inline">Viewing as:</span>}
+        {!compact && <span className="hidden text-muted xl:inline">Demo · viewing as</span>}
         <span className="font-medium">{ROLE_LABEL[role]}</span>
         <ChevronDown className="h-4 w-4 text-muted" />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content align="end" sideOffset={6} className="z-50 min-w-[200px] rounded-xl border border-line bg-white p-1 shadow-lg">
+        <DropdownMenu.Content align="end" sideOffset={6} className="z-50 min-w-[220px] rounded-lg border border-line bg-white p-1 shadow-[var(--shadow-float)]">
           <DropdownMenu.Label className="px-3 py-1.5 text-[11px] uppercase tracking-wide text-muted">Demo role</DropdownMenu.Label>
           {ROLES.map((r) => (
             <DropdownMenu.Item

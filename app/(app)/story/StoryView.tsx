@@ -17,8 +17,8 @@ export function StoryView({ markdown }: { markdown: string }) {
   const toc = [...markdown.matchAll(/^## (.+)$/gm)].map((m) => ({ title: m[1].trim(), id: slug(m[1]) }));
   return (
     <>
-      <PageHeader title="The story behind Cost of Yes" />
-      <div className="mb-6 rounded-2xl border border-lime bg-lime/20 px-5 py-3">
+      <PageHeader title="About this demo" subtitle="Why this stage, the problem, who is involved, how it works, data and privacy, and how success is measured." />
+      <div className="mb-6 rounded-lg border border-lime bg-lime/20 px-5 py-3">
         <Disclaimer className="text-[13px] text-ink" />
       </div>
       <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
@@ -32,7 +32,7 @@ export function StoryView({ markdown }: { markdown: string }) {
             ))}
           </ol>
         </nav>
-        <article className="prose-story max-w-3xl rounded-2xl border border-line bg-white p-6 shadow-card md:p-10">
+        <article className="prose-story max-w-3xl rounded-lg border border-line bg-white p-6 shadow-card md:p-10">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{ h2: ({ children }) => <h2 id={slug(textOf(children))}>{children}</h2> }}

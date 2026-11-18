@@ -1,13 +1,15 @@
 'use client';
 
 import {
-  Bar, BarChart, ComposedChart, Line, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar, BarChart, ComposedChart, Line, CartesianGrid, Cell, LabelList, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
   type PieLabelRenderProps,
 } from 'recharts';
 
-export const SERIES = ['#828BFC', '#0C5E69', '#B1D0CA', '#4364B2', '#E0E767'];
-const AXIS = { fontSize: 11, fill: '#7D9093' };
-const GRID = '#EEF1F1';
+export const SERIES = ['#828BFC', '#005D68', '#B1D0CA', '#4364B2', '#E0E767'];
+/** Chart palette shared across screens (design tokens). */
+export const CHART = { primary: '#005D68', current: '#1F5FA8', proposed: '#D08A2E', positive: '#1D7A4B', missed: '#E8B86A', grid: '#E3E9EE', ink: '#172B3A', muted: '#465B68' };
+const AXIS = { fontSize: 12, fill: '#465B68' };
+const GRID = '#E3E9EE';
 
 const tooltipStyle = {
   contentStyle: { borderRadius: 10, border: '1px solid #E6EBEB', fontSize: 12, boxShadow: '0 4px 14px rgba(0,0,0,0.06)' },
@@ -32,7 +34,7 @@ export function SimpleBars<T extends Row>({
 }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 10, right: 8, left: yLabel ? 8 : -12, bottom: 0 }}>
+      <BarChart accessibilityLayer data={data} margin={{ top: 10, right: 8, left: yLabel ? 8 : -12, bottom: 0 }}>
         <CartesianGrid vertical={false} stroke={GRID} />
         <XAxis dataKey={x} tick={AXIS} tickLine={false} axisLine={{ stroke: GRID }} interval={0} />
         <YAxis
@@ -190,6 +192,74 @@ export function TrendChart<T extends Row>({
         <Bar yAxisId="l" dataKey={bar.key} name={bar.label} fill="#B1D0CA" radius={[4, 4, 0, 0]} maxBarSize={40} />
         <Line yAxisId="r" dataKey={line.key} name={line.label} stroke="#828BFC" strokeWidth={2} dot={{ r: 4, fill: '#828BFC' }} />
       </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
+
+/**
+ * Horizontal bars for comparing suppliers: category labels on the left, the
+ * exact value printed at the end of each bar, light vertical gridlines.
+ * Values show on hover and on keyboard focus (accessibilityLayer).
+ */
+export function HBars<T extends Row>({
+  data, y, x, format, onBarClick, color = CHART.primary, highlight, rowHeight = 38, labelWidth = 150,
+}: {
+  data: T[];
+  y: string;
+  x: string;
+  format: (v: number) => string;
+  onBarClick?: (d: T) => void;
+  color?: string;
+  highlight?: (d: T) => boolean;
+  rowHeight?: number;
+  labelWidth?: number;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={Math.max(120, data.length * rowHeight + 28)}>
+      <BarChart accessibilityLayer layout="vertical" data={data} margin={{ top: 4, right: 72, left: 0, bottom: 4 }} barCategoryGap={10}>
+        <CartesianGrid horizontal={false} stroke={GRID} />
+        <XAxis type="number" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={(v) => String(v)} />
+        <YAxis type="category" dataKey={y} width={labelWidth} tick={{ ...AXIS, fill: CHART.ink, fontSize: 13 }} tickLine={false} axisLine={false} />
+        <Tooltip {...tooltipStyle} formatter={(v) => format(Number(v))} />
+        <Bar
+          dataKey={x}
+          fill={color}
+          radius={[0, 4, 4, 0]}
+          maxBarSize={22}
+          onClick={onBarClick ? (d) => onBarClick((d as unknown as { payload: T }).payload) : undefined}
+          className={onBarClick ? 'cursor-pointer' : undefined}
+        >
+          {highlight && data.map((d, i) => <Cell key={i} fill={highlight(d) ? color : '#7FAEB4'} />)}
+          <LabelList dataKey={x} position="right" formatter={(v: unknown) => format(Number(v))} style={{ fontSize: 12, fill: CHART.ink, fontVariantNumeric: 'tabular-nums' }} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+/** Horizontal stacked bars (e.g. credits recovered vs missed), legend above, totals by hover/focus. */
+export function StackedHBars<T extends Row>({
+  data, y, series, format, rowHeight = 44, labelWidth = 130,
+}: {
+  data: T[];
+  y: string;
+  series: { key: string; label: string; color: string }[];
+  format: (v: number) => string;
+  rowHeight?: number;
+  labelWidth?: number;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={data.length * rowHeight + 64}>
+      <BarChart accessibilityLayer layout="vertical" data={data} margin={{ top: 0, right: 16, left: 0, bottom: 4 }} barCategoryGap={12}>
+        <CartesianGrid horizontal={false} stroke={GRID} />
+        <XAxis type="number" tick={AXIS} tickLine={false} axisLine={false} />
+        <YAxis type="category" dataKey={y} width={labelWidth} tick={{ ...AXIS, fill: CHART.ink, fontSize: 13 }} tickLine={false} axisLine={false} />
+        <Tooltip {...tooltipStyle} formatter={(v, name) => [format(Number(v)), name]} />
+        <Legend verticalAlign="top" align="left" iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12, paddingBottom: 8, color: CHART.ink }} />
+        {series.map((sr, i) => (
+          <Bar key={sr.key} dataKey={sr.key} name={sr.label} stackId="a" fill={sr.color} maxBarSize={24} radius={i === series.length - 1 ? [0, 4, 4, 0] : [0, 0, 0, 0]} />
+        ))}
+      </BarChart>
     </ResponsiveContainer>
   );
 }

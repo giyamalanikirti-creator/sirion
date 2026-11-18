@@ -12,14 +12,15 @@ import { Logo } from './Logo';
 export function SignInGate({ children }: { children: React.ReactNode }) {
   const signedIn = useDemo((s) => s.signedIn);
   const signIn = useDemo((s) => s.signIn);
+  const profile = useDemo((s) => s.profile);
   if (signedIn) return <>{children}</>;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-page-bg px-4">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-white p-8 shadow-card">
+      <div className="w-full max-w-md rounded-lg border border-line bg-white p-8">
         <div className="flex items-center gap-3">
           <Logo className="h-10 w-10" color="#0C5E69" />
           <div>
-            <div className="text-[17px] text-teal-title">Cost of Yes</div>
+            <div className="text-[18px] font-semibold text-ink">Cost of Yes</div>
             <div className="text-xs text-muted">A negotiation assistant for Sirion customers · concept</div>
           </div>
         </div>
@@ -41,7 +42,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
           autoFocus
           className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-teal-900 text-sm font-medium text-white hover:bg-teal-700"
         >
-          <UserRound className="h-4 w-4" /> Continue as Riya Kapoor, procurement lead
+          <UserRound className="h-4 w-4" /> Continue as {profile.fullName}, {profile.jobTitle.toLowerCase()}
         </button>
         <p className="mt-2 text-center text-xs text-muted">Fictional demo data. Nothing you do here leaves your browser.</p>
         <Disclaimer className="mt-6 text-center" />

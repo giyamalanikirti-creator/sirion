@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ArrowUp, ChevronRight, Database, Loader2, PanelRightClose, Sparkles, Users, Wrench } from 'lucide-react';
+import { ArrowRight, ArrowUp, ChevronRight, Database, Loader2, PanelRightClose, Sparkles, Users, Wrench, FileText } from 'lucide-react';
 import { AiBadge, Chip } from '@/components/ui';
 import { Logo } from '@/components/shell/Logo';
 import { type AskResponse, AskResponseSchema, ASK_LIMITS } from '@/lib/schemas';
 import { useDemo } from '@/lib/store';
 import { suggestedQuestions } from '@/lib/askSuggestions';
+import { getRedline } from '@/lib/data';
 
 
 type Turn = { question: string; response?: AskResponse; error?: string };
@@ -20,6 +21,8 @@ export function AskPanel({
 }: { redlineId: string; onClose?: () => void; request?: { text: string; id: number } }) {
   const role = useDemo((s) => s.role);
   const SUGGESTED = suggestedQuestions(redlineId);
+  const r = getRedline(redlineId);
+  const context = { supplier: r.supplier, contractId: r.contractId, changes: r.changes.length };
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -76,11 +79,20 @@ export function AskPanel({
   const lastSource = [...turns].reverse().find((t) => t.response)?.response?.source;
 
   return (
-    <aside ref={rootRef} aria-label="Ask Cost of Yes" className="flex h-full flex-col rounded-[22px] border border-line bg-white shadow-card">
-      <header className="flex items-center justify-between px-5 pb-2 pt-5">
-        <div className="flex items-center gap-2">
-          <Logo className="h-7 w-7" color="#0C5E69" />
-          <h2 className="text-[17px] text-teal-title">Ask Cost of Yes</h2>
+    <aside ref={rootRef} aria-label="Ask Cost of Yes" className="flex h-full flex-col rounded-lg border border-line bg-white">
+      <header className="flex items-start justify-between gap-2 border-b border-line px-5 pb-3 pt-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <Logo className="h-6 w-6" color="#005D68" />
+            <h2 className="text-[16px] font-semibold text-ink">Ask Cost of Yes</h2>
+          </div>
+          {/* Which document the assistant is answering about, so the scope is never ambiguous. */}
+          <div className="mt-2 flex items-center gap-1.5 rounded-md border border-line bg-page-bg px-2 py-1 text-[12px] text-muted">
+            <FileText className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">
+              About: <span className="font-medium text-ink">{context.supplier} renewal redline</span> · {context.contractId} · {context.changes} proposed changes
+            </span>
+          </div>
         </div>
         {onClose && (
           <button type="button" onClick={onClose} aria-label="Collapse Ask panel" className="rounded p-1 text-muted hover:bg-page-bg">
@@ -102,7 +114,7 @@ export function AskPanel({
                   type="button"
                   onClick={() => ask(q)}
                   disabled={busy}
-                  className="flex w-full items-center justify-between gap-2 rounded-xl border border-line px-3 py-2.5 text-left text-sm text-ink hover:border-teal-900/40 hover:bg-teal-900/[0.03]"
+                  className="flex w-full items-center justify-between gap-2 rounded-md border border-line px-3 py-2.5 text-left text-sm text-ink hover:border-teal-900/40 hover:bg-teal-900/[0.03]"
                 >
                   <span className="flex items-center gap-2"><Sparkles className="h-3.5 w-3.5 shrink-0 text-teal-900" /> {q}</span>
                   <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
@@ -120,13 +132,13 @@ export function AskPanel({
                 <Loader2 className="h-4 w-4 animate-spin" /> Running the numbers…
               </div>
             )}
-            {t.error && <p className="rounded-xl bg-danger/5 px-3 py-2 text-sm text-danger">{t.error}</p>}
+            {t.error && <p className="rounded-md bg-danger/5 px-3 py-2 text-sm text-danger">{t.error}</p>}
             {t.response && (
               <>
                 {t.response.sources.length > 0 && (
-                  <div className="rounded-2xl border border-line p-4">
+                  <div className="rounded-lg border border-line p-4">
                     <div className="mb-2 flex items-center gap-2 text-[15px] text-teal-title">
-                      <Logo className="h-5 w-5" color="#0C5E69" /> Sources
+                      <Logo className="h-5 w-5" color="#005D68" /> Sources
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {t.response.sources.map((c) => (
@@ -135,9 +147,9 @@ export function AskPanel({
                     </div>
                   </div>
                 )}
-                <div className="rounded-2xl border border-line p-4">
+                <div className="rounded-lg border border-line p-4">
                   <div className="mb-2 flex items-center gap-2 text-[15px] text-teal-title">
-                    <Logo className="h-5 w-5" color="#0C5E69" /> Response
+                    <Logo className="h-5 w-5" color="#005D68" /> Response
                   </div>
                   <p className="whitespace-pre-line text-sm leading-relaxed text-ink">{t.response.answer}</p>
                   {t.response.links.length > 0 && (

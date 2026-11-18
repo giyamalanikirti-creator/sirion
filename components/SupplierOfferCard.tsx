@@ -68,7 +68,7 @@ export function SupplierOfferCard({
     </>
   );
   const cls = cn(
-    'flex flex-col rounded-2xl border bg-white p-6 text-left shadow-sm transition',
+    'flex flex-col rounded-lg border bg-white p-6 text-left shadow-sm transition',
     chosen ? 'border-teal-900 ring-2 ring-teal-900/20' : 'border-line',
     as === 'button' && !chosen && 'hover:border-teal-900/40',
   );

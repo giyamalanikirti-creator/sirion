@@ -49,7 +49,7 @@ export function pooledFor(type: SupplierType, line: Line, group: WordingGroup): 
 /**
  * Workspace setting: may estimates use aggregate peer benchmarks? Set by the admin
  * ("Use aggregate peer benchmarks"). When off, any input that would need pooled
- * data has no source, and the estimate says "Insufficient data to estimate".
+ * data has no source, and the estimate says "Insufficient internal history to estimate".
  * Engines are synchronous, so callers set this right before computing.
  */
 let peerBenchmarks = true;

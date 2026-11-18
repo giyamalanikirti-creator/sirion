@@ -1,7 +1,8 @@
 'use client';
 
 import { AlertTriangle, Lock } from 'lucide-react';
-import { GroupedBars, TrendChart } from '@/components/charts';
+import { Donut, GroupedBars, SimpleBars, TrendChart } from '@/components/charts';
+import { creditWordingSplit, noticeDeadlinesNext6Months } from '@/lib/engines/dashboard';
 import { PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { kpiHistory, learning, pooledRates } from '@/lib/data';
 import { GROUP_LABEL, LINE_LABEL, formatLakh } from '@/lib/format';
@@ -115,6 +116,12 @@ export default function InsightsPage() {
             line={{ key: 'enforceable', label: 'Enforceable at signing (%)' }}
           />
           <p className="mt-2 text-xs text-muted">Fewer back-and-forth rounds as more money lines get checkable wording.</p>
+        </SirionCard>
+        <SirionCard title="Notice deadlines, next 6 months (contracts)" subtitle="Auto-renew contracts only: end date minus notice days.">
+          <SimpleBars data={noticeDeadlinesNext6Months()} x="month" y="count" yLabel="Contracts" />
+        </SirionCard>
+        <SirionCard title="Service credit wording (software contracts)" subtitle="Claim-based credits recover far less than automatic ones.">
+          <Donut data={creditWordingSplit()} />
         </SirionCard>
       </div>
     </>

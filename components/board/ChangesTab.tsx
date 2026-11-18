@@ -1,92 +1,79 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, ChevronDown, FileText, Scale, Tag, UserRound } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronDown, Scale, UserRound } from 'lucide-react';
 import { AiBadge, Button, EmptyState, GROUP_TONE, StatusPill } from '@/components/ui';
 import { wordDiff } from '@/lib/diff';
 import { GROUP_LABEL } from '@/lib/format';
-import { InWords, inWords } from '@/lib/nextStep';
+import { InWords } from '@/lib/nextStep';
 import type { PriceTag, Redline, RedlineChange } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useBoard } from './context';
 import type { BoardTab } from './NextStepPanel';
 
-function Diff({ oldText, newText, supplier }: { oldText: string; newText: string; supplier: string }) {
-  const parts = wordDiff(oldText, newText);
+/** Two aligned document columns; only the changed words are highlighted (blue = current, amber = proposed). */
+function DocColumns({ ch, supplier }: { ch: RedlineChange; supplier: string }) {
+  const parts = wordDiff(ch.oldText, ch.newText);
   return (
-    <div className="grid gap-3 text-sm leading-relaxed md:grid-cols-2">
-      <div>
-        <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">Current signed contract</div>
-        <p>{parts.filter((p) => p.type !== 'ins').map((p, i) => <span key={i} className={p.type === 'del' ? 'diff-del' : undefined}>{p.text}</span>)}</p>
+    <div className="grid gap-3 md:grid-cols-2 md:gap-0 md:divide-x md:divide-line">
+      <div className="md:pr-5">
+        <div className="mb-1 text-[12px] font-medium text-agreement md:hidden">Current signed contract</div>
+        <p className="text-[14px] leading-relaxed text-ink">
+          {parts.filter((p) => p.type !== 'ins').map((p, i) => <span key={i} className={p.type === 'del' ? 'diff-del' : undefined}>{p.text}</span>)}
+        </p>
       </div>
-      <div>
-        <div className="mb-1 text-[11px] uppercase tracking-wide text-muted">{supplier}’s proposed renewal</div>
-        <p>{parts.filter((p) => p.type !== 'del').map((p, i) => <span key={i} className={p.type === 'ins' ? 'diff-ins' : undefined}>{p.text}</span>)}</p>
+      <div className="md:pl-5">
+        <div className="mb-1 text-[12px] font-medium text-proposed md:hidden">{supplier}’s proposed renewal</div>
+        <p className="text-[14px] leading-relaxed text-ink">
+          {parts.filter((p) => p.type !== 'del').map((p, i) => <span key={i} className={p.type === 'ins' ? 'diff-ins' : undefined}>{p.text}</span>)}
+        </p>
       </div>
     </div>
   );
 }
 
-function ChangeCard({
-  ch, redline, tag, onGoTags, openByDefault,
-}: { ch: RedlineChange; redline: Redline; tag?: PriceTag; onGoTags: () => void; openByDefault?: boolean }) {
+function ChangeRow({ ch, redline, onGoTags }: { ch: RedlineChange; redline: Redline; onGoTags: () => void }) {
   const { n } = useBoard();
-  const [showClause, setShowClause] = useState(!!openByDefault);
   const cls = n.sortResult?.results.find((r) => r.no === ch.no);
   const decision = n.legalDecisions[ch.no];
+  const money = cls?.group === 'money';
   return (
-    <article className={cn('rounded-2xl border bg-white p-5 shadow-card', cls?.group === 'money' ? 'border-periwinkle/40' : 'border-line')}>
-      <header className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-[13px] text-muted">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-page-bg text-xs">{ch.no}</span>
-          Clause {ch.clause} · {ch.title}
-        </div>
+    <article className="px-5 py-4" aria-labelledby={`ch-${ch.no}`}>
+      <header className="flex flex-wrap items-center gap-2">
+        <span className="num text-[12px] text-muted">{ch.no}.</span>
+        <h3 id={`ch-${ch.no}`} className="text-[14px] font-semibold text-ink">Clause {ch.clause} · {ch.title}</h3>
         {cls ? (
-          <div className="flex flex-wrap items-center gap-2">
+          <>
             <StatusPill tone={GROUP_TONE[cls.group]}>
-              {cls.group === 'money' ? 'affects what you pay' : cls.group === 'legal' ? 'legal review' : 'routine'}
-              {cls.wordingGroup ? ` · ${GROUP_LABEL[cls.wordingGroup].toLowerCase()}` : ''}
+              {money ? 'Affects what you pay' : cls.group === 'legal' ? 'Needs legal review' : 'Routine'}
             </StatusPill>
-            <span className="text-xs text-muted">{Math.round(cls.confidence * 100)}% sure</span>
-          </div>
+            {cls.wordingGroup && <span className="text-[12px] text-muted">{GROUP_LABEL[cls.wordingGroup]}</span>}
+            <span className="ml-auto text-[12px] text-muted">{Math.round(cls.confidence * 100)}% confidence</span>
+          </>
         ) : (
-          <StatusPill tone="grey">Not analysed</StatusPill>
+          <StatusPill tone="grey" className="ml-auto">Not analysed</StatusPill>
         )}
       </header>
 
-      <p className={cn('text-[15px] leading-relaxed', cls?.group === 'money' ? 'text-ink' : 'text-ink/90')}>{ch.plain}</p>
+      <p className={cn('mt-2 max-w-[80ch] leading-relaxed text-ink', money ? 'text-[15px] font-medium' : 'text-[14px]')}>{ch.plain}</p>
 
-      <button
-        type="button"
-        onClick={() => setShowClause((v) => !v)}
-        aria-expanded={showClause}
-        className="mt-2 inline-flex items-center gap-1 text-xs text-teal-900 hover:underline"
-      >
-        <FileText className="h-3.5 w-3.5" /> {showClause ? 'Hide' : 'Show'} the clause text
-      </button>
-      {showClause && (
-        <div className="mt-3 rounded-xl bg-page-bg/60 p-3">
-          <Diff oldText={ch.oldText} newText={ch.newText} supplier={redline.supplier} />
-        </div>
-      )}
+      <div className="mt-3 rounded-md border border-line bg-page-bg/50 p-3">
+        <DocColumns ch={ch} supplier={redline.supplier} />
+      </div>
 
       {cls && (
-        <footer className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-3 text-sm">
+        <footer className="mt-3 flex flex-wrap items-center justify-end gap-2 text-[13px]">
           {cls.confidence < 0.7 ? (
-            <span className="flex items-center gap-1.5 text-danger"><UserRound className="h-4 w-4" /> Needs a person</span>
+            <span className="flex items-center gap-1.5 text-danger"><UserRound className="h-4 w-4" /> Needs a person to classify</span>
           ) : cls.group === 'harmless' ? (
-            <span className="flex items-center gap-1.5 text-teal-900"><CheckCircle2 className="h-4 w-4" /> Approved by Cost of Yes · logged</span>
+            <span className="flex items-center gap-1.5 text-positive"><CheckCircle2 className="h-4 w-4" /> Approved by Cost of Yes · logged</span>
           ) : cls.group === 'legal' ? (
-            <span className="flex items-center gap-1.5 text-indigo">
+            <span className="flex items-center gap-1.5 text-agreement">
               <Scale className="h-4 w-4" />
-              {decision ? `Legal: ${decision}` : <Link href="/legal" className="hover:underline">With Legal for review</Link>}
+              {decision ? `Legal decision: ${decision}` : <Link href="/legal" className="hover:underline">With Legal for review</Link>}
             </span>
           ) : (
-            <button type="button" onClick={onGoTags} className="flex items-center gap-1.5 font-medium text-teal-900 hover:underline">
-              <Tag className="h-4 w-4" />
-              {tag && Number.isFinite(tag.costLakh) ? `See the financial impact` : 'See the estimate'} <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+            <Button variant="ghost" size="sm" onClick={onGoTags}>Review financial impact <ArrowRight className="h-3.5 w-3.5" /></Button>
           )}
         </footer>
       )}
@@ -94,12 +81,11 @@ function ChangeCard({
   );
 }
 
-export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags: PriceTag[]; onGoTags: () => void; onGoTab?: (t: BoardTab) => void }) {
+export function ChangesTab({ redline, onGoTags }: { redline: Redline; tags: PriceTag[]; onGoTags: () => void; onGoTab?: (t: BoardTab) => void }) {
   const { n } = useBoard();
   const sortResult = n.sortResult;
 
-  // After analysis: the service-credit change first, then the other commercial changes, then legal.
-  // Routine edits fold into one collapsed row.
+  // After analysis: commercial changes first (service credits leading), then legal; routine edits collapse.
   const LINE_ORDER = ['credits', 'renewal', 'price'];
   const clsOf = (no: number) => sortResult?.results.find((r) => r.no === no);
   const rank = (no: number) => {
@@ -123,54 +109,51 @@ export function ChangesTab({ redline, tags, onGoTags }: { redline: Redline; tags
     harmless ? `${InWords(harmless)} ${harmless === 1 ? 'is' : 'are'} routine.` : '',
   ].filter(Boolean).join(' ');
 
+  if (!redline.changes.length) return <EmptyState title="No changes in this redline" />;
+
   return (
-    <div className="space-y-4">
-      <div className="rounded-2xl border border-line bg-white px-6 py-4 shadow-card">
-        <div className="text-xs text-muted">
-          Comparing <strong className="font-medium text-ink">Current signed contract</strong> with{' '}
-          <strong className="font-medium text-ink">{redline.supplier}’s proposed renewal</strong>
-        </div>
+    <section className="rounded-lg border border-line bg-white" aria-label="Supplier changes">
+      <div className="border-b border-line px-5 py-4">
         {sortResult ? (
-          <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="text-[17px] text-teal-title">{summary}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-[18px] font-semibold text-ink">{summary}</h2>
             <AiBadge source={sortResult.source} />
-            {money > 0 && (
-              <Button variant="ghost" size="sm" onClick={onGoTags}>See the financial impact <ArrowRight className="h-3.5 w-3.5" /></Button>
-            )}
           </div>
         ) : (
-          <p className="mt-1 text-[15px] text-ink">
-            {redline.supplier} proposed {inWords(redline.changes.length)} changes. Use <strong className="font-medium">Analyse</strong> above to find which ones affect what you pay.
-          </p>
+          <h2 className="text-[18px] font-semibold text-ink">
+            {redline.supplier} proposed {redline.changes.length} change{redline.changes.length === 1 ? '' : 's'} to your contract
+          </h2>
         )}
+        <p className="mt-0.5 text-[13px] text-muted">
+          {sortResult ? 'Commercial changes first. Routine edits are logged and collapsed below.' : `Use “Analyse ${redline.changes.length} changes” above to find which ones affect what you pay.`}
+        </p>
       </div>
 
-      {ordered.map((ch) => (
-        <ChangeCard
-          key={ch.no}
-          ch={ch}
-          redline={redline}
-          tag={tags.find((t) => t.line === clsOf(ch.no)?.line)}
-          onGoTags={onGoTags}
-        />
-      ))}
+      {/* Column headings once, aligned with the document columns. */}
+      <div className="hidden grid-cols-2 border-b border-line bg-page-bg/60 px-5 py-2 text-[12px] font-semibold md:grid">
+        <span className="flex items-center gap-2 pr-5 text-agreement"><span className="h-2.5 w-2.5 rounded-sm bg-agreement" aria-hidden /> Current signed contract</span>
+        <span className="flex items-center gap-2 pl-5 text-proposed"><span className="h-2.5 w-2.5 rounded-sm bg-proposed" aria-hidden /> {redline.supplier}’s proposed renewal</span>
+      </div>
+
+      <div className="divide-y divide-line">
+        {ordered.map((ch) => <ChangeRow key={ch.no} ch={ch} redline={redline} onGoTags={onGoTags} />)}
+      </div>
 
       {routine.length > 0 && (
-        <details className="group rounded-2xl border border-line bg-white shadow-card">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm">
-            <span className="flex items-center gap-2 text-teal-900">
+        <details className="group border-t border-line">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-[14px] hover:bg-page-bg/60">
+            <span className="flex items-center gap-2 text-positive">
               <CheckCircle2 className="h-4 w-4" />
-              {InWords(routine.length)} routine edit{routine.length === 1 ? '' : 's'} approved by Cost of Yes and logged
+              {InWords(routine.length)} routine edit{routine.length === 1 ? '' : 's'} approved and logged
               <span className="text-muted">({routine.map((c) => c.title.toLowerCase()).join(', ')})</span>
             </span>
             <ChevronDown className="h-4 w-4 text-muted transition-transform group-open:rotate-180" />
           </summary>
-          <div className="space-y-4 border-t border-line p-4">
-            {routine.map((ch) => <ChangeCard key={ch.no} ch={ch} redline={redline} onGoTags={onGoTags} />)}
+          <div className="divide-y divide-line border-t border-line">
+            {routine.map((ch) => <ChangeRow key={ch.no} ch={ch} redline={redline} onGoTags={onGoTags} />)}
           </div>
         </details>
       )}
-      {redline.changes.length === 0 && <EmptyState title="No changes in this redline" />}
-    </div>
+    </section>
   );
 }

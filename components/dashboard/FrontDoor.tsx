@@ -1,162 +1,129 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowRight, Compass, Database, X } from 'lucide-react';
+import { ArrowRight, Clock, FileText } from 'lucide-react';
+import { DemoLabel, StatusPill } from '@/components/ui';
+import { callName } from '@/lib/account';
 import { getContract, getRedline, redlines } from '@/lib/data';
 import { redlinePriceTags } from '@/lib/engines/redline';
-import { formatDate, formatLakh } from '@/lib/format';
-import { inWords, nextStep } from '@/lib/nextStep';
+import { formatLakh } from '@/lib/format';
+import { type ActionId, nextStep, inWords } from '@/lib/nextStep';
 import { STORY_REDLINE, useDemo, useNegotiation } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { StatusPill } from '../ui';
-import { DataUsePanel } from './DataUsePanel';
 
 const BOARD = `/redlines/${STORY_REDLINE}`;
-export const openDemoGuide = () => window.dispatchEvent(new Event('open-demo-guide'));
 
-/** First visit: who you are, what you are deciding, and one button. */
-function Welcome() {
-  const dismiss = useDemo((s) => s.dismissWelcome);
-  const r = getRedline(STORY_REDLINE);
-  const c = getContract(r.contractId);
-  return (
-    <section className="overflow-hidden rounded-2xl bg-teal-900 text-white shadow-card">
-      <div className="px-6 py-7 md:px-8">
-        <span className="inline-flex rounded-full border border-white/30 px-2 py-0.5 text-[11px] uppercase tracking-wide text-white/80">Fictional demo data</span>
-        <h2 className="mt-3 text-[24px] font-normal leading-snug">You’re Riya, the procurement lead.</h2>
-        <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-white/85">
-          Your company pays {c.supplier} {formatLakh(c.annualFeeInr / 1e5)} a year for helpdesk software. {c.supplier} has proposed{' '}
-          {inWords(r.changes.length)} changes to renew the contract. Your job is to decide which terms to accept and what to negotiate.
-        </p>
-        <div className="mt-5 rounded-xl bg-white/10 px-4 py-3 text-sm">
-          <div className="text-[11px] uppercase tracking-wide text-white/60">The question to answer</div>
-          <div className="mt-0.5 text-[15px]">“{c.supplier} wants to change our renewal terms. Which changes should I accept, and what should I ask for in return?”</div>
-        </div>
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <Link
-            href={`${BOARD}?tab=changes`}
-            onClick={dismiss}
-            className="inline-flex h-11 items-center gap-2 rounded-lg bg-white px-5 text-sm font-medium text-teal-900 hover:bg-white/90"
-          >
-            Review {c.supplier}’s changes <ArrowRight className="h-4 w-4" />
-          </Link>
-          <span className="text-sm text-white/70">
-            {c.supplier} returned your {formatLakh(c.annualFeeInr / 1e5)} renewal with {r.changes.length} edits · received {formatDate(r.receivedAt)}
-          </span>
-        </div>
-        <button type="button" onClick={openDemoGuide} className="mt-4 inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white">
-          <Compass className="h-3.5 w-3.5" /> Walk me through the demo
-        </button>
-      </div>
-    </section>
-  );
-}
+/** The task heading for each stage of the story negotiation. */
+const HEADING: Partial<Record<ActionId, string>> = {
+  analyse: 'Review CloudDesk’s renewal',
+  impact: 'Review financial impact',
+  offers: 'Compare offers',
+  sendApproval: 'Send offers for approval',
+  viewOwner: 'Waiting for approval',
+  viewFinance: 'Waiting for Finance',
+  sendSupplier: 'Send offers to CloudDesk',
+  viewSupplier: 'Waiting for CloudDesk',
+  respondCounter: 'Review supplier counteroffer',
+  sign: 'Send for signature',
+  invoice: 'Check first invoice',
+};
 
-/** Returning visit: the story redline's next step, in one line and one button. */
-function StoryTask({ onShowData }: { onShowData: () => void }) {
+const TAB_FOR: Partial<Record<ActionId, string>> = {
+  analyse: 'changes', impact: 'tags', offers: 'packages', sendApproval: 'packages', viewOwner: 'packages', viewFinance: 'packages',
+  sendSupplier: 'packages', viewSupplier: 'packages', respondCounter: 'packages', sign: 'signing', invoice: 'signing',
+};
+
+/** The active negotiation: the dashboard's focal point. */
+export function ActiveTask() {
   const n = useNegotiation(STORY_REDLINE);
+  const profile = useDemo((s) => s.profile);
   const step = nextStep(STORY_REDLINE, n);
   const r = getRedline(STORY_REDLINE);
   const c = getContract(r.contractId);
   const { vsCurrentLakh } = redlinePriceTags(STORY_REDLINE);
-  const tab =
-    n.status === 'received' ? 'changes' : n.status === 'sorted' ? 'tags' : ['priced', 'packages_ready'].includes(n.status) ? 'packages' : ['agreed', 'signed'].includes(n.status) ? 'signing' : 'changes';
-  const title = n.status === 'received' ? `${c.supplier} returned your ${formatLakh(c.annualFeeInr / 1e5)} renewal with ${r.changes.length} edits` : step.title;
-  const sub =
-    n.status === 'received'
-      ? 'Decide which terms to accept and what to ask for in return.'
-      : n.sortResult && n.status !== 'signed'
-        ? `Accepting all of ${c.supplier}’s commercial changes could cost an estimated ${formatLakh(vsCurrentLakh)} more per year than your current contract.`
-        : step.detail;
+  const fresh = n.status === 'received';
+  const othersTurn = ['owner', 'finance', 'supplier', 'legal'].includes(step.turn);
+  const heading = step.turn === 'done' ? `${c.supplier} renewal signed` : HEADING[step.action ?? 'analyse'] ?? step.title;
+  const href = `${BOARD}?tab=${TAB_FOR[step.action ?? 'analyse'] ?? 'changes'}`;
+
   return (
-    <section className="overflow-hidden rounded-2xl bg-teal-900 text-white shadow-card">
-      <div className="flex flex-col gap-5 px-6 py-6 md:flex-row md:items-center md:justify-between md:px-8">
-        <div>
-          <div className="text-xs uppercase tracking-wide text-white/60">{step.whose} · {c.supplier} renewal</div>
-          <h2 className="mt-1 max-w-2xl text-[21px] font-normal leading-snug">{title}</h2>
-          {sub && <p className="mt-2 max-w-2xl text-sm text-white/75">{sub}</p>}
-          <button type="button" onClick={onShowData} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/70 hover:text-white">
-            <Database className="h-3.5 w-3.5" /> How this workspace uses data
-          </button>
+    <section aria-labelledby="active-task" className="relative overflow-hidden rounded-lg border border-line bg-white">
+      <span className="absolute inset-y-0 left-0 w-1 bg-teal-900" aria-hidden />
+      <div className="px-6 py-5 pl-7">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-teal-tint text-teal-900"><FileText className="h-4 w-4" /></span>
+          <span className="text-[13px] text-muted">{c.supplier} · helpdesk software · {formatLakh(c.annualFeeInr / 1e5)} a year</span>
+          <StatusPill tone={othersTurn ? 'proposed' : step.turn === 'done' ? 'positive' : 'teal'}>{step.whose}</StatusPill>
+          <DemoLabel className="ml-auto" />
         </div>
-        <Link
-          href={`${BOARD}?tab=${tab}`}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-medium text-teal-900 hover:bg-white/90"
-        >
-          {n.status === 'received' ? `Review ${c.supplier}’s changes` : `Open ${c.supplier}`} <ArrowRight className="h-4 w-4" />
-        </Link>
+        <h2 id="active-task" className="mt-3 text-[24px] font-semibold leading-tight tracking-tight text-ink">{heading}</h2>
+
+        {fresh ? (
+          <p className="mt-2 max-w-[62ch] text-[15px] leading-relaxed text-ink">
+            You’re {profile.fullName}, the {profile.jobTitle.toLowerCase()}. Your company pays {c.supplier} {formatLakh(c.annualFeeInr / 1e5)} a year for helpdesk software.{' '}
+            {c.supplier} has proposed {inWords(r.changes.length)} changes. Decide which to accept and what to ask for in return.
+          </p>
+        ) : (
+          <div className="mt-2 max-w-[66ch] space-y-1">
+            <p className="text-[15px] leading-relaxed text-ink">{step.title}.</p>
+            {n.sortResult && n.status !== 'signed' && vsCurrentLakh > 0.005 && (
+              <p className="text-[14px] text-muted">
+                Accepting every commercial change could cost an estimated <span className="num font-semibold text-ink">{formatLakh(vsCurrentLakh)}</span> more per year than your current contract.
+              </p>
+            )}
+            {step.detail && !(n.sortResult && n.status !== 'signed') && <p className="text-[14px] text-muted">{step.detail}</p>}
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <Link
+            href={href}
+            className={cn(
+              'inline-flex h-11 items-center gap-2 rounded-md px-5 text-[15px] font-medium',
+              othersTurn ? 'border border-line bg-white text-ink hover:bg-page-bg' : 'bg-teal-900 text-white hover:bg-teal-700',
+            )}
+          >
+            {fresh ? `Review the ${r.changes.length} changes` : othersTurn ? `Open ${c.supplier}` : step.turn === 'done' ? `Open ${c.supplier}` : step.actionLabel ?? `Open ${c.supplier}`}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          {othersTurn && <span className="inline-flex items-center gap-1.5 text-[13px] text-muted"><Clock className="h-4 w-4" /> {step.title}</span>}
+          <Link href="/workspace" className="text-[13px] text-teal-900 hover:underline">How this workspace uses data</Link>
+        </div>
       </div>
+      <span className="sr-only">Signed in as {callName(profile)}</span>
     </section>
   );
 }
 
-const TURN_TONE = { you: 'teal', owner: 'lime', finance: 'lime', supplier: 'periwinkle', legal: 'indigo', sirion: 'mint', done: 'grey' } as const;
+const TURN_TONE = { you: 'teal', owner: 'proposed', finance: 'proposed', supplier: 'proposed', legal: 'current', sirion: 'positive', done: 'grey' } as const;
 
-/** Every redline's next step: what returning users land on. */
-function WorkQueue() {
+/** The other open negotiations, compact. */
+export function OtherNegotiations() {
   const negotiations = useDemo((s) => s.negotiations);
-  const rows = redlines.map((r) => ({ r, step: nextStep(r.id, negotiations[r.id]) })).filter(({ step }) => step.turn !== 'done');
-  const mine = rows.filter(({ step }) => step.turn === 'you').length;
+  const rows = redlines
+    .filter((r) => r.id !== STORY_REDLINE)
+    .map((r) => ({ r, step: nextStep(r.id, negotiations[r.id]) }))
+    .filter(({ step }) => step.turn !== 'done');
   return (
-    <section className="rounded-2xl border border-line bg-white shadow-card">
-      <header className="mx-6 flex min-h-[56px] items-center justify-between border-b border-line">
-        <h2 className="text-[15px] text-teal-title">Your work queue</h2>
-        <span className="text-xs text-muted">{mine} waiting on you · {rows.length - mine} with others</span>
+    <section aria-labelledby="other-negs" className="rounded-lg border border-line bg-white">
+      <header className="flex items-center justify-between border-b border-line px-5 py-3">
+        <h2 id="other-negs" className="text-[16px] font-semibold text-ink">Other negotiations</h2>
+        <Link href="/redlines" className="text-[13px] text-teal-900 hover:underline">View all</Link>
       </header>
       <ul className="divide-y divide-line">
         {rows.map(({ r, step }) => (
           <li key={r.id}>
-            <Link href={`/redlines/${r.id}`} className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 hover:bg-page-bg/60">
+            <Link href={`/redlines/${r.id}`} className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-page-bg">
               <span className="min-w-0">
-                <span className="font-medium text-teal-900">{r.supplier}</span>
-                <span className="ml-2 text-sm text-muted">{step.title}</span>
+                <span className="block truncate text-[14px] font-medium text-ink">{r.supplier}</span>
+                <span className="block truncate text-[12px] text-muted">{step.title}</span>
               </span>
-              <StatusPill tone={TURN_TONE[step.turn]}>{step.whose}</StatusPill>
+              <StatusPill tone={TURN_TONE[step.turn]}>{step.turn === 'you' ? 'You' : step.whose.replace('’s turn', '')}</StatusPill>
             </Link>
           </li>
         ))}
-        {rows.length === 0 && <li className="px-6 py-4 text-sm text-muted">Nothing open. Every redline is signed.</li>}
+        {rows.length === 0 && <li className="px-5 py-4 text-[14px] text-muted">No other open negotiations.</li>}
       </ul>
     </section>
-  );
-}
-
-export function FrontDoor() {
-  const status = useNegotiation(STORY_REDLINE).status;
-  const welcomeDismissed = useDemo((s) => s.welcomeDismissed);
-  const firstVisit = status === 'received' && !welcomeDismissed;
-  const [showData, setShowData] = useState(false);
-
-  return (
-    <div className="mb-6 space-y-6">
-      {firstVisit ? (
-        <div className="grid items-start gap-6 xl:grid-cols-[1fr_380px]">
-          <Welcome />
-          <DataUsePanel />
-        </div>
-      ) : (
-        <>
-          <StoryTask onShowData={() => setShowData(true)} />
-          <WorkQueue />
-        </>
-      )}
-      <Dialog.Root open={showData} onOpenChange={setShowData}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/30" />
-          <Dialog.Content className={cn('fixed left-1/2 top-1/2 z-50 w-[min(92vw,440px)] -translate-x-1/2 -translate-y-1/2 outline-none')}>
-            <Dialog.Title className="sr-only">How this workspace uses data</Dialog.Title>
-            <Dialog.Description className="sr-only">Data sources and peer benchmark settings</Dialog.Description>
-            <div className="relative">
-              <DataUsePanel />
-              <Dialog.Close className="absolute right-3 top-3 rounded p-1 text-muted hover:bg-page-bg" aria-label="Close">
-                <X className="h-4 w-4" />
-              </Dialog.Close>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </div>
   );
 }

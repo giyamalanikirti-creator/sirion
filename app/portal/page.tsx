@@ -31,7 +31,7 @@ export default function PortalIndex() {
       </header>
       <h1 className="mt-8 text-[22px] font-normal text-ink">Which supplier are you?</h1>
       <p className="mt-1 text-sm text-[#5f6b6d]">In the real product each supplier signs in to its own portal. For the demo, pick one.</p>
-      <ul className="mt-6 divide-y divide-line rounded-2xl border border-line bg-white">
+      <ul className="mt-6 divide-y divide-line rounded-lg border border-line bg-white">
         {rows.map(({ r, label, ready }) => (
           <li key={r.id}>
             <Link href={`/portal/${r.slug}`} className="flex items-center justify-between gap-3 px-5 py-4 hover:bg-page-bg">
@@ -43,7 +43,7 @@ export default function PortalIndex() {
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-xs text-muted">DataVault is not listed: its redline has legal changes only, so there is no package to choose.</p>
+      <p className="mt-4 text-xs text-muted">DataVault is not listed: its redline has legal changes only, so there is no offer to choose.</p>
     </div>
   );
 }

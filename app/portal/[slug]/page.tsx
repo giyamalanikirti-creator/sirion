@@ -86,7 +86,7 @@ export default function SupplierPortal() {
 
   const onSubmit = () => {
     if (!pick) {
-      toast('Choose a package first');
+      toast('Choose an offer first');
       return;
     }
     submit(redline.id, pick, activeCounter);
@@ -111,13 +111,13 @@ export default function SupplierPortal() {
       </div>
 
       {!canRespond && !responded && (
-        <div className="mt-6 rounded-xl border border-line bg-white px-5 py-4 text-sm text-[#5f6b6d]">
+        <div className="mt-6 rounded-md border border-line bg-white px-5 py-4 text-sm text-[#5f6b6d]">
           No proposal is waiting for you yet. The customer’s team is still preparing it.{' '}
           <Link href={`/redlines/${redline.id}`} onClick={() => setRole('lead')} className="text-teal-900 underline">Back to procurement</Link>
         </div>
       )}
       {responded && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-900/30 bg-teal-900/[0.05] px-5 py-4 text-sm text-teal-title">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-teal-900/30 bg-teal-900/[0.05] px-5 py-4 text-sm text-teal-title">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4" /> Sent to Procurement: you picked offer {n.supplierPick}
             {n.counter ? ' and suggested one change' : ''}.
@@ -146,7 +146,7 @@ export default function SupplierPortal() {
       </div>
 
       {canRespond && (
-        <div className="mt-6 rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-lg border border-line bg-white p-6 shadow-sm">
           <label className={cn('flex items-start gap-3 text-sm', !options.length && 'opacity-50')}>
             <input
               type="checkbox"
@@ -158,7 +158,7 @@ export default function SupplierPortal() {
             <span>
               <span className="font-medium">Suggest one change</span>
               <span className="block text-muted">
-                {pick ? (options.length ? 'You can propose one alternative on one term.' : 'This package has no alternative terms to suggest.') : 'Select a package first.'}
+                {pick ? (options.length ? 'You can propose one alternative on one term.' : 'This offer has no alternative terms to suggest.') : 'Select an offer first.'}
               </span>
             </span>
           </label>
@@ -185,7 +185,7 @@ export default function SupplierPortal() {
             </div>
           )}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-            <span className="text-sm text-muted">{pick ? `Offer ${pick} selected.` : 'Select a package above.'}</span>
+            <span className="text-sm text-muted">{pick ? `Offer ${pick} selected.` : 'Select an offer above.'}</span>
             <Button onClick={onSubmit} disabled={!pick}>
               {loadingReasons ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Submit to Procurement
             </Button>

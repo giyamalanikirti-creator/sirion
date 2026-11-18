@@ -6,12 +6,14 @@ import { useSwitchRole } from '@/components/shell/RoleSwitcher';
 import { Button, EmptyState, PageHeader, SirionCard, StatusPill } from '@/components/ui';
 import { getContract, redlines } from '@/lib/data';
 import { offersFor } from '@/lib/offers';
+import { callName } from '@/lib/account';
 import { formatLakh } from '@/lib/format';
 import { atLeast, financePackages, legalChanges, needsFinanceStep, type Negotiation, useDemo } from '@/lib/store';
 import type { Redline } from '@/lib/types';
 
 function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
   const approveOwner = useDemo((s) => s.approveOwner);
+  const leadName = callName(useDemo((s) => s.profile));
   const packages = offersFor(r.id, n).filter((p) => n.selectedPackages.includes(p.id));
   const maxProtect = Math.max(...packages.map((p) => p.protectedLakh));
   const gives = [...new Set(packages.flatMap((p) => p.gives.map((g) => g.id)))];
@@ -29,7 +31,7 @@ function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
   const c = getContract(r.contractId);
 
   return (
-    <div className="max-w-xl rounded-xl border border-[#e1dfdd] bg-white shadow-sm">
+    <div className="max-w-xl rounded-md border border-[#e1dfdd] bg-white shadow-sm">
       <div className="flex items-center gap-2 border-b border-[#edebe9] px-4 py-2.5 text-xs text-[#605e5c]">
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-900 text-white"><Bot className="h-3.5 w-3.5" /></span>
         <span className="font-semibold text-[#242424]">Cost of Yes</span>
@@ -61,7 +63,7 @@ function OwnerCard({ r, n }: { r: Redline; n: Negotiation }) {
               {n.status === 'awaiting_approval'
                 ? 'Finance decides on the three-year commitment.'
                 : n.status === 'approved'
-                  ? `Riya sends the offers to ${r.supplier}.`
+                  ? `${leadName} sends the offers to ${r.supplier}.`
                   : `${r.supplier} has the offers.`}
             </span>
           </span>
@@ -88,7 +90,7 @@ function FinanceTable({ items }: { items: { r: Redline; n: Negotiation }[] }) {
         .map((g) => ({ r, n, p, g, offered: n.selectedPackages.includes(p.id), needs: g.needsFinance && n.selectedPackages.includes(p.id) })),
     ),
   );
-  if (!rows.length) return <EmptyState title="Nothing waiting for finance">Gives that need finance appear here once packages are sent for approval.</EmptyState>;
+  if (!rows.length) return <EmptyState title="Nothing waiting for finance">Gives that need Finance appear here once offers are sent for approval.</EmptyState>;
 
   return (
     <SirionCard title="Gives needing finance" bodyClassName="p-0">
@@ -96,7 +98,7 @@ function FinanceTable({ items }: { items: { r: Redline; n: Negotiation }[] }) {
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="text-left text-xs text-muted">
-              <th className="px-6 py-3 font-normal">Supplier · package</th>
+              <th className="px-6 py-3 font-normal">Supplier · offer</th>
               <th className="px-3 py-3 font-normal">Give</th>
               <th className="px-3 py-3 font-normal">Why finance</th>
               <th className="px-6 py-3 text-right font-normal">Decision</th>
@@ -161,7 +163,7 @@ export default function ApprovalsPage() {
           <section>
             {role !== 'owner' && <h2 className="mb-3 text-sm text-muted">Business owners</h2>}
             {ownerQueue.length === 0 ? (
-              <EmptyState title="Nothing waiting for you">No redline has packages waiting for business owner approval.</EmptyState>
+              <EmptyState title="Nothing waiting for you">No negotiation has offers waiting for business owner approval.</EmptyState>
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
                 {ownerQueue.map(({ r, n }) => <OwnerCard key={r.id} r={r} n={n} />)}
@@ -182,14 +184,14 @@ export default function ApprovalsPage() {
           </section>
         )}
         {readyForLead.length > 0 && role !== 'lead' && (
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-teal-900/30 bg-teal-900/[0.06] px-5 py-3 text-sm text-teal-title">
-            All approvals are in for {readyForLead.map(({ r }) => r.supplier).join(', ')}. The lead can now send the packages.
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-teal-900/30 bg-teal-900/[0.06] px-5 py-3 text-sm text-teal-title">
+            All approvals are in for {readyForLead.map(({ r }) => r.supplier).join(', ')}. The lead can now send the offers.
             <Button size="sm" onClick={() => switchRole('lead', `/redlines/${readyForLead[0].r.id}?tab=packages`)}>Back to the lead’s board</Button>
           </div>
         )}
         {role === 'lead' && (
           <p className="text-sm text-muted">
-            You are viewing as the procurement lead. Switch role to approve, or go back to the <Link href="/redlines" className="text-teal-900 underline">inbox</Link>.
+            You are viewing as the procurement lead. Switch role to approve, or go back to the <Link href="/redlines" className="text-teal-900 underline">negotiations</Link>.
           </p>
         )}
       </div>
